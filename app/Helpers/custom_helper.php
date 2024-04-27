@@ -247,7 +247,7 @@ if (!function_exists('validateValue')) {
                 }
                 break;
             case 'tel':
-                if (!preg_match('/^[0-9]+$/', $value)) {
+                if (!preg_match('/^\+?[0-9]+$/', $value)) {
                     $error = 602;
                 }
                 break;

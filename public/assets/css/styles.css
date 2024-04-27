@@ -1,0 +1,14 @@
+.alert-content {
+    position: fixed;
+    justify-content: center;
+    align-items: center;
+    display: flex;
+    left: 0;
+    right: 0px;
+    z-index: 100000000;
+}
+
+img.img-fluid.imgindex {
+    mask-image: linear-gradient(black 80%, transparent);
+}
+

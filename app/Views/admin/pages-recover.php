@@ -1,20 +1,4 @@
-<html lang="en" data-bs-theme="dark" data-menu-color="brand" data-topbar-color="light" data-sidebar-size="full"><head>
-    <meta charset="utf-8">
-    <title>Forgot Password | Dashtrap - Responsive Bootstrap 5 Admin Dashboard</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta content="A fully featured admin theme which can be used to build CRM, CMS, etc." name="description">
-    <meta content="Myra Studio" name="author">
 
-    <!-- App favicon -->
-    <link rel="shortcut icon" href="assets/images/favicon.ico">
-
-    <!-- App css -->
-    <link href="assets/css/style.min.css" rel="stylesheet" type="text/css">
-    <link href="assets/css/icons.min.css" rel="stylesheet" type="text/css">
-    <script src="assets/js/config.js"></script>
-</head>
-
-<body class="bg-primary d-flex justify-content-center align-items-center min-vh-100 p-5">
     <div class="container">
         <div class="row justify-content-center">
             <div class="col-xl-4 col-md-5">
@@ -57,7 +41,7 @@
 
                 <div class="row mt-3">
                     <div class="col-12 text-center">                        
-                        <p class="text-white-50">Already have an account ? <a class="text-white font-weight-medium ms-1" href="/dashtrap/pages-login">Log In</a></p>
+                        <p class="text-white-50">Already have an account ? <a class="text-white font-weight-medium ms-1" href="/admin/login">Log In</a></p>
                     </div> <!-- end col -->
                 </div>
                 <!-- end row -->
@@ -67,10 +51,3 @@
         <!-- end row -->
     </div>
 
-    <!-- App js -->
-    <script src="assets/js/vendor.min.js"></script>
-    <script src="assets/js/app.js"></script>
-
-
-
-</body></html>

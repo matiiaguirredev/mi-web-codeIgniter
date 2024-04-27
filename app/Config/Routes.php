@@ -10,44 +10,78 @@ $routes->get('/', 'Home::index');
 $routes->get('/test', 'Home::test'); // ruta de pruebas
 
 
+
 // rutas administrador
 
 $routes->group('admin', function ($routes) {
 
-    // $routes->match(['get', 'post'], 'create', 'Books::create');
-    // $routes->match(['get', 'post'], 'edit/(:segment)', 'Admin::edit/$1');
-    // $routes->get('delete/(:segment)', 'Admin::delete/$1');
-    
-    // $routes->get('test', 'Admin::test');
-    // $routes->get('(:segment)', 'Admin::details/$1');
-    
-    // $routes->get('login', 'Admin::login');
     $routes->get('pages-404', 'Admin::pages_404');
     $routes->get('pages-500', 'Admin::pages_500');
     $routes->match(['get', 'post'], 'login', 'Admin::login');
-    $routes->match(['get', 'post'], 'userNew', 'Admin::userNew');
-    $routes->match(['get', 'post'], 'newproyect', 'Admin::newproyect');
+    $routes->match(['get', 'post'], 'logout', 'Admin::logout');
+    $routes->match(['get', 'post'], 'register', 'Admin::register');
+    $routes->match(['get', 'post'], 'recover', 'Admin::recover');
+    $routes->match(['get', 'post'], 'perfil', 'Admin::perfil');
+
     $routes->get('tables-basic', 'Admin::tables_basic');
     $routes->get('tables-datatables', 'Admin::tables_datatables');
     $routes->get('forms-advanced', 'Admin::forms_advanced');
     $routes->get('forms-elements', 'Admin::forms_elements');
     $routes->get('forms-file-uploads', 'Admin::forms_file_uploads');
     $routes->get('forms-quilljs', 'Admin::forms_quilljs');
-
+    $routes->get('components-sweet-alert', 'Admin::components_sweet_alert');
     $routes->get('/', 'Admin::index');
+
+    $entitySegments = [
+        'proyect',
+        'lenguaje',
+        'redes',
+        'categorias',
+        'servicios',
+        'curriculum',
+        'hobies',
+        'contacto',
+        'secciones',
+        'navbar',
+        
+    ];
+    foreach ($entitySegments as $entitySegment) {
+
+        // CRUD - Read All
+        $routes->match(['get', 'post'], $entitySegment, "Admin::get_" . $entitySegment);
+        // CRUD - Read Single
+        $routes->match(['get', 'post'], $entitySegment . '/(:segment)', "Admin::get_" . $entitySegment . "/$1");
+
+        // Grupos CRUD - Create
+        $routes->match(['get', 'post'], 'create/' . $entitySegment, "Admin::create_" . $entitySegment);
+
+        // Grupos CRUD - Update
+        $routes->match(['get', 'post'], 'update/' . $entitySegment . '/(:segment)', "Admin::update_" . $entitySegment . "/$1");
+
+        // Grupos CRUD - Delete
+        $routes->match(['get', 'post'], 'delete/' . $entitySegment . '/(:segment)', "Admin::delete_" . $entitySegment . "/$1");
+    }
 });
 
 $routes->group('api', function ($routes) {
 
     $routes->match(['get', 'post'], 'register', 'Api::register');
     $routes->match(['get', 'post'], 'login', 'Api::login');
-    // $routes->match(['get', 'post'], 'create/proyect', 'Api::create_proyect'); estasmos trabajando a la manera de alberto
+    $routes->match(['get', 'post'], 'checktoken', 'Api::checkToken');
     $routes->get('/', 'Api::index');
-
-
 
     $entitySegments = [
         'proyect',
+        'lenguaje',
+        'redes',
+        'categorias',
+        'servicios',
+        'curriculum',
+        'perfil',
+        'hobies',
+        'contacto',
+        'secciones',
+        'navbar',
     ];
 
     foreach ($entitySegments as $entitySegment) {
