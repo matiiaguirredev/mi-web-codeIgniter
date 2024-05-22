@@ -26,6 +26,7 @@
                 <ul class="navbar-nav ms-auto">
 
                     <?php foreach ($secciones as $key => $secc) { ?>
+                        <!-- aqui va el if del nuevo campo y en vez de imprimir titulo imprimimos el nuevo campo -->
                         <li class="nav-item"><a class="nav-link" href="#<?= $secc->alias ?>"><?= $secc->titulos ?></a></li>
                     <?php }; ?>
 

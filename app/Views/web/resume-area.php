@@ -7,7 +7,7 @@
                     <p><?= $descripciones ?></p>
                 </div>
                 <div class="row">
-                    <!-- <div class="col-lg-6 col-md-12">
+                    <div class="col-lg-6 col-md-12">
                         <h3 class="title">Education</h3>
                         <ul class="timeline">
                             <?php foreach ($curriculum as $key => $cv) { ?>
@@ -35,65 +35,8 @@
                                 <?php } ?>
                             <?php } ?>
                         </ul>
-                    </div> -->
-
-                    <div class="col-lg-6 col-md-12">
-                        <h3 class="title">Experience</h3>
-                        <ul class="timeline">
-                            <li class="event">
-                                <h3>Graphics Designer</h3>
-                                <h4><span>Amazon</span> (2009-2011)</h4>
-                                <p>Sed posuere consectetur est at lobortis. Nullam quis risus eget urna mollis ornare vel eu leo. Donec sed odio dui. Morbi leo risus, porta ac consectetur ac, vestibulum at eros. Nullam quis risus eget urna mollis ornare vel eu leo. Cras mattis consectetur purus sit amet fermentum.</p>
-                            </li>
-
-                            <li class="event">
-                                <h3>UX/UI Designer</h3>
-                                <h4><span>Adobe</span> (2011-2012)</h4>
-                                <p>Sed posuere consectetur est at lobortis. Nullam quis risus eget urna mollis ornare vel eu leo. Donec sed odio dui. Morbi leo risus, porta ac consectetur ac, vestibulum at eros. Nullam quis risus eget urna mollis ornare vel eu leo. Cras mattis consectetur purus sit amet fermentum.</p>
-                            </li>
-
-                            <li class="event">
-                                <h3>Jonior Web Developer</h3>
-                                <h4><span>Google</span> (2011-2012)</h4>
-                                <p>Sed posuere consectetur est at lobortis. Nullam quis risus eget urna mollis ornare vel eu leo. Donec sed odio dui. Morbi leo risus, porta ac consectetur ac, vestibulum at eros. Nullam quis risus eget urna mollis ornare vel eu leo. Cras mattis consectetur purus sit amet fermentum.</p>
-                            </li>
-
-                            <li class="event">
-                                <h3>Senior Web Developer</h3>
-                                <h4><span>Google</span> (2015-present)</h4>
-                                <p>Sed posuere consectetur est at lobortis. Nullam quis risus eget urna mollis ornare vel eu leo. Donec sed odio dui. Morbi leo risus, porta ac consectetur ac, vestibulum at eros. Nullam quis risus eget urna mollis ornare vel eu leo. Cras mattis consectetur purus sit amet fermentum.</p>
-                            </li>
-                        </ul>
                     </div>
 
-                    <div class="col-lg-6 col-md-12">
-                        <h3 class="title">Experience</h3>
-                        <ul class="timeline">
-                            <li class="event">
-                                <h3>Graphics Designer</h3>
-                                <h4><span>Amazon</span> (2009-2011)</h4>
-                                <p>Sed posuere consectetur est at lobortis. Nullam quis risus eget urna mollis ornare vel eu leo. Donec sed odio dui. Morbi leo risus, porta ac consectetur ac, vestibulum at eros. Nullam quis risus eget urna mollis ornare vel eu leo. Cras mattis consectetur purus sit amet fermentum.</p>
-                            </li>
-                            
-                            <li class="event">
-                                <h3>UX/UI Designer</h3>
-                                <h4><span>Adobe</span> (2011-2012)</h4>
-                                <p>Sed posuere consectetur est at lobortis. Nullam quis risus eget urna mollis ornare vel eu leo. Donec sed odio dui. Morbi leo risus, porta ac consectetur ac, vestibulum at eros. Nullam quis risus eget urna mollis ornare vel eu leo. Cras mattis consectetur purus sit amet fermentum.</p>
-                            </li>
-                            
-                            <li class="event">
-                                <h3>Jonior Web Developer</h3>
-                                <h4><span>Google</span> (2011-2012)</h4>
-                                <p>Sed posuere consectetur est at lobortis. Nullam quis risus eget urna mollis ornare vel eu leo. Donec sed odio dui. Morbi leo risus, porta ac consectetur ac, vestibulum at eros. Nullam quis risus eget urna mollis ornare vel eu leo. Cras mattis consectetur purus sit amet fermentum.</p> 
-                            </li>
-                            
-                            <li class="event">
-                                <h3>Senior Web Developer</h3>
-                                <h4><span>Google</span> (2015-present)</h4>
-                                <p>Sed posuere consectetur est at lobortis. Nullam quis risus eget urna mollis ornare vel eu leo. Donec sed odio dui. Morbi leo risus, porta ac consectetur ac, vestibulum at eros. Nullam quis risus eget urna mollis ornare vel eu leo. Cras mattis consectetur purus sit amet fermentum.</p> 
-                            </li>
-                        </ul>
-                    </div>
                 </div>
             </div>
         </section>

@@ -107,7 +107,7 @@
            <!-- HASTA! aca form quill. -->
 
            <script src="assets/js/pages/range-sliders.js"></script>
-           <script src="assets/js/main.js?v=<?= time() ?>"></script>
+           <script src="assets/js/main.js?v=<?= time() ?>"></script> <!-- el time para que se actualice el archivo y la cache -->
 
            <?php if (isset($error)) :  ?>
                <script>

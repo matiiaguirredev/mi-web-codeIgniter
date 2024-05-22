@@ -9,6 +9,7 @@ class Admin extends BaseController {
     private $urlAPI = "http://mi-web/api/";
     private $user = null;
     private $data = null;
+    private $token = null;
 
     public function __construct() {
 
@@ -795,10 +796,9 @@ class Admin extends BaseController {
     // FUNCIONES CURRICULUM
     public function get_curriculum() {
         $this->valtoken();
-        $token = $this->request->getCookie("token");
 
         $this->data['curriculum'] = [];
-        $curriculum = json_decode(send_post($this->urlAPI . "curriculum", ["token" => $token]));
+        $curriculum = json_decode(send_post($this->urlAPI . "curriculum", ["token" => $this->token]));
         if (isset($curriculum->error)) {
             $this->data['error'] = $curriculum->error;
         } else {
@@ -817,12 +817,11 @@ class Admin extends BaseController {
         $view = true;
 
         if ($this->request->getGetPost()) {
-            $token = $this->request->getCookie("token");
-            $requestData = array_merge($this->request->getGetPost(), ["token" => $token]); // en una variable tengo que guardar el merge 
+            $requestData = array_merge($this->request->getGetPost(), ["token" => $this->token]); // en una variable tengo que guardar el merge 
             // debug($_FILES,false);
             foreach ($_FILES as $k => $v) {
                 if (strlen($v['name'])) {
-                    $requestData[$k] = curl_file_create($v['tmp_name'], $v['type'], basename($v['name']));
+                    $requestData[$k] = curl_file_create($v['tmp_name'], $v['type'], basename($v['name'])); // esto es para poder enviar archivos por curl
                 }
             }
             $create_curriculum = json_decode(send_post($this->urlAPI . "create/curriculum", $requestData)); // envio directamente la variable que tiene todo ya concatenado
@@ -850,11 +849,10 @@ class Admin extends BaseController {
 
         $this->valtoken();
         $view = true;
-        $token = $this->request->getCookie("token");
 
         if ($this->request->getGetPost()) {
 
-            $requestData = array_merge($this->request->getGetPost(), ["token" => $token]); // en una variable tengo que guardar el merge 
+            $requestData = array_merge($this->request->getGetPost(), ["token" => $this->token]); // en una variable tengo que guardar el merge 
             // debug($_FILES);
             foreach ($_FILES as $k => $v) {
                 if (strlen($v['name'])) {
@@ -876,7 +874,7 @@ class Admin extends BaseController {
 
         if ($view) {
             $this->data['curriculum'] = [];
-            $curriculum = json_decode(send_post($this->urlAPI . "curriculum/" . $id, ["token" => $token]));
+            $curriculum = json_decode(send_post($this->urlAPI . "curriculum/" . $id, ["token" => $this->token]));
             if (isset($curriculum->error)) {
                 $this->data['error'] = $curriculum->error;
             } else {
@@ -1293,25 +1291,24 @@ class Admin extends BaseController {
     // FIN FUNCIONES SECCIONES TITULOS/DESCRIPTIONS Y MAS
 
     private function valtoken() {
-
-        $token = $this->request->getCookie("token");
-        if (!$token) {
+        $this->token = $this->request->getCookie("token");
+        if (!$this->token) {
             header("Location: /admin/login");
             exit();
         }
-        // debug($token,false);
-        $checkToken = json_decode(send_post($this->urlAPI . "checktoken", ["token" => $token]));
+        // debug($this->token,false);
+        $checkToken = json_decode(send_post($this->urlAPI . "checktoken", ["token" => $this->token]));
         // debug($this->urlAPI ."checkToken", false);
         if (isset($checkToken->error)) {
             header("Location: /admin/login");
             exit();
         } else {
             $this->user = $checkToken;
-            $checkToken = json_decode(send_post($this->urlAPI . "perfil", ["token" => $token]));
+            $checkPerfil = json_decode(send_post($this->urlAPI . "perfil", ["token" => $this->token]));
             // debug(send_post($this->urlAPI . "perfil", ["token" => $token]));
-            // debug($checkToken);
-            if (!isset($checkToken->error)) {
-                $this->user->informacion = $checkToken;
+            // debug($checkPerfil);
+            if (!isset($checkPerfil->error)) {
+                $this->user->informacion = $checkPerfil;
             }
         }
         // debug($checkToken);

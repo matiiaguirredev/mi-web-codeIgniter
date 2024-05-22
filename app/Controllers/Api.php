@@ -207,12 +207,12 @@ class Api extends BaseController {
         }
 
         $query = $this->db->query("SELECT * FROM usuarios WHERE id = '$valtoken->id'");
-        $checkUser = $query->getResult();
+        $checkUser = $query->getResult(); // los datos del usuario
         if (!$checkUser) {
             custom_error(501, $this->lang);
         }
 
-        $checkUser = $checkUser[0];
+        $checkUser = $checkUser[0]; 
         // debug($checkUser);
 
         unset($checkUser->pasw);
@@ -1032,24 +1032,24 @@ class Api extends BaseController {
         }
 
         // $data["user_id"] = $this->user->id;
-        $data["activo"] = ($this->request->getGetPost("activo")) ? 1 : 0;
+        $data["activo"] = ($this->request->getGetPost("activo")) ? 1 : 0; // si se mando por es 1, si no se envio es 0 (true false)
 
         $titulo = $data['titulo'];
 
-        $query = $this->db->query("SELECT * FROM resume WHERE titulo = '$titulo'"); // estamos chekeando si existe el usuario o emial
+        $query = $this->db->query("SELECT * FROM resume WHERE titulo = '$titulo'"); // estamos chekeando si existe ese titulo cargado
         $checkResume = $query->getResult();
         if ($checkResume) {
-            custom_error(208, $this->lang);
+            custom_error(208, $this->lang); // el titulo debe ser unico, si existe da error
         }
 
         $insert = $this->db->table("resume")->insert($data);
         if (!$insert) {
-            custom_error(204, $this->lang);
+            custom_error(204, $this->lang); // si no se inserto leemos el error
         }
 
-        $id = $this->db->insertID(); // ultimo identificador insertado !
+        $id = $this->db->insertID(); // a la variable id le agregamos el valor del ultimo identificador insertado !
 
-        json_debug(array_merge(["id" => $id], $data));
+        json_debug(array_merge(["id" => $id], $data)); // imprimos en json todos los datos agregados con su id
     }
 
     public function get_curriculum($id = null) {
@@ -1082,7 +1082,7 @@ class Api extends BaseController {
         $this->valToken();
 
         $query = "SELECT * FROM resume WHERE id = '$id'";
-        $query = $this->db->query($query);
+        $query = $this->db->query($query); // realizamos la operacion
         $datos = $query->getResult();
 
         if (!$datos) {
@@ -1115,9 +1115,9 @@ class Api extends BaseController {
         if ($this->request->getGetPost("titulo")) {
             $titulo = $data['titulo'];
             $query = $this->db->query("SELECT * FROM resume WHERE titulo = '$titulo' AND id <> '$id'"); // estamos chekeando si existe el usuario o emial
-            $checkServicios = $query->getResult();
-            if ($checkServicios) {
-                custom_error(208, $this->lang);
+            $checkResume = $query->getResult();
+            if ($checkResume) {
+                custom_error(208, $this->lang); // el titulo no puede ser modificado
             }
         }
 
@@ -1148,9 +1148,7 @@ class Api extends BaseController {
             custom_error(507, $this->lang, "resume");
         }
 
-        if ($id) {
-            $datos = $datos[0];
-        }
+        $datos = $datos[0];
 
         json_debug($datos);
     }
@@ -1215,7 +1213,7 @@ class Api extends BaseController {
 
         $data["img"] = base_url() . "assets/images/perfil/" . $data["img"];
 
-        $id = $this->db->insertID(); // ultimo identificador insertado !
+        $id = $this->db->insertID(); // obtenemos el ultimo identificador insertado !
 
         json_debug((object)array_merge(["id" => $id], $data));
     }
@@ -1742,7 +1740,7 @@ class Api extends BaseController {
         $data["bg_img"] = $this->uploadImage("secciones", "bg_img"); // nombre de carpeta y desp campo de bd 
         if (!$data["bg_img"]) {
             // $valRequire[] = "bg_img";
-            $data["bg_img"] = $datos->bg_img; 
+            $data["bg_img"] = $datos->bg_img;
         }
 
         $data["activo"] = ($this->request->getGetPost("activo")) ? 1 : 0;
@@ -1805,11 +1803,11 @@ class Api extends BaseController {
             custom_error(101, $this->lang, $valRequire);
         }
 
-        $valtoken = json_decode(decode($data['token'], $this->key));
+        $valtoken = json_decode(decode($data['token'], $this->key)); // decodificamos y validamos el token
         // debug($valtoken, false);
 
         if (!$valtoken) {
-            custom_error(103, $this->lang, 'token');
+            custom_error(103, $this->lang, 'token'); // si el token no tiene formato correcto
         }
 
         // aqui va la validación de tiempo de token
@@ -1821,7 +1819,7 @@ class Api extends BaseController {
         // Calcular la diferencia en segundos
         $difference = $currentTimestamp - $tokenTimestamp;
 
-        $maxTime = getenv('SESION_TIME') * 60; // 60 minutos
+        $maxTime = getenv('SESION_TIME') * 60; // 60 minutos // esta funcion es para traer valores del arch env
 
         if ($difference > $maxTime) {
             // custom_error(502, $this->lang); esta comentado por el momento para que no expire el tiempo
@@ -1830,7 +1828,7 @@ class Api extends BaseController {
         $query = $this->db->query("SELECT * FROM usuarios WHERE id = '$valtoken->id'");
         $checkUser = $query->getResult();
         if (!$checkUser) {
-            custom_error(501, $this->lang);
+            custom_error(501, $this->lang); // si el usuario no existe
         }
 
         $checkUser = $checkUser[0];

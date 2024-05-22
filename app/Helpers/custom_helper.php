@@ -119,7 +119,7 @@ if (!function_exists('send_post')) {
 }
 
 if (!function_exists('custom_error')) {
-    function custom_error($code, $language = 'en', $variables = [], $responseCode = 500) {
+    function custom_error($code, $language = 'en', $variables = [], $responseCode = 500) { // si los parametros tiene algo asignado son opcionales
         // Definir mensajes de error según el idioma y código
         $variablesText = $variables;
         if (is_array($variables)) {
