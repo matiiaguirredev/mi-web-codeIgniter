@@ -44,6 +44,20 @@
                                                 <textarea class="form-control" name="descripciones" id="example-textarea" rows="5"></textarea>
                                             </div>
                                         </div>
+
+                                        <div class="mb-2 row">
+                                            <label class="col-md-2 col-form-label" for="simpleinput">Texto de Boton</label>
+                                            <div class="col-md-10">
+                                                <input type="text" name="txt_btn" id="simpleinput" class="form-control">
+                                            </div>
+                                        </div>
+
+                                        <div class="mb-2 row">
+                                            <label class="col-md-2 col-form-label" for="simpleinput">Link de seccion</label>
+                                            <div class="col-md-10">
+                                                <input type="text" name="link_secc" id="simpleinput" class="form-control">
+                                            </div>
+                                        </div>
                                         
                                         <div class="mb-2 row">
                                             <label class="col-md-2 col-form-label" for="example-fileinput">Imagen de fondo</label>
@@ -64,13 +78,13 @@
                                             <div class="col-md-10">
                                                 <select class="form-control" name="alias" id="" require>
                                                     <option value="">Selecciona una seccion</option>
-                                                    <option value="acerca">Acerca de mi</option>
-                                                    <option value="servicios">Servicios</option>
-                                                    <option value="clientes">Clientes felices</option>
-                                                    <option value="exp">Expiencia</option>
-                                                    <option value="proyectos">Proyectos</option>
-                                                    <option value="contratame">Contrátame</option>
-                                                    <option value="contactame">Contáctame</option>
+                                                    <option value="acerca">Acerca de mi (1)</option>
+                                                    <option value="servicios">Servicios (2)</option>
+                                                    <option value="clientes">Clientes felices (3)</option>
+                                                    <option value="exp">Expiencia (4)</option>
+                                                    <option value="proyectos">Proyectos (5)</option>
+                                                    <option value="contratame">Contrátame (6)</option>
+                                                    <option value="contactame">Contáctame (7)</option>
                                                 </select>
                                             </div>
                                         </div>

@@ -46,6 +46,20 @@
                                         </div>
 
                                         <div class="mb-2 row">
+                                            <label class="col-md-2 col-form-label" for="simpleinput">Texto de Boton</label>
+                                            <div class="col-md-10">
+                                                <input type="text" name="txt_btn" id="simpleinput" class="form-control" value="<?= $secciones->txt_btn ?>">
+                                            </div>
+                                        </div>
+
+                                        <div class="mb-2 row">
+                                            <label class="col-md-2 col-form-label" for="simpleinput">Link de seccion</label>
+                                            <div class="col-md-10">
+                                                <input type="text" name="link_secc" id="simpleinput" class="form-control" value="<?= $secciones->link_secc ?>">
+                                            </div>
+                                        </div>
+
+                                        <div class="mb-2 row">
                                             <label class="col-md-2 col-form-label" for="example-fileinput">Imagen de fondo</label>
                                             <div class="col-md-10">
                                                 <div class="input-group">
@@ -67,13 +81,13 @@
                                             <div class="col-md-10">
                                                 <select class="form-control" name="alias" id="" require>
                                                     <option value="">Selecciona una seccion</option>
-                                                    <option value="acerca" <?= ($secciones->alias == 'acerca') ? 'selected' : ''; ?>>Acerca de mi</option>
-                                                    <option value="servicios" <?= ($secciones->alias == 'servicios') ? 'selected' : ''; ?>>Servicios</option>
-                                                    <option value="clientes" <?= ($secciones->alias == 'clientes') ? 'selected' : ''; ?>>Clientes felices</option>
-                                                    <option value="exp" <?= ($secciones->alias == 'exp') ? 'selected' : ''; ?>>Expiencia</option>
-                                                    <option value="proyectos" <?= ($secciones->alias == 'proyectos') ? 'selected' : ''; ?>>Proyectos</option>
-                                                    <option value="contratame" <?= ($secciones->alias == 'contratame') ? 'selected' : ''; ?>>Contrátame</option>
-                                                    <option value="contactame" <?= ($secciones->alias == 'contactame') ? 'selected' : ''; ?>>Contáctame</option>
+                                                    <option value="acerca" <?= ($secciones->alias == 'acerca') ? 'selected' : ''; ?>>Acerca de mi (1)</option>
+                                                    <option value="servicios" <?= ($secciones->alias == 'servicios') ? 'selected' : ''; ?>>Servicios (2)</option>
+                                                    <option value="clientes" <?= ($secciones->alias == 'clientes') ? 'selected' : ''; ?>>Clientes felices (3)</option>
+                                                    <option value="exp" <?= ($secciones->alias == 'exp') ? 'selected' : ''; ?>>Expiencia (4)</option>
+                                                    <option value="proyectos" <?= ($secciones->alias == 'proyectos') ? 'selected' : ''; ?>>Proyectos (5)</option>
+                                                    <option value="contratame" <?= ($secciones->alias == 'contratame') ? 'selected' : ''; ?>>Contrátame (6)</option>
+                                                    <option value="contactame" <?= ($secciones->alias == 'contactame') ? 'selected' : ''; ?>>Contáctame (7)</option>
                                                 </select>
                                             </div>
                                         </div>

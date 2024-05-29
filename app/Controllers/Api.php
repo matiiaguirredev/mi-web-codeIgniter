@@ -1650,6 +1650,8 @@ class Api extends BaseController {
             "descripciones",
             "bg_img",
             "bg_color",
+            "txt_btn",
+            "link_secc",
         ];
 
         foreach ($optionals as $name) {
@@ -1657,7 +1659,6 @@ class Api extends BaseController {
         }
 
         $data["bg_img"] = $this->uploadImage("secciones", "bg_img"); // nombre de carpeta y desp campo de bd 
-
 
         $data["activo"] = ($this->request->getGetPost("activo")) ? 1 : 0;
 
@@ -1727,6 +1728,8 @@ class Api extends BaseController {
             "descripciones",
             "bg_img",
             "bg_color",
+            "txt_btn",
+            "link_secc",
             "alias",
             "orden",
         ];
