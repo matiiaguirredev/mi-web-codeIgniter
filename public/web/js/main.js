@@ -71,6 +71,28 @@
     
     // Header Sticky
     
+    $.ajax({
+        async: true,
+        type: "POST",
+        dataType: "json",
+        url:
+            "./api/txtbanner/",
+        data: [],
+        contentType: "application/json; charset=utf-8",
+        // contentType: false,
+        processData: false,
+    })
+        .done(function (Response) {
+            //do something when get response
+            
+            console.log('txtbanner',Response);
+        })
+        .fail(function (Response) {
+            //do something when any error occurs.
+            // showAlert("danger", Response.error);
+            console.error('txtbanner',Response);
+        });
+    
     new TypeIt('.animated-text', {
         speed: 65,
         loop: true

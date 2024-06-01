@@ -269,6 +269,30 @@
             </li>
 
             <li class="menu-item">
+                <a href="#menutxtBanner" data-bs-toggle="collapse" class="menu-link waves-effect waves-light">
+                    <span class="menu-icon"><i class="fa-sharp fa-solid fa-text-size"></i></span>
+                    <span class="menu-text"> Texto Banner </span>
+                    <span class="menu-arrow"></span>
+                </a>
+                <div class="collapse" id="menutxtBanner">
+                    <ul class="sub-menu">
+
+                        <li class="menu-item">
+                            <a class='menu-link' href='/admin/txtbanner'>
+                                <span class="menu-text">Lista de txtbanner</span>
+                            </a>
+                        </li>
+                        <li class="menu-item">
+                            <a class='menu-link' href='/admin/create/txtbanner'>
+                                <span class="menu-text">Nuevo texto de txtbanner</span>
+                            </a>
+                        </li>
+
+                    </ul>
+                </div>
+            </li>
+
+            <li class="menu-item">
                 <a href="#menuExpages" data-bs-toggle="collapse" class="menu-link waves-effect waves-light">
                     <span class="menu-icon"><i class="bx bx-file"></i></span>
                     <span class="menu-text"> Extra Pages </span>

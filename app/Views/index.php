@@ -24,19 +24,13 @@
             </button>
             <div id="navbarNavDropdown" class="navbar-collapse collapse">
                 <ul class="navbar-nav ms-auto">
-
+                    <li class="nav-item"><a class="nav-link" href="#home" target="_blank">Inicio</a></li>
                     <?php foreach ($secciones as $key => $secc) { ?>
-                        <?php if($secc->txt_btn){?>
+                        <?php if ($secc->txt_btn) { ?>
                             <li class="nav-item"><a class="nav-link" href="<?= $secc->link_secc ?>"><?= $secc->txt_btn ?></a></li>
-                        <?php };?>
+                        <?php }; ?>
                     <?php }; ?>
 
-                    <!-- <li class="nav-item"><a class="nav-link" href="#home">Home</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#about">About</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#services">Services</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#resume">Resume</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#works">Works</a></li>
-                    <li class="nav-item pr-0"><a class="nav-link" href="#contact">Contact</a></li> -->
                 </ul>
             </div>
         </nav>
@@ -46,8 +40,11 @@
 
 <!-- Start Parallax Home Area -->
 <div id="home" class="main-banner parallax">
+    <!-- <?php debug($perfil, false); ?> -->
     <style>
-        .main-banner {}
+        .main-banner {
+            background-image: url(<?= $perfil->img_fondo ?>);
+        }
     </style>
     <div class="parallax-home"></div>
     <div class="d-table">
@@ -68,7 +65,7 @@
 
                     <div class="col-lg-5 col-md-5">
                         <div class="parallax-home-img">
-                            <!-- <img class="img-fluid imgindex" src="<?= $perfil->img ?>" alt="me"> -->
+                            <img class="img-fluid imgindex" src="<?= $perfil->img ?>" alt="me">
                         </div>
                     </div>
                 </div>

@@ -43,6 +43,7 @@ $routes->group('admin', function ($routes) {
         'contacto',
         'secciones',
         'navbar',
+        'txtbanner',
         
     ];
     foreach ($entitySegments as $entitySegment) {
@@ -82,6 +83,7 @@ $routes->group('api', function ($routes) {
         'contacto',
         'secciones',
         'navbar',
+        'txtbanner',
     ];
 
     foreach ($entitySegments as $entitySegment) {

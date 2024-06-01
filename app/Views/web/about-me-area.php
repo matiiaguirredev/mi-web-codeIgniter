@@ -57,55 +57,6 @@
                                         </div>
                                     </div>
                                 <?php }; ?>
-
-                                
-                                <div class="col-lg-3 col-md-4">
-                                    <div class="box">
-                                        <h3>Music</h3>
-                                    </div>
-                                </div>
-
-                                <div class="col-lg-3 col-md-4">
-                                    <div class="box">
-                                        <h3>Photography</h3>
-                                    </div>
-                                </div>
-
-                                <div class="col-lg-3 col-md-4">
-                                    <div class="box">
-                                        <h3>Gaming</h3>
-                                    </div>
-                                </div>
-
-                                <div class="col-lg-3 col-md-4">
-                                    <div class="box">
-                                        <h3>Reading/Writing</h3>
-                                    </div>
-                                </div>
-
-                                <div class="col-lg-3 col-md-4">
-                                    <div class="box">
-                                        <h3>Driving</h3>
-                                    </div>
-                                </div>
-
-                                <div class="col-lg-3 col-md-4">
-                                    <div class="box">
-                                        <h3>Traveling</h3>
-                                    </div>
-                                </div>
-
-                                <div class="col-lg-3 col-md-6">
-                                    <div class="box">
-                                        <h3>Football</h3>
-                                    </div>
-                                </div>
-
-                                <div class="col-lg-3 col-md-6">
-                                    <div class="box">
-                                        <h3>Shopping</h3>
-                                    </div>
-                                </div>
                             </div>
                         </div>
                     </div>

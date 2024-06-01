@@ -212,7 +212,7 @@ class Api extends BaseController {
             custom_error(501, $this->lang);
         }
 
-        $checkUser = $checkUser[0]; 
+        $checkUser = $checkUser[0];
         // debug($checkUser);
 
         unset($checkUser->pasw);
@@ -1197,6 +1197,12 @@ class Api extends BaseController {
             $data["img"] = "300x300.png"; // aca esta opcional y tenemos una por defecto, si queremos obligatoria descomentar arriba.
         }
 
+        $data["img_fondo"] = $this->uploadImage("perfil", "img_fondo"); // nombre de carpeta y despues campo de base datos
+        if (!$data["img_fondo"]) {
+            // $valRequire[] = "img_fondo";
+            $data["img_fondo"] = "300x300.png"; // aca esta opcional y tenemos una por defecto, si queremos obligatoria descomentar arriba.
+        }
+
         if ($valRequire) {
             // validar error que te faltan datos
             custom_error(101, "es", $valRequire);
@@ -1212,6 +1218,7 @@ class Api extends BaseController {
 
 
         $data["img"] = base_url() . "assets/images/perfil/" . $data["img"];
+        $data["img_fondo"] = base_url() . "assets/images/perfil/" . $data["img_fondo"];
 
         $id = $this->db->insertID(); // obtenemos el ultimo identificador insertado !
 
@@ -1235,6 +1242,7 @@ class Api extends BaseController {
         $datos = $datos[0];
 
         $datos->img = base_url() . "assets/images/perfil/" . $datos->img;
+        $datos->img_fondo = base_url() . "assets/images/perfil/" . $datos->img_fondo;
 
         json_debug($datos);
     }
@@ -1276,6 +1284,12 @@ class Api extends BaseController {
             $data["img"] = $datos->img; // aca esta opcional y tenemos una por defecto, si queremos obligatoria descomentar arriba.
         }
 
+        $data["img_fondo"] = $this->uploadImage("perfil", "img_fondo"); // nombre de carpeta y despues campo de base datos
+        if (!$data["img_fondo"]) {
+            // $valRequire[] = "img_fondo";
+            $data["img_fondo"] = $datos->img_fondo; // aca esta opcional y tenemos una por defecto, si queremos obligatoria descomentar arriba.
+        }
+
         $data["user_id"] = $this->user->id;
         // $data["activo"] = ($this->request->getGetPost("activo")) ? 1 : 0;
 
@@ -1286,6 +1300,8 @@ class Api extends BaseController {
         }
 
         $data["img"] = base_url() . "assets/images/perfil/" . $data["img"];
+        $data["img_fondo"] = base_url() . "assets/images/perfil/" . $data["img_fondo"];
+
 
         json_debug(array_merge((array)$datos, $data));
     }
@@ -1784,6 +1800,137 @@ class Api extends BaseController {
         json_debug($datos);
     }
     // FIN CRUD SECCIONES TITULOS/DESCRIPTIONS Y MAS
+
+
+    // CRUD TEXTO BANNER
+    public function create_txtbanner() {
+        $this->valToken();
+
+        $require = [
+            "txtBanner" => "text",
+        ];
+
+        $valRequire = [];
+
+        foreach ($require as $name => $type) {
+            $value = $this->request->getGetPost($name);
+            if ($value) {
+                $data[$name] = validateValue($value, $type, $this->lang);
+            } else {
+                $valRequire[] = $name;
+            }
+        }
+
+        if ($valRequire) {
+            // validar error que te faltan datos
+            custom_error(101, "es", $valRequire);
+        }
+
+        $data["activo"] = ($this->request->getGetPost("activo")) ? 1 : 0;
+
+        $insert = $this->db->table("txtbanner")->insert($data);
+        if (!$insert) {
+            custom_error(204, $this->lang);
+        }
+
+        $id = $this->db->insertID(); // ultimo identificador insertado !
+
+        json_debug(array_merge(["id" => $id], $data));
+    }
+
+    public function get_txtbanner($id = null) {
+        $this->variables();
+        // $this->valToken(); // las unicas que no se pide el token son las consultas publicas,  login y registro
+
+        // $query = "SELECT * FROM txtbanner ";
+        $query = "SELECT * FROM `txtbanner` ";
+        if ($id) { // esto se utilza para consultar 1 especifico
+            $query .= "WHERE id = '$id'";
+        }
+        if ($this->activo) {
+            $query .= ($id) ? " AND" : " WHERE";
+            $query .= " activo = 1";
+        }
+
+        $query .= " ORDER BY `txtbanner`.`txtBanner` ASC";
+        $query = $this->db->query($query);
+        $datos = $query->getResult();
+
+        if (!$datos) {
+            custom_error(504, $this->lang, "txtbanner");
+        }
+
+        if ($id) {
+            $datos = $datos[0];
+        }
+
+        json_debug($datos);
+    }
+
+    public function update_txtbanner($id) {
+        $this->valToken();
+
+        $query = "SELECT * FROM txtbanner WHERE id = '$id'";
+        $query = $this->db->query($query);
+        $datos = $query->getResult();
+
+        if (!$datos) {
+            custom_error(504, $this->lang, "txtbanner");
+        }
+
+        $datos = $datos[0];
+
+        $require = [
+            "txtBanner" => "text",
+
+        ];
+
+        foreach ($require as $name => $type) {
+            $value = $this->request->getGetPost($name);
+            if ($value) {
+                $data[$name] = validateValue($value, $type, $this->lang);
+            } else {
+                $valRequire[] = $name;
+            }
+        }
+
+        $data["activo"] = ($this->request->getGetPost("activo")) ? 1 : 0;
+        // debug($this->request->getGetPost(), false);
+        // debug($data);
+
+        $update = $this->db->table("txtbanner")->update($data, ["id" => $id]); // ver query de mysql para entender bien cuales son los 2 paremetros q recibimos (set y where)
+        // debug($datos);
+        if (!$update) {
+            custom_error(506, $this->lang, "txtbanner");
+        }
+
+        json_debug(array_merge((array)$datos, $data));
+    }
+
+    public function delete_txtbanner($id) {
+
+        $this->valToken(); // las unicas que no se pide el token son las consultas publicas,  login y registro
+
+        $query = "SELECT * FROM txtbanner WHERE id = '$id'";
+        $query = $this->db->query($query);
+        $datos = $query->getResult();
+
+        if (!$datos) {
+            custom_error(504, $this->lang, "txtbanner");
+        }
+
+        $delete = $this->db->table("txtbanner")->delete(["id" => $id]);
+        if (!$delete) {
+            custom_error(507, $this->lang, "general");
+        }
+
+        if ($id) {
+            $datos = $datos[0];
+        }
+
+        json_debug($datos);
+    }
+    // FIN CRUD TEXTO BANNER
 
     private function valToken() {
         $require = [

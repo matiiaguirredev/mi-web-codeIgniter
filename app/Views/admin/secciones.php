@@ -36,7 +36,7 @@
 
                                     <tbody>
                                         <?php
-                                        // debug($proyectos, false);
+                                        // debug($secciones, false);
                                         foreach ($secciones as $key => $sec) {
                                             // debug($sec, false);
                                         ?>

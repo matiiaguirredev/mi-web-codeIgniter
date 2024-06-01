@@ -1290,6 +1290,115 @@ class Admin extends BaseController {
 
     // FIN FUNCIONES SECCIONES TITULOS/DESCRIPTIONS Y MAS
 
+    // FUNCIONES TEXTO BANNER
+    public function get_txtbanner() {
+        $this->valtoken();
+        $token = $this->request->getCookie("token");
+
+        $this->data['txtbanner'] = [];
+        $txtbanner = json_decode(send_post($this->urlAPI . "txtbanner", ["token" => $token]));
+        if (isset($txtbanner->error)) {
+            $this->data['error'] = $txtbanner->error;
+        } else {
+            $this->data['txtbanner'] = $txtbanner;
+        }
+
+        $this->header();
+        $this->sidebar();
+        echo view('admin/txtbanner', $this->data);
+        $this->footer();
+    }
+
+    public function create_txtbanner() {
+
+        $this->valtoken();
+        $view = true;
+
+        if ($this->request->getGetPost()) {
+            $token = $this->request->getCookie("token");
+            $requestData = array_merge($this->request->getGetPost(), ["token" => $token]); // en una variable tengo que guardar el merge 
+
+            $create_txtbanner = json_decode(send_post($this->urlAPI . "create/txtbanner", $requestData)); // envio directamente la variable que tiene todo ya concatenado
+            // debug($create_txtbanner, false);
+            if (isset($create_txtbanner->error)) {
+                $this->data['error'] = $create_txtbanner->error;
+            } else {
+                $this->data['success'] = "Informacion de txtbanner creada exitosamente";
+                $this->get_txtbanner();
+                $view = false;
+            }
+            // debug($create_txtbanner, false);
+
+        }
+
+        if ($view) {
+            $this->header();
+            $this->sidebar();
+            echo view('admin/newtxtbanner');
+            $this->footer();
+        }
+    }
+
+    public function update_txtbanner($id) {
+
+        $this->valtoken();
+        $view = true;
+        $token = $this->request->getCookie("token");
+
+        if ($this->request->getGetPost()) {
+
+            $requestData = array_merge($this->request->getGetPost(), ["token" => $token]); // en una variable tengo que guardar el merge 
+
+            // debug($requestData, false);
+            $update_txtbanner = json_decode(send_post($this->urlAPI . "update/txtbanner/" . $id, $requestData)); // envio directamente la variable que tiene todo ya concatenado
+            // debug($update_txtbanner, false);
+            if (isset($update_txtbanner->error)) {
+                $this->data['error'] = $update_txtbanner->error;
+            } else {
+                $this->data['success'] = "Informacion de texto modificada exitosamente";
+                $this->get_txtbanner();
+                $view = false;
+            }
+            // debug($update_txtbanner, false);
+
+        }
+
+        if ($view) {
+            $this->data['txtbanner'] = [];
+            $txtbanner = json_decode(send_post($this->urlAPI . "txtbanner/" . $id, ["token" => $token]));
+            if (isset($txtbanner->error)) {
+                $this->data['error'] = $txtbanner->error;
+            } else {
+                $this->data['txtbanner'] = $txtbanner;
+            }
+            $this->header();
+            $this->sidebar();
+            echo view('admin/edit-txtbanner');
+            $this->footer();
+        }
+    }
+
+    public function delete_txtbanner($id) {
+        // $this->valtoken();
+        $token = $this->request->getCookie("token");
+
+        // $this->data = [];
+        if ($id) {
+            $requestData = ["token" => $token]; // Datos para enviar a la API
+            $delete_txtbanner = json_decode(send_post($this->urlAPI . "delete/txtbanner/" . $id, $requestData));
+
+            if (isset($delete_txtbanner->error)) {
+                $this->data['error'] = $delete_txtbanner->error;
+            } else {
+                // El proyecto se eliminó exitosamente
+                $this->data['success'] = "Informacion de txtbanner eliminada exitosamente";
+            }
+        }
+        $this->get_txtbanner();
+    }
+
+    // FIN FUNCIONES TEXTO BANNER
+
     private function valtoken() {
         $this->token = $this->request->getCookie("token");
         if (!$this->token) {
