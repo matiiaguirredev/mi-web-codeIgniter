@@ -475,3 +475,77 @@ $(document).on("click", ".showdescrip", function (e) {
     e.preventDefault();
     Swal.fire({ title: $(this).data("description") });
 });
+
+// verificaciones de clase de img 
+// console.log("cantidad", $(".input-group-text").length );
+if ($(".input-group-text").length > 0) {
+
+    $(".input-group-text").each(function () { // recorremos cada una de la que exista con la correspondiente url
+        var img = $(this).attr("href"); // con el atributo href obtnemos la url de la clase
+        // console.log("imagen", img);
+        if (img) {
+            var html = `
+            <button class="btn btn-outline-secondary del-img" type="button" data-img="${img}">
+                <i class="fa fa-trash"></i>
+            </button>
+            `;
+            $(this).parent().append(html);
+        }
+    });
+}
+
+$(document).on("click", ".del-img", function (e) {
+    var ruta = $(this).attr("href");
+    Swal.fire({
+        title: '¿Estás seguro?',
+        text: '¡No podrás revertir esto!',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Sí, eliminarlo',
+        cancelButtonText: 'Cancelar'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            data = [];
+            data["ruta"] = ruta;
+            data["token"] = getCookie("token");
+
+            $.ajax({
+                async: true,
+                type: "POST",
+                dataType: "json",
+                url:
+                    "./api/delete/img/?token=" + 
+                    getCookie("token") +
+                    "&ruta=" +
+                    ruta,
+                data: data,
+                contentType: "application/json; charset=utf-8",
+                // contentType: false,
+                processData: false,
+            })
+                .done(function (Response) {
+                    Swal.fire(
+                        '¡Eliminado!',
+                        'Tu archivo ha sido eliminado.',
+                        'success'
+                    );
+                })
+                .fail(function (Response) {
+                    Swal.fire(
+                        'Abortado',
+                        'El servidor no pudo eliminar el archivo',
+                        'error'
+                    );
+                });
+
+        } else if (result.dismiss === Swal.DismissReason.cancel) {
+            Swal.fire(
+                'Cancelado',
+                'Tu archivo está a salvo :)',
+                'error'
+            );
+        }
+    });
+});

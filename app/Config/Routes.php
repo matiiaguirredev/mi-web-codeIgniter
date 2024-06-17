@@ -65,10 +65,11 @@ $routes->group('admin', function ($routes) {
 });
 
 $routes->group('api', function ($routes) {
-
+        //metodos que acepta        //ruta(url navegador) //function(controlador)
     $routes->match(['get', 'post'], 'register', 'Api::register');
     $routes->match(['get', 'post'], 'login', 'Api::login');
     $routes->match(['get', 'post'], 'checktoken', 'Api::checkToken');
+    $routes->match(['get', 'post'], 'delete/img', 'Api::delete_img');
     $routes->get('/', 'Api::index');
 
     $entitySegments = [

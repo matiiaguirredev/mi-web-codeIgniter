@@ -65,6 +65,7 @@
                                                 <div class="input-group">
                                                     <a href="<?= $secciones->bg_img ?>" target="_blank" class="input-group-text" id="basic-addon1"><i class="fa-sharp fa-solid fa-image"></i></a>
                                                     <input multiple type="file" name="bg_img" class="form-control" id="example-fileinput">
+                                                    
                                                 </div>
                                             </div>
                                         </div>
@@ -72,7 +73,9 @@
                                         <div class="mb-2 row">
                                             <label class="col-md-2 col-form-label" for="example-fileinput">Color de fondo</label>
                                             <div class="col-md-10">
-                                                <input multiple type="color" name="bg_color" class="form-control" id="example-fileinput" value="<?= $secciones->bg_color ?>">
+                                                <div class="input-group">
+                                                    <input multiple type="color" name="bg_color" class="form-control" id="example-fileinput" value="<?= $secciones->bg_color ?>">
+                                                                                                       </div>
                                             </div>
                                         </div>
 

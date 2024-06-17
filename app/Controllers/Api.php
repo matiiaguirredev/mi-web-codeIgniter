@@ -2024,6 +2024,37 @@ class Api extends BaseController {
         return $nombreEncriptado;
     }
 
+    public function delete_img(){
+        
+    }
+
+    private function TrashFIle($origen, $name) {
+        // Verificar si el nombre del archivo es válido
+        if (empty($name)) {
+            return false;
+        }
+
+        // Rutas de las carpetas
+        $carpetaOrigen = $origen;
+        $carpetaDestino = 'img/trash/';
+
+        // Ruta completa de los archivos
+        $rutaArchivoOrigen = $carpetaOrigen . $name;
+        $rutaArchivoDestino = $carpetaDestino . $name;
+
+        // Verificar si el archivo existe en la carpeta de origen
+        if (file_exists($rutaArchivoOrigen)) {
+            // Mover el archivo a la carpeta de destino
+            if (rename($rutaArchivoOrigen, $rutaArchivoDestino)) {
+                return true;
+            } else {
+                return false;
+            }
+        } else {
+            return false; // El archivo no existe en la carpeta de origen
+        }
+    }
+
     private function variables() {
         $this->activo = $this->request->getGetPost('activo');
         if ($this->activo && $this->activo != 1) {
