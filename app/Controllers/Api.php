@@ -2025,7 +2025,12 @@ class Api extends BaseController {
     }
 
     public function delete_img(){
-        
+        json_debug([
+            "post"=>$_POST,
+            "get"=>$_GET,
+            "request"=>$_REQUEST,
+            "file"=>$_FILES
+        ]);
     }
 
     private function TrashFIle($origen, $name) {

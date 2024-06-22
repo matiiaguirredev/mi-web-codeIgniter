@@ -495,7 +495,10 @@ if ($(".input-group-text").length > 0) {
 }
 
 $(document).on("click", ".del-img", function (e) {
-    var ruta = $(this).attr("href");
+    e.preventDefault(); // Evitar que se siga el enlace por defecto
+
+    var ruta = $(this).data("img"); // Obtener la ruta de la imagen a eliminar
+    // console.log("href", ruta);
     Swal.fire({
         title: '¿Estás seguro?',
         text: '¡No podrás revertir esto!',
@@ -507,38 +510,76 @@ $(document).on("click", ".del-img", function (e) {
         cancelButtonText: 'Cancelar'
     }).then((result) => {
         if (result.isConfirmed) {
-            data = [];
-            data["ruta"] = ruta;
-            data["token"] = getCookie("token");
+            // Capturar la URL actual
+            const url = window.location.href;
+
+            // Crear un elemento URL para descomponerla
+            const urlObj = new URL(url);
+            // console.log("utl", urlObj);
+            
+            // Separando el pathname en partes individuales
+            const pathSegments = urlObj.pathname.split('/').filter(segment => segment.length > 0);
+
+            // console.log("path", pathSegments);
+            // Obtener update, secciones e id
+            const funcion = pathSegments[1];
+            const seccion = pathSegments[2];
+            const id = pathSegments[3];
+
+            // Construir el objeto data con todos los datos necesarios
+            // Objeto de datos original
+            const data = {
+                funcion: funcion,
+                seccion: seccion,
+                id: id,
+                token: getCookie("token"),
+                ruta: ruta
+            };
+            // console.log("data", data);
+            // Crear un nuevo FormData
+            const formData = new FormData();
+
+            // Iterar sobre el objeto data y añadir cada par clave-valor al FormData
+            $get = ''
+            for (let key in data) {
+                if (!$get) {
+                    $get += '?'
+                }
+                $get += `${key}=${data[key]}&`;
+                formData.append(key, data[key]);
+                // console.log("key", key);
+
+            }
+            // console.log("get", $get);
+            // Construir la URL para la solicitud AJAX
+            const ajaxUrl = `./api/delete/img/`;
 
             $.ajax({
-                async: true,
+                url: ajaxUrl + $get,
                 type: "POST",
-                dataType: "json",
-                url:
-                    "./api/delete/img/?token=" + 
-                    getCookie("token") +
-                    "&ruta=" +
-                    ruta,
-                data: data,
-                contentType: "application/json; charset=utf-8",
-                // contentType: false,
-                processData: false,
-            })
-                .done(function (Response) {
+                data: formData,
+                contentType: false,
+                processData: false, // Evitar que jQuery convierta los datos en una cadena de consulta
+                beforeSend: function () {
+
+                },
+                success: function (response) {
+                    console.log('Respuesta del servidor:', response);
                     Swal.fire(
                         '¡Eliminado!',
                         'Tu archivo ha sido eliminado.',
                         'success'
                     );
-                })
-                .fail(function (Response) {
+                },
+                error: function (xhr, status, error) {
+                    console.error('Error en la solicitud AJAX:', error);
                     Swal.fire(
                         'Abortado',
                         'El servidor no pudo eliminar el archivo',
                         'error'
                     );
-                });
+                }
+            });
 
         } else if (result.dismiss === Swal.DismissReason.cancel) {
             Swal.fire(
@@ -549,3 +590,5 @@ $(document).on("click", ".del-img", function (e) {
         }
     });
 });
+
+
