@@ -446,7 +446,7 @@ class Api extends BaseController {
 
         //esto es para agregar url a la imagen !
         foreach ($datos as $key => $value) {
-            if ($value->img_lenguajes) {
+            if (isset($value->img_lenguajes)) {
                 $datos[$key]->img_lenguajes = base_url() . "assets/images/lenguajes/" . $value->img_lenguajes;
             }
         }
@@ -1766,6 +1766,8 @@ class Api extends BaseController {
         // debug($this->request->getGetPost(), false);
         // debug($data);
 
+        // data es un parametro y representa el set
+        // luego separado por , tenemos el where
         $update = $this->db->table("secciones")->update($data, ["id" => $id]); // ver query de mysql para entender bien cuales son los 2 paremetros q recibimos (set y where)
         // debug($datos);
         if (!$update) {
@@ -2024,24 +2026,109 @@ class Api extends BaseController {
         return $nombreEncriptado;
     }
 
-    public function delete_img(){
-        json_debug([
-            "post"=>$_POST,
-            "get"=>$_GET,
-            "request"=>$_REQUEST,
-            "file"=>$_FILES
-        ]);
+    public function delete_img() {
+        // $postData = $_POST;
+        // $getData = $_GET;
+        // $requestData = $_REQUEST;
+        // $fileData = $_FILES;
+
+        // // Para debuggear los datos recibidos
+        // json_debug([
+        //     "post" => $postData,
+        //     "get" => $getData,
+        //     "request" => $requestData,
+        //     "file" => $fileData
+        // ]);
+
+        // Procesar los datos según sea necesario
+
+        $require = [
+            "seccion" => "text",
+            "id" => "number",
+
+        ];
+
+        $valRequire = [];
+
+        foreach ($require as $name => $type) {
+            $value = $this->request->getGetPost($name);
+            if ($value) {
+                $req[$name] = validateValue($value, $type, $this->lang);
+            } else {
+                $valRequire[] = $name;
+            }
+        }
+        if ($valRequire) {
+            // validar error que te faltan datos
+            custom_error(101, "es", $valRequire);
+        }
+
+        // $funcion = $this->request->getGetPost("funcion");
+        $seccion = $req["seccion"];
+        $id = $req["id"];
+        // $ruta = $this->request->getGetPost("ruta"); ya no lo usamos
+
+        $query = "SELECT * FROM $seccion WHERE id = '$id'";
+        // debug($query);
+        $query = $this->db->query($query);
+        $datos = $query->getResult();
+        // debug($datos);
+
+        if (!$datos) {
+            custom_error(504, $this->lang, $seccion);
+        }
+
+        $datos = $datos[0];
+        $data = [];
+        $img = null; // esta variable es para guardar el valor la img para envair a la papelera
+
+        if (isset($datos->bg_img)) {
+            $img = $datos->bg_img;
+            $data['bg_img'] = null;
+        }
+
+        if (isset($datos->img)) {
+            $img = $datos->img;
+            $data['img'] = null;
+        }
+
+        if (isset($datos->img_proyecto)) {
+            $img = $datos->img_proyecto;
+            $data['img_proyecto'] = null;
+        }
+
+        if (isset($datos->{'img_' . $seccion})) {
+            $img = $datos->{'img_' . $seccion};
+            $data['img_' . $seccion] = null;
+        }
+
+        if ($data) {
+            // en el update
+            // data es un parametro y representa el set
+            // luego separado por , tenemos el where
+            $update = $this->db->table($seccion)->update($data, ["id" => $id]);
+            if (!$update) {
+                custom_error(507, $this->lang, $seccion);
+            }
+        }
+
+        if ($img) {
+            $this->TrashFIle($seccion, $img);
+        }
+
+        json_debug(array_merge((array)$datos, $data));
     }
 
-    private function TrashFIle($origen, $name) {
+
+    private function TrashFIle($carpeta, $name) {
         // Verificar si el nombre del archivo es válido
         if (empty($name)) {
             return false;
         }
 
         // Rutas de las carpetas
-        $carpetaOrigen = $origen;
-        $carpetaDestino = 'img/trash/';
+        $carpetaOrigen = 'assets/images/' . $carpeta . '/';
+        $carpetaDestino = 'assets/images/papelera/';
 
         // Ruta completa de los archivos
         $rutaArchivoOrigen = $carpetaOrigen . $name;

@@ -476,7 +476,7 @@ $(document).on("click", ".showdescrip", function (e) {
     Swal.fire({ title: $(this).data("description") });
 });
 
-// verificaciones de clase de img 
+// VERIFICACIONES DE CLASE IMG PARA AGREGADO DE BTN
 // console.log("cantidad", $(".input-group-text").length );
 if ($(".input-group-text").length > 0) {
 
@@ -494,6 +494,7 @@ if ($(".input-group-text").length > 0) {
     });
 }
 
+// ajax para borrar las img
 $(document).on("click", ".del-img", function (e) {
     e.preventDefault(); // Evitar que se siga el enlace por defecto
 

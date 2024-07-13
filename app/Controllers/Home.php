@@ -46,6 +46,7 @@ class Home extends BaseController {
 
         $this->data['lenguajes'] = [];
         $lenguaje = json_decode(send_post($this->urlAPI . "lenguaje?activo=1"));
+        // debug($lenguaje);
         if (isset($lenguaje->error)) {
             $this->data['error'] = $lenguaje->error;
         } else {

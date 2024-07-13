@@ -1396,8 +1396,12 @@ class Admin extends BaseController {
         }
         $this->get_txtbanner();
     }
-
     // FIN FUNCIONES TEXTO BANNER
+
+    // FUNCION BORRAR IMG CARGADAS //
+    
+
+    // FIN FUNCION BORRAR IMG CARGADAS //
 
     private function valtoken() {
         $this->token = $this->request->getCookie("token");

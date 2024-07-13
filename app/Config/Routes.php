@@ -22,6 +22,8 @@ $routes->group('admin', function ($routes) {
     $routes->match(['get', 'post'], 'register', 'Admin::register');
     $routes->match(['get', 'post'], 'recover', 'Admin::recover');
     $routes->match(['get', 'post'], 'perfil', 'Admin::perfil');
+    $routes->match(['get', 'post'], 'delete/img', 'Api::delete_img');
+
 
     $routes->get('tables-basic', 'Admin::tables_basic');
     $routes->get('tables-datatables', 'Admin::tables_datatables');
