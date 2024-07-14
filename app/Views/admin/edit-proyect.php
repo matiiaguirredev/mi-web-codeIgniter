@@ -61,8 +61,8 @@
                                             <label class="col-md-2 col-form-label" for="example-fileinput">Default file input</label>
                                             <div class="col-md-10">
                                                 <div class="input-group">
-                                                    <a href="<?= $proyecto->img_proyecto ?>" target="_blank" class="input-group-text" id="basic-addon1"><i class="fa-sharp fa-solid fa-image"></i></a>
-                                                    <input multiple type="file" name="img_proyecto" class="form-control" id="example-fileinput">
+                                                    <a href="<?= $proyecto->img ?>" target="_blank" class="input-group-text" id="basic-addon1"><i class="fa-sharp fa-solid fa-image"></i></a>
+                                                    <input multiple type="file" name="img" class="form-control" id="example-fileinput">
                                                 </div>
                                             </div>
                                         </div>

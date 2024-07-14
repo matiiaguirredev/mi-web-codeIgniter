@@ -47,7 +47,7 @@
                                                     <th class="text-center" scope="row"><?= $key + 1; ?></th>
                                                     <td><?= $proyecto->nombre; ?></td>
                                                     <td class="text-center"><a class="showdescrip" data-description="<?= $proyecto->descripcion; ?>">Ver descripcion</a></td>
-                                                    <td class="text-center"><a href="<?= ($proyecto->img_proyecto) ? $proyecto->img_proyecto : '#'; ?>" target="_blank">Ver</a></td>
+                                                    <td class="text-center"><a href="<?= ($proyecto->img) ? $proyecto->img : '#'; ?>" target="_blank">Ver</a></td>
                                                     <td class="text-center"><a href="<?= ($proyecto->url) ? $proyecto->url : '#'; ?>" target="_blank">Ver</a></td>
                                                     <td><?= $categoria_proyecto->nombre; ?></td>
                                                     <td class="text-center d-flex justify-content-center gap-1" colspan="">

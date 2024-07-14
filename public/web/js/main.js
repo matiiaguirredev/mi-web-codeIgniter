@@ -1,9 +1,9 @@
-(function($) {
-	'use strict';
+(function ($) {
+    'use strict';
 
     // Menu JS
     /*==============================================================*/
-    $('.navbar-area .navbar-nav li a, .main-banner .ca3-scroll-down-link, .about-text .btn').on('click', function(e){
+    $('.navbar-area .navbar-nav li a, .main-banner .ca3-scroll-down-link, .about-text .btn').on('click', function (e) {
         var anchor = $(this);
         $('html, body').stop().animate({
             scrollTop: $(anchor.attr('href')).offset().top - 50
@@ -11,12 +11,12 @@
         e.preventDefault();
     });
 
-    $(document).on('click','.navbar-collapse.in',function(e) {
-        if( $(e.target).is('a') && $(e.target).attr('class') != 'dropdown-toggle' ) {
+    $(document).on('click', '.navbar-collapse.in', function (e) {
+        if ($(e.target).is('a') && $(e.target).attr('class') != 'dropdown-toggle') {
             $(this).collapse('hide');
         }
-    });	
-    
+    });
+
     // Animation Text
     /*==============================================================*/
     // var TxtType = function(el, toRotate, period) {
@@ -68,66 +68,119 @@
     //     css.innerHTML = ".typewrite > .wrap { border-right: 0.08em solid #fff}";
     //     document.body.appendChild(css);
     // };
-    
+
     // Header Sticky
-    
+
+    // $.ajax({
+    //     async: true,
+    //     type: "POST",
+    //     dataType: "json",
+    //     url: "./api/txtbanner/",  // Ajusta esta URL si es necesario
+    //     data: [],
+    //     contentType: "application/json; charset=utf-8",
+    //     processData: false,
+    // })
+    //     .done(function (Response) {
+    //         //do something when get response
+
+    //         console.log('txtbanner',Response);
+    //     })
+    //     .fail(function (Response) {
+    //         //do something when any error occurs.
+    //         // showAlert("danger", Response.error);
+    //         console.error('txtbanner',Response);
+    //     });
+
+    // new TypeIt('.animated-text', {
+    //     speed: 65,
+    //     loop: true
+    // })
+    //     .type("Hola! Soy Matias Aguirre, Desarrollador Web.", { delay: 500 })
+    //     .move(1, { delay: 500 })
+    //     .delete(70, { pause: 500 })
+    //     .type("Developer. ", { delay: 750 })
+    //     .delete(15, { pause: 750 })
+    //     .type("BackEnd. ", { delay: 750 })
+    //     .delete(10, { pause: 750 })
+    //     .type("FrontEnd. ", { delay: 750 })
+    //     .delete(10, { pause: 750 })
+    //     .type("Full-Stack. ", { delay: 750 })
+    //     .delete(60, { pause: 750 })
+    //     .move(null, { to: 'end' })
+    //     .move(null, { speed: 30, to: 'start', instant: true })
+    //     .type("Bienvenido</em>", { delay: 750 })
+    //     .delete(1, { delay: 750 })
+    //     .type("a", { delay: 750 })
+    //     .delete(1, { delay: 750 })
+    //     .type('os.', { delay: 750 })
+    //     .move(null, { delay: 500, to: 'end', instant: true })
+    //     .go();
+
+    /*==============================================================*/
+
     $.ajax({
         async: true,
         type: "POST",
         dataType: "json",
-        url:
-            "./api/txtbanner/",
-        data: [],
+        url: "./api/txtbanner/?activo=1",  // Ajusta esta URL si es necesario
         contentType: "application/json; charset=utf-8",
-        // contentType: false,
         processData: false,
     })
-        .done(function (Response) {
+        .done(function (response) {
             //do something when get response
-            
-            console.log('txtbanner',Response);
+            console.log('txtbanner', response);
+
+            // Extraer los textos de la respuesta
+            // Aquí vamos a usar los datos obtenidos de la API para inicializar TypeIt
+            let texts = response.map(item => item.txtBanner);
+            // Inicializar TypeIt con los textos obtenidos
+
+            let instance = new TypeIt('.animated-text', {
+                speed: 10,
+                loop: true
+            });
+            // Agregar cada texto a la animación
+            response.forEach((item, index) => {
+                console.log("INDEX: ", index);
+                if (item.cambio1 && item.cambio2) {
+                    console.log("AQUI ESTAMOS EN LA CUARTA: ", index);
+
+                    let cantotal = item.txtBanner.length - parseInt(item.delete1) + item.cambio2.length;
+                    // cantotal es la cantidad de caracteres despues de la resta y suma de los caracteres de cambio 1 y cambio 2
+
+                    instance = instance.type(item.txtBanner, { delay: 750 })
+                        .delete(parseInt(item.delete1), { delay: 750 })
+                        .type(item.cambio1, { delay: 750 })
+                        .delete(item.cambio1.length, { delay: 750 })
+                        .type( item.cambio2, { delay: 750 })
+                        .pause(500)
+                        .delete(cantotal, { delay: 750 });
+
+                } else {
+                    instance = instance.type(item.txtBanner, { delay: 750 })
+                        .pause(500)
+                        .delete(item.txtBanner.length, { delay: 750 });
+                }
+            });
+            // Iniciar la animación
+            instance.go();
         })
-        .fail(function (Response) {
+        .fail(function (response) {
             //do something when any error occurs.
-            // showAlert("danger", Response.error);
-            console.error('txtbanner',Response);
+            console.error('txtbanner', response);
         });
-    
-    new TypeIt('.animated-text', {
-        speed: 65,
-        loop: true
-    })
-        .type("Hola! Soy Matias Aguirre, Desarrollador Web.", { delay: 500 })
-        .move(1, { delay: 500 })
-        .delete(70, { pause: 500 })
-        .type("Developer. ", { delay: 750 })
-        .delete(15, { pause: 750 })
-        .type("BackEnd. ", { delay: 750 })
-        .delete(10, { pause: 750 })
-        .type("FrontEnd. ", { delay: 750 })
-        .delete(10, { pause: 750 })
-        .type("Full-Stack. ", { delay: 750 })
-        .delete(60, { pause: 750 })
-        .move(null, { to: 'end' })
-        .move(null, { speed: 30, to: 'start', instant: true })
-        .type("Bienvenido</em>", { delay: 750 })
-        .delete(1, { delay: 750 })
-        .type("a", { delay: 750 })
-        .delete(1, { delay: 750 })
-        .type('os.', { delay: 750 })
-        .move(null, { delay: 500, to: 'end', instant: true })
-        .go();
-    
+
     /*==============================================================*/
-    $(window).on('scroll',function() {
-        if ($(this).scrollTop() >70){  
+
+    $(window).on('scroll', function () {
+        if ($(this).scrollTop() > 70) {
             $('.header-sticky').addClass("is-sticky");
         }
-        else{
+        else {
             $('.header-sticky').removeClass("is-sticky");
         }
     });
-    
+
     // Shorting
     /*==============================================================*/
     try {
@@ -136,8 +189,8 @@
                 toggleDefault: 'none'
             }
         });
-    } catch (err) {}
-    
+    } catch (err) { }
+
     /* Services Slider
     ========================================================*/
     $(".services-slider").owlCarousel({
@@ -152,28 +205,28 @@
         smartSpeed: 750,
         loop: true,
         navText: ["<i class='fa fa-angle-left'></i>", "<i class='fa fa-angle-right'></i>"],
-        responsive:{
-            0:{
-                items:1,
+        responsive: {
+            0: {
+                items: 1,
             },
-            768:{
-                items:2,
+            768: {
+                items: 2,
             },
-            1200:{
-                items:3,
+            1200: {
+                items: 3,
             }
         }
     });
-    
+
     /* Zoom Portfolio
     ========================================================*/
     $('.zoom-portfolio').magnificPopup({
         type: 'image',
-        gallery:{
-            enabled:true
+        gallery: {
+            enabled: true
         }
     });
-    
+
     /* Testimonial Slider
     ========================================================*/
     $(".testimonial-slider").owlCarousel({
@@ -188,19 +241,19 @@
         smartSpeed: 750,
         loop: true,
         navText: ["<i class='fa fa-angle-left'></i>", "<i class='fa fa-angle-right'></i>"],
-        responsive:{
-            0:{
-                items:1,
+        responsive: {
+            0: {
+                items: 1,
             },
-            768:{
-                items:1,
+            768: {
+                items: 1,
             },
-            1200:{
-                items:2,
+            1200: {
+                items: 2,
             }
         }
     });
-    
+
     /* Ripple Effect
     ========================================================*/
     $('.ripple-effect, .ripple-playing').ripples({
@@ -208,7 +261,7 @@
         dropRadius: 25,
         perturbance: 0.04,
     });
-    
+
     /* Blog Slider
     ========================================================*/
     $(".blog-slider").owlCarousel({
@@ -223,28 +276,28 @@
         autoplayHoverPause: true,
         loop: true,
         navText: ["<i class='fa fa-angle-left'></i>", "<i class='fa fa-angle-right'></i>"],
-        responsive:{
-            0:{
-                items:1,
+        responsive: {
+            0: {
+                items: 1,
             },
-            768:{
-                items:2,
+            768: {
+                items: 2,
             },
-            1200:{
-                items:3,
+            1200: {
+                items: 3,
             }
         }
     });
-    
+
     /* Practicle JS
     ========================================================*/
-    if(document.getElementById("particles-js")) particlesJS("particles-js", {
+    if (document.getElementById("particles-js")) particlesJS("particles-js", {
         "particles": {
             "number": {
                 "value": 150,
                 "density": {
                     "enable": true,
-                    "value_area":1000
+                    "value_area": 1000
                 }
             },
             "color": {
@@ -338,51 +391,51 @@
     /* Go To Top
     ========================================================*/
     //Scroll event
-    $(window).on('scroll',function(){
+    $(window).on('scroll', function () {
         var scrolled = $(window).scrollTop();
         if (scrolled > 200) $('.go-top').fadeIn('slow');
         if (scrolled < 200) $('.go-top').fadeOut('slow');
-    }); 
-     
+    });
+
     //Click event
     $('.go-top').on('click', function () {
-        $("html, body").animate({ scrollTop: "0" },  500);
+        $("html, body").animate({ scrollTop: "0" }, 500);
     });
-    
+
     /* Preloader
     ========================================================*/
-    jQuery(window).on('load', function() {
+    jQuery(window).on('load', function () {
         $('.preloader-area').fadeOut();
     });
 
     // Buy Now Btn
-	// $('body').append("<a href='https://themeforest.net/checkout/from_item/22745035?license=regular&support=bundle_6month&_ga=2.51442410.233315998.1651981865-1425290503.1590986634' target='_blank' class='buy-now-btn'><img src='web/img/envato.png' alt='envato'/>Buy Now</a>");
+    // $('body').append("<a href='https://themeforest.net/checkout/from_item/22745035?license=regular&support=bundle_6month&_ga=2.51442410.233315998.1651981865-1425290503.1590986634' target='_blank' class='buy-now-btn'><img src='web/img/envato.png' alt='envato'/>Buy Now</a>");
 
     // Switch Btn
-	$('body').append("<div class='switch-box'><label id='switch' class='switch'><input type='checkbox' onchange='toggleTheme()' id='slider'><span class='slider round'></span></label></div>");
+    $('body').append("<div class='switch-box'><label id='switch' class='switch'><input type='checkbox' onchange='toggleTheme()' id='slider'><span class='slider round'></span></label></div>");
 
 })(jQuery);
 
 // function to set a given theme/color-scheme
 function setTheme(themeName) {
-	localStorage.setItem('phkr_theme', themeName);
-	document.documentElement.className = themeName;
+    localStorage.setItem('phkr_theme', themeName);
+    document.documentElement.className = themeName;
 }
 // function to toggle between light and dark theme
 function toggleTheme() {
-	if (localStorage.getItem('phkr_theme') === 'theme-dark') {
-		setTheme('theme-light');
-	} else {
-		setTheme('theme-dark');
-	}
+    if (localStorage.getItem('phkr_theme') === 'theme-dark') {
+        setTheme('theme-light');
+    } else {
+        setTheme('theme-dark');
+    }
 }
 // Immediately invoked function to set the theme on initial load
 (function () {
-	if (localStorage.getItem('phkr_theme') === 'theme-dark') {
-		setTheme('theme-dark');
-		document.getElementById('slider').checked = false;
-	} else {
-		setTheme('theme-light');
-	document.getElementById('slider').checked = true;
-	}
+    if (localStorage.getItem('phkr_theme') === 'theme-dark') {
+        setTheme('theme-dark');
+        document.getElementById('slider').checked = false;
+    } else {
+        setTheme('theme-light');
+        document.getElementById('slider').checked = true;
+    }
 })();

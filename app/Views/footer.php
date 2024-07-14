@@ -34,7 +34,7 @@
 <!-- Contact Form Min JS -->
 <script src="web/js/contact-form-script.js"></script>
 <!-- Main JS -->
-<script src="web/js/main.js"></script>
+<script src="web/js/main.js?v=<?= time() ?>"></script>
 
 
 </body>

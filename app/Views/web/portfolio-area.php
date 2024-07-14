@@ -28,10 +28,10 @@
                         <?php foreach ($proyectos as $key => $proy) { ?>
                             <div class="col-lg-4 col-md-6 mix category-<?= $proy->cat_id ?>">
                                 <div class="single-portfolio">
-                                    <img src="<?= $proy->img_proyecto ?>" alt="portfolio">
+                                    <img src="<?= $proy->img ?>" alt="portfolio">
                                     <div class="content">
                                         <h3><?= $proy->nombre ?></h3>
-                                        <a href="<?= $proy->img_proyecto ?>" class="zoom-portfolio"><i class="fa fa-search-plus"></i></a>
+                                        <a href="<?= $proy->img ?>" class="zoom-portfolio"><i class="fa fa-search-plus"></i></a>
                                         <a href="<?= $proy->url ?>" target="_blank" class="link-btn"><i class="fa fa-link"></i></a>
                                     </div>
                                 </div>

@@ -243,10 +243,10 @@ class Api extends BaseController {
             }
         }
 
-        $data["img_proyecto"] = $this->uploadImage("proyectos", "img_proyecto"); // nombre de carpeta y desp campo de bd 
-        if (!$data["img_proyecto"]) {
-            // $valRequire[] = "img_proyecto";
-            $data["img_proyecto"] = "300x300.jpg"; // aca esta opcional y tenemos una por defecto, si queremos obligatoria descomentar arriba.
+        $data["img"] = $this->uploadImage("proyectos", "img"); // nombre de carpeta y desp campo de bd 
+        if (!$data["img"]) {
+            // $valRequire[] = "img";
+            $data["img"] = "300x300.jpg"; // aca esta opcional y tenemos una por defecto, si queremos obligatoria descomentar arriba.
         }
 
         if ($valRequire) {
@@ -262,7 +262,7 @@ class Api extends BaseController {
             custom_error(204, $this->lang);
         }
 
-        $data["img_proyecto"] = base_url() . "assets/images/proyectos/" . $data["img_proyecto"];
+        $data["img"] = base_url() . "assets/images/proyectos/" . $data["img"];
 
         $id = $this->db->insertID(); // ultimo identificador insertado !
 
@@ -291,8 +291,8 @@ class Api extends BaseController {
 
         //esto es para agregar url a la imagen !
         foreach ($datos as $key => $value) {
-            if ($value->img_proyecto) {
-                $datos[$key]->img_proyecto = base_url() . "assets/images/proyectos/" . $value->img_proyecto;
+            if ($value->img) {
+                $datos[$key]->img = base_url() . "assets/images/proyectos/" . $value->img;
             }
         }
 
@@ -331,10 +331,10 @@ class Api extends BaseController {
             }
         }
 
-        $data["img_proyecto"] = $this->uploadImage("proyectos", "img_proyecto"); // nombre de carpeta y desp campo de bd 
-        if (!$data["img_proyecto"]) {
-            // $valRequire[] = "img_proyecto";
-            $data["img_proyecto"] = $datos->img_proyecto;
+        $data["img"] = $this->uploadImage("proyectos", "img"); // nombre de carpeta y desp campo de bd 
+        if (!$data["img"]) {
+            // $valRequire[] = "img";
+            $data["img"] = $datos->img;
         }
 
         $data["user_id"] = $this->user->id;
@@ -346,7 +346,7 @@ class Api extends BaseController {
             custom_error(506, $this->lang, "proyectos");
         }
 
-        $data["img_proyecto"] = base_url() . "assets/images/proyectos/" . $data["img_proyecto"];
+        $data["img"] = base_url() . "assets/images/proyectos/" . $data["img"];
 
         json_debug(array_merge((array)$datos, $data));
     }
@@ -1803,7 +1803,6 @@ class Api extends BaseController {
     }
     // FIN CRUD SECCIONES TITULOS/DESCRIPTIONS Y MAS
 
-
     // CRUD TEXTO BANNER
     public function create_txtbanner() {
         $this->valToken();
@@ -1853,8 +1852,9 @@ class Api extends BaseController {
             $query .= ($id) ? " AND" : " WHERE";
             $query .= " activo = 1";
         }
-
-        $query .= " ORDER BY `txtbanner`.`txtBanner` ASC";
+        
+        $query .= " ORDER BY `txtbanner`.`id` ASC";
+        // debug($query);
         $query = $this->db->query($query);
         $datos = $query->getResult();
 
@@ -2118,7 +2118,6 @@ class Api extends BaseController {
 
         json_debug(array_merge((array)$datos, $data));
     }
-
 
     private function TrashFIle($carpeta, $name) {
         // Verificar si el nombre del archivo es válido
