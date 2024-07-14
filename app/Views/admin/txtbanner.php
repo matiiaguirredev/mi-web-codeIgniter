@@ -23,6 +23,9 @@
                                         <tr>
                                             <th class="text-center">#</th>
                                             <th class="text-center">Texto de banner</th>
+                                            <th class="text-center">Error de tipeo 1</th>
+                                            <th class="text-center">Error de tipeo 2</th>
+                                            <th class="text-center">Caracteres a borrar</th>
                                             <th class="text-center">Opciones</th>
                                         </tr>
                                     </thead>
@@ -35,7 +38,10 @@
                                         ?>
                                             <tr>
                                                 <th class="text-center" scope="row"><?= $key + 1; ?></th>
-                                                <td><?= $txt->txtBanner; ?></td>
+                                                <td><?= $txt->texto; ?></td>
+                                                <td><?= $txt->cambio1; ?></td>
+                                                <td><?= $txt->cambio2; ?></td>
+                                                <td><?= $txt->delete1; ?></td>
                                                 <td class="text-center d-flex justify-content-center gap-1" colspan="">
                                                     <a href="admin/update/txtbanner/<?= $txt->id; ?>"><i class="fa-sharp fa-solid fa-pen-to-square "></i></a>
                                                     <a href="" onclick="deletetxtbanner(<?= $txt->id; ?>)" data-bs-toggle="modal" data-bs-target="#exampleModal"><i class="fa-sharp fa-solid fa-trash"></i></a>

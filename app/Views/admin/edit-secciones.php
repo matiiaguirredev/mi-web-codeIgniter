@@ -63,8 +63,8 @@
                                             <label class="col-md-2 col-form-label" for="example-fileinput">Imagen de fondo</label>
                                             <div class="col-md-10">
                                                 <div class="input-group">
-                                                    <a href="<?= $secciones->bg_img ?>" target="_blank" class="input-group-text" id="basic-addon1"><i class="fa-sharp fa-solid fa-image"></i></a>
-                                                    <input multiple type="file" name="bg_img" class="form-control" id="example-fileinput">
+                                                    <a href="<?= $secciones->img ?>" target="_blank" class="input-group-text" id="basic-addon1"><i class="fa-sharp fa-solid fa-image"></i></a>
+                                                    <input multiple type="file" name="img" class="form-control" id="example-fileinput">
                                                     
                                                 </div>
                                             </div>

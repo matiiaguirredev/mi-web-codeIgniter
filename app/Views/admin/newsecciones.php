@@ -62,7 +62,7 @@
                                         <div class="mb-2 row">
                                             <label class="col-md-2 col-form-label" for="example-fileinput">Imagen de fondo</label>
                                             <div class="col-md-10">
-                                                <input multiple type="file" name="bg_img" class="form-control" id="example-fileinput">
+                                                <input multiple type="file" name="img" class="form-control" id="example-fileinput">
                                             </div>
                                         </div>
 

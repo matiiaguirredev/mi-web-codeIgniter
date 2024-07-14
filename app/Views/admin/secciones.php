@@ -26,7 +26,7 @@
                                             <th class="text-center">Descripciones</th>
                                             <th class="text-center">Txt Btn</th>
                                             <th class="text-center">Link Secc</th>
-                                            <th class="text-center">Img BG</th>
+                                            <th class="text-center">Image</th>
                                             <th class="text-center">Color BG</th>
                                             <th class="text-center">Alias seccion</th>
                                             <th class="text-center">Orden</th>
@@ -46,7 +46,7 @@
                                                 <td class="text-center " ><a class="showdescrip"  data-description="<?= $sec->descripciones; ?>">Ver descripcion</a></td>
                                                 <td><?= $sec->txt_btn; ?></td>
                                                 <td><?= $sec->link_secc; ?></td>
-                                                <td class="text-center"><a href="<?= ($sec->bg_img) ? $sec->bg_img : '#'; ?>" target="_blank">Ver</a></td>
+                                                <td class="text-center"><a href="<?= ($sec->img) ? $sec->img : '#'; ?>" target="_blank">Ver</a></td>
                                                 <td><?= $sec->bg_color; ?></td>
                                                 <td><?= $sec->alias; ?></td>
                                                 <td><?= $sec->orden; ?></td>

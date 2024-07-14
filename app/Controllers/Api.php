@@ -1664,7 +1664,7 @@ class Api extends BaseController {
         $optionals = [ // datos opcionales 
             "titulos",
             "descripciones",
-            "bg_img",
+            "img",
             "bg_color",
             "txt_btn",
             "link_secc",
@@ -1674,7 +1674,7 @@ class Api extends BaseController {
             $data[$name] = $this->request->getGetPost($name);
         }
 
-        $data["bg_img"] = $this->uploadImage("secciones", "bg_img"); // nombre de carpeta y desp campo de bd 
+        $data["img"] = $this->uploadImage("secciones", "img"); // nombre de carpeta y desp campo de bd 
 
         $data["activo"] = ($this->request->getGetPost("activo")) ? 1 : 0;
 
@@ -1683,7 +1683,7 @@ class Api extends BaseController {
             custom_error(204, $this->lang);
         }
 
-        $data["bg_img"] = base_url() . "assets/images/secciones/" . $data["bg_img"];
+        $data["img"] = base_url() . "assets/images/secciones/" . $data["img"];
         $id = $this->db->insertID(); // ultimo identificador insertado !
 
         json_debug(array_merge(["id" => $id], $data));
@@ -1713,8 +1713,8 @@ class Api extends BaseController {
 
         //esto es para agregar url a la imagen !
         foreach ($datos as $key => $value) {
-            if ($value->bg_img) {
-                $datos[$key]->bg_img = base_url() . "assets/images/secciones/" . $value->bg_img;
+            if ($value->img) {
+                $datos[$key]->img = base_url() . "assets/images/secciones/" . $value->img;
             }
         }
 
@@ -1742,7 +1742,7 @@ class Api extends BaseController {
         $optionals = [ // datos opcionales 
             "titulos",
             "descripciones",
-            "bg_img",
+            "img",
             "bg_color",
             "txt_btn",
             "link_secc",
@@ -1756,10 +1756,10 @@ class Api extends BaseController {
             }
         }
 
-        $data["bg_img"] = $this->uploadImage("secciones", "bg_img"); // nombre de carpeta y desp campo de bd 
-        if (!$data["bg_img"]) {
-            // $valRequire[] = "bg_img";
-            $data["bg_img"] = $datos->bg_img;
+        $data["img"] = $this->uploadImage("secciones", "img"); // nombre de carpeta y desp campo de bd 
+        if (!$data["img"]) {
+            // $valRequire[] = "img";
+            $data["img"] = $datos->img;
         }
 
         $data["activo"] = ($this->request->getGetPost("activo")) ? 1 : 0;
@@ -1774,7 +1774,7 @@ class Api extends BaseController {
             custom_error(506, $this->lang, "secciones");
         }
 
-        $data["bg_img"] = base_url() . "assets/images/secciones/" . $data["bg_img"];
+        $data["img"] = base_url() . "assets/images/secciones/" . $data["img"];
         json_debug(array_merge((array)$datos, $data));
     }
 
@@ -1808,7 +1808,7 @@ class Api extends BaseController {
         $this->valToken();
 
         $require = [
-            "txtBanner" => "text",
+            "texto" => "text",
         ];
 
         $valRequire = [];
@@ -1825,6 +1825,16 @@ class Api extends BaseController {
         if ($valRequire) {
             // validar error que te faltan datos
             custom_error(101, "es", $valRequire);
+        }
+
+        $optionals = [ // datos opcionales 
+            "cambio1",
+            "cambio2",
+            "delete1",
+        ];
+
+        foreach ($optionals as $name) {
+            $data[$name] = $this->request->getGetPost($name);
         }
 
         $data["activo"] = ($this->request->getGetPost("activo")) ? 1 : 0;
@@ -1883,7 +1893,7 @@ class Api extends BaseController {
         $datos = $datos[0];
 
         $require = [
-            "txtBanner" => "text",
+            "texto" => "text",
 
         ];
 
@@ -1893,6 +1903,18 @@ class Api extends BaseController {
                 $data[$name] = validateValue($value, $type, $this->lang);
             } else {
                 $valRequire[] = $name;
+            }
+        }
+
+        $optionals = [ // datos opcionales 
+            "cambio1",
+            "cambio2",
+            "delete1",
+        ];
+
+        if (!$this->request->getGetPost("notnull")) {
+            foreach ($optionals as $name) {
+                $data[$name] = $this->request->getGetPost($name);
             }
         }
 

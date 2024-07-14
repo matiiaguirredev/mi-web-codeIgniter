@@ -145,10 +145,10 @@
                 if (item.cambio1 && item.cambio2) {
                     console.log("AQUI ESTAMOS EN LA CUARTA: ", index);
 
-                    let cantotal = item.txtBanner.length - parseInt(item.delete1) + item.cambio2.length;
+                    let cantotal = item.texto.length - parseInt(item.delete1) + item.cambio2.length;
                     // cantotal es la cantidad de caracteres despues de la resta y suma de los caracteres de cambio 1 y cambio 2
 
-                    instance = instance.type(item.txtBanner, { delay: 750 })
+                    instance = instance.type(item.texto, { delay: 750 })
                         .delete(parseInt(item.delete1), { delay: 750 })
                         .type(item.cambio1, { delay: 750 })
                         .delete(item.cambio1.length, { delay: 750 })
@@ -157,9 +157,9 @@
                         .delete(cantotal, { delay: 750 });
 
                 } else {
-                    instance = instance.type(item.txtBanner, { delay: 750 })
+                    instance = instance.type(item.texto, { delay: 750 })
                         .pause(500)
-                        .delete(item.txtBanner.length, { delay: 750 });
+                        .delete(item.texto.length, { delay: 750 });
                 }
             });
             // Iniciar la animación

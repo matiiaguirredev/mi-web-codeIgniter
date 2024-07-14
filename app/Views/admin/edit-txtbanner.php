@@ -35,7 +35,28 @@
                                         <div class="mb-2 row">
                                             <label class="col-md-2 col-form-label" for="simpleinput">Nuevo texto de banner</label>
                                             <div class="col-md-10">
-                                                <input type="text" name="txtBanner" id="simpleinput" class="form-control" value="<?= $txtbanner->txtBanner ?>">
+                                                <input type="text" name="texto" id="simpleinput" class="form-control" value="<?= $txtbanner->texto ?>">
+                                            </div>
+                                        </div>
+
+                                        <div class="mb-2 row">
+                                            <label class="col-md-2 col-form-label" for="simpleinput">Primer cambio de tipeo</label>
+                                            <div class="col-md-10">
+                                                <input type="text" name="cambio1" id="simpleinput" class="form-control" value="<?= $txtbanner->cambio1 ?>">
+                                            </div>
+                                        </div>
+
+                                        <div class="mb-2 row">
+                                            <label class="col-md-2 col-form-label" for="simpleinput">Segundo cambio de tipeo</label>
+                                            <div class="col-md-10">
+                                                <input type="text" name="cambio2" id="simpleinput" class="form-control" value="<?= $txtbanner->cambio2 ?>">
+                                            </div>
+                                        </div>
+
+                                        <div class="mb-2 row">
+                                            <label class="col-md-2 col-form-label" for="simpleinput">Caracteres a borrar total</label>
+                                            <div class="col-md-10">
+                                                <input type="number" name="delete1" id="simpleinput" class="form-control" value="<?= $txtbanner->delete1 ?>">
                                             </div>
                                         </div>
 
