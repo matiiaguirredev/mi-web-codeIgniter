@@ -67,36 +67,40 @@ class Home extends BaseController {
 
         $this->header();
         echo view('index', $this->data);
+        // debug($secciones, false);
 
         foreach ($secciones as $secc) {
-            // debug($secc, false);
-            $this->data["titulos"] = ($secc->titulos) ?? null;
-            $this->data["descripciones"] = ($secc->descripciones) ?? null;
-            $this->data["bg_img"] = ($secc->bg_img) ?? null;
-            $this->data["bg_color"] = ($secc->bg_color) ?? null;
-            switch ($secc->alias) {
-                    // debug($secc->alias, false);
-                case "acerca":
-                    $this->aboutmearea();
-                    break;
-                case "servicios":
-                    $this->servicesarea();
-                    break;
-                case "clientes":
-                    $this->funfactsarea();
-                    break;
-                case "exp":
-                    $this->resumearea();
-                    break;
-                case "proyectos":
-                    $this->portfolioarea();
-                    break;
-                case "contratame":
-                    $this->hireme();
-                    break;
-                case "contactame":
-                    $this->contact();
-                    break;
+            // debug($secc);
+            if (isset($secc->alias)) {
+                $this->data["titulos"] = ($secc->titulos) ?? null;
+                $this->data["descripciones"] = ($secc->descripciones) ?? null;
+                $this->data["bg_img"] = ($secc->bg_img) ?? null;
+                $this->data["bg_color"] = ($secc->bg_color) ?? null;
+
+                switch ($secc->alias) {
+                        // debug($secc->alias, false);
+                    case "acerca":
+                        $this->aboutmearea();
+                        break;
+                    case "servicios":
+                        $this->servicesarea();
+                        break;
+                    case "clientes":
+                        $this->funfactsarea();
+                        break;
+                    case "exp":
+                        $this->resumearea();
+                        break;
+                    case "proyectos":
+                        $this->portfolioarea();
+                        break;
+                    case "contratame":
+                        $this->hireme();
+                        break;
+                    case "contactame":
+                        $this->contact();
+                        break;
+                }
             }
         }
 

@@ -21,7 +21,6 @@
                <!-- end Footer -->
            <?php endif; ?>
 
-           <div class="alert-content"></div>
 
            </div>
 

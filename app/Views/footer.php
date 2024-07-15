@@ -36,6 +36,20 @@
 <!-- Main JS -->
 <script src="web/js/main.js?v=<?= time() ?>"></script>
 
+<?php if (isset($error)) :  ?>
+    <script>
+        let $error = '<?= $error; ?>';
+        showAlert("danger", $error);
+    </script>
+<?php endif; ?>
+
+<?php if (isset($success)) :  ?>
+    <script>
+        let $success = '<?= $success; ?>';
+        showAlert("success", $success);
+    </script>
+<?php endif; ?>
+
 
 </body>
 

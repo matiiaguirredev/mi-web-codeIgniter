@@ -38,23 +38,6 @@
                                             </div>
                                         </div>
 
-                                        <!-- <div class="mb-2 row">
-                                            <label class="col-md-2 col-form-label" for="example-textarea">Text area</label>
-                                            <div class="col-md-10">
-                                                <textarea class="form-control" name="descripcion" id="example-textarea" rows="5"><?= $lenguaje->descripcion ?></textarea>
-                                            </div>
-                                        </div> -->
-
-                                        <!-- <div class="mb-2 row">
-                                            <label class="col-md-2 col-form-label" for="example-fileinput">Default file input</label>
-                                            <div class="col-md-10">
-                                                <div class="input-group">
-                                                    <a href="<?= $lenguaje->img_lenguajes ?>" target="_blank" class="input-group-text" id="basic-addon1"><i class="fa-sharp fa-solid fa-image"></i></a>
-                                                    <input multiple type="file" name="img_lenguajes" class="form-control" id="example-fileinput">
-                                                </div>
-                                            </div>
-                                        </div> -->
-
                                         <div class="mb-2 row">
                                             <label class="col-md-2 col-form-label" for="form-range">Form range</label>
                                             <div class="col-md-10 align-self-center">

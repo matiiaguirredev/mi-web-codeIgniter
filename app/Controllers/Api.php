@@ -220,7 +220,7 @@ class Api extends BaseController {
         // $this->user = $checkUser;
     }
 
-    // CRUD PROYECTOS
+    // CRUD proyect
     public function create_proyect() {
         $this->valToken();
 
@@ -243,7 +243,7 @@ class Api extends BaseController {
             }
         }
 
-        $data["img"] = $this->uploadImage("proyectos", "img"); // nombre de carpeta y desp campo de bd 
+        $data["img"] = $this->uploadImage("proyect", "img"); // nombre de carpeta y desp campo de bd 
         if (!$data["img"]) {
             // $valRequire[] = "img";
             $data["img"] = "300x300.jpg"; // aca esta opcional y tenemos una por defecto, si queremos obligatoria descomentar arriba.
@@ -257,12 +257,12 @@ class Api extends BaseController {
         $data["user_id"] = $this->user->id;
         $data["activo"] = ($this->request->getGetPost("activo")) ? 1 : 0;
 
-        $insert = $this->db->table("proyectos")->insert($data);
+        $insert = $this->db->table("proyect")->insert($data);
         if (!$insert) {
             custom_error(204, $this->lang);
         }
 
-        $data["img"] = base_url() . "assets/images/proyectos/" . $data["img"];
+        $data["img"] = base_url() . "assets/images/proyect/" . $data["img"];
 
         $id = $this->db->insertID(); // ultimo identificador insertado !
 
@@ -274,7 +274,7 @@ class Api extends BaseController {
 
         // $this->valToken(); // las unicas que no se pide el token son las consultas publicas,  login y registro
 
-        $query = "SELECT * FROM proyectos ";
+        $query = "SELECT * FROM proyect ";
         if ($id) { // esto se utilza para consultar 1 especifico
             $query .= "WHERE id = '$id'";
         }
@@ -286,13 +286,13 @@ class Api extends BaseController {
         $datos = $query->getResult();
 
         if (!$datos) {
-            custom_error(504, $this->lang, "proyectos");
+            custom_error(504, $this->lang, "proyect");
         }
 
         //esto es para agregar url a la imagen !
         foreach ($datos as $key => $value) {
             if ($value->img) {
-                $datos[$key]->img = base_url() . "assets/images/proyectos/" . $value->img;
+                $datos[$key]->img = base_url() . "assets/images/proyect/" . $value->img;
             }
         }
 
@@ -306,12 +306,12 @@ class Api extends BaseController {
     public function update_proyect($id) {
         $this->valToken();
 
-        $query = "SELECT * FROM proyectos WHERE id = '$id'";
+        $query = "SELECT * FROM proyect WHERE id = '$id'";
         $query = $this->db->query($query);
         $datos = $query->getResult();
 
         if (!$datos) {
-            custom_error(504, $this->lang, "proyectos");
+            custom_error(504, $this->lang, "proyect");
         }
 
         $datos = $datos[0];
@@ -331,7 +331,7 @@ class Api extends BaseController {
             }
         }
 
-        $data["img"] = $this->uploadImage("proyectos", "img"); // nombre de carpeta y desp campo de bd 
+        $data["img"] = $this->uploadImage("proyect", "img"); // nombre de carpeta y desp campo de bd 
         if (!$data["img"]) {
             // $valRequire[] = "img";
             $data["img"] = $datos->img;
@@ -341,12 +341,12 @@ class Api extends BaseController {
         $data["activo"] = ($this->request->getGetPost("activo")) ? 1 : 0;
 
 
-        $update = $this->db->table("proyectos")->update($data, ["id" => $id]); // ver query de mysql para entender bien cuales son los 2 paremetros q recibimos (set y where)
+        $update = $this->db->table("proyect")->update($data, ["id" => $id]); // ver query de mysql para entender bien cuales son los 2 paremetros q recibimos (set y where)
         if (!$update) {
-            custom_error(506, $this->lang, "proyectos");
+            custom_error(506, $this->lang, "proyect");
         }
 
-        $data["img"] = base_url() . "assets/images/proyectos/" . $data["img"];
+        $data["img"] = base_url() . "assets/images/proyect/" . $data["img"];
 
         json_debug(array_merge((array)$datos, $data));
     }
@@ -355,17 +355,17 @@ class Api extends BaseController {
 
         $this->valToken(); // las unicas que no se pide el token son las consultas publicas,  login y registro
 
-        $query = "SELECT * FROM proyectos WHERE id = '$id'";
+        $query = "SELECT * FROM proyect WHERE id = '$id'";
         $query = $this->db->query($query);
         $datos = $query->getResult();
 
         if (!$datos) {
-            custom_error(504, $this->lang, "proyectos");
+            custom_error(504, $this->lang, "proyect");
         }
 
-        $delete = $this->db->table("proyectos")->delete(["id" => $id]);
+        $delete = $this->db->table("proyect")->delete(["id" => $id]);
         if (!$delete) {
-            custom_error(507, $this->lang, "proyectos");
+            custom_error(507, $this->lang, "proyect");
         }
 
         if ($id) {
@@ -374,7 +374,7 @@ class Api extends BaseController {
 
         json_debug($datos);
     }
-    // FIN CRUD PROYECTOS
+    // FIN CRUD proyect
 
     // CRUD LENGUAJES
     public function create_lenguaje() {
@@ -2112,6 +2112,11 @@ class Api extends BaseController {
         if (isset($datos->img)) {
             $img = $datos->img;
             $data['img'] = null;
+        }
+
+        if (isset($datos->img_fondo)) {
+            $img = $datos->img_fondo;
+            $data['img_fondo'] = null;
         }
 
         if (isset($datos->img_proyecto)) {

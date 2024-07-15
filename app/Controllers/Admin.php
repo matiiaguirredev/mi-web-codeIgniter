@@ -15,11 +15,14 @@ class Admin extends BaseController {
 
         $this->db = \Config\Database::connect();
         $this->key = getenv('KEYENCRIPT');
+        $this->data = [];
+
     }
 
-    public function login() {
-        $this->data = [];
-        if ($this->request->getGetPost()) {
+    public function login($var=true) {
+        // $this->data = [];
+        // debug($this->data);
+        if ($var && $this->request->getGetPost()) {
             $login = json_decode(send_post($this->urlAPI . "login", $this->request->getGetPost()));
             // debug($this->urlAPI ."login", false);
             if (isset($login->error)) {
@@ -149,20 +152,23 @@ class Admin extends BaseController {
     public function register() {
 
         $this->data = [];
+        $view = true;
         if ($this->request->getGetPost()) {
             $register = json_decode(send_post($this->urlAPI . "register", $this->request->getGetPost()));
             if (isset($register->error)) {
                 $this->data['error'] = $register->error;
             } else {
-                header("Location: /admin/login");
-                exit();
-                // debug($register, false);
+                $this->data['success'] = "Registro creado exitosamente";
+                $this->login(false);
+                $view = false;
             }
         }
 
-        $this->header();
-        echo view('admin/pages-register', $this->data);
-        $this->footer();
+        if ($view) {
+            $this->header();
+            echo view('admin/pages-register', $this->data);
+            $this->footer();
+        }
     }
 
     public function recover() {
@@ -373,12 +379,16 @@ class Admin extends BaseController {
 
     public function update_lenguaje($id) {
 
+        // debug('aqui', false);
+        
         $this->valtoken();
+        
         $view = true;
         $token = $this->request->getCookie("token");
-
+        
         if ($this->request->getGetPost()) {
-
+            // debug('aqui dentro del if');
+            
             $requestData = array_merge($this->request->getGetPost(), ["token" => $token]); // en una variable tengo que guardar el merge 
             // debug($_FILES);
             foreach ($_FILES as $k => $v) {
@@ -396,18 +406,23 @@ class Admin extends BaseController {
                 $view = false;
             }
         }
-
+        // debug('aqui FUERA DEL  if', false);
+        
         if ($view) {
+            // debug('viewwww', false);
+            // debug($view,false );
             $this->data['lenguajes'] = [];
-            $proyect = json_decode(send_post($this->urlAPI . "lenguaje/" . $id, ["token" => $token]));
-            if (isset($proyect->error)) {
-                $this->data['error'] = $proyect->error;
+            $lenguaje = json_decode(send_post($this->urlAPI . "lenguaje/" . $id, ["token" => $token]));
+            // debug('lenguaje', false);
+            // debug($lenguaje, false );
+            if (isset($lenguaje->error)) {
+                $this->data['error'] = $lenguaje->error;
             } else {
-                $this->data['lenguaje'] = $proyect;
+                $this->data['lenguaje'] = $lenguaje;
             }
             $this->header();
             $this->sidebar();
-            echo view('admin/edit-lenguaje');
+            echo view('admin/edit-lenguaje', $this->data);
             $this->footer();
         }
     }
@@ -1397,11 +1412,6 @@ class Admin extends BaseController {
         $this->get_txtbanner();
     }
     // FIN FUNCIONES TEXTO BANNER
-
-    // FUNCION BORRAR IMG CARGADAS //
-    
-
-    // FIN FUNCION BORRAR IMG CARGADAS //
 
     private function valtoken() {
         $this->token = $this->request->getCookie("token");

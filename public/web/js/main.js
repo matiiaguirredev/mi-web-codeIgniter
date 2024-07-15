@@ -136,7 +136,7 @@
             // Inicializar TypeIt con los textos obtenidos
 
             let instance = new TypeIt('.animated-text', {
-                speed: 10,
+                speed: 25,
                 loop: true
             });
             // Agregar cada texto a la animación
@@ -439,3 +439,18 @@ function toggleTheme() {
         document.getElementById('slider').checked = true;
     }
 })();
+
+// showalert para la web 
+function showAlert(type, message) {
+    let errorMessagePrefix = message.split(":")[0];
+    let content = `
+    <div class="text-light alert bg-${type} alert-dismissible fade show" role="alert">
+        <strong>${errorMessagePrefix}</strong>:${message.substring(errorMessagePrefix.length + 1)}
+        <button type="button" class="btn-close close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    `;
+    $(".alert-content").html(content);
+    setTimeout(() => {
+        $(".alert-content .close").click();
+    }, 3000);
+}

@@ -16,16 +16,14 @@ function showAlert(type, message) {
     let errorMessagePrefix = message.split(":")[0];
     let content = `
     <div class="text-light alert bg-${type} alert-dismissible fade show" role="alert">
-        <strong>${errorMessagePrefix}</strong>:${message.substring(
-        errorMessagePrefix.length + 1
-    )}
+        <strong>${errorMessagePrefix}</strong>:${message.substring(errorMessagePrefix.length + 1)}
         <button type="button" class="btn-close close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
     `;
     $(".alert-content").html(content);
-    setTimeout(() => {
-        $(".alert-content .close").click();
-    }, 3000);
+    // setTimeout(() => {
+    //     $(".alert-content .close").click();
+    // }, 3000);
 }
 
 function deleteproyect(id) {
@@ -520,8 +518,8 @@ $(document).on("click", ".del-img", function (e) {
             
             // Separando el pathname en partes individuales
             const pathSegments = urlObj.pathname.split('/').filter(segment => segment.length > 0);
-
             // console.log("path", pathSegments);
+
             // Obtener update, secciones e id
             const funcion = pathSegments[1];
             const seccion = pathSegments[2];

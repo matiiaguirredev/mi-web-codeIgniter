@@ -23,8 +23,8 @@
                                         <tr>
                                             <th class="text-center">#</th>
                                             <th class="text-center">Texto de banner</th>
-                                            <th class="text-center">Error de tipeo 1</th>
-                                            <th class="text-center">Error de tipeo 2</th>
+                                            <th class="text-center">Cambio 1</th>
+                                            <th class="text-center">Cambio 2</th>
                                             <th class="text-center">Caracteres a borrar</th>
                                             <th class="text-center">Opciones</th>
                                         </tr>

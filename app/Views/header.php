@@ -43,3 +43,5 @@
 </head>
 
 <body data-bs-spy="scroll" data-bs-offset="70">
+
+<div class="alert-content"></div>

@@ -17,7 +17,7 @@
                         <form action="" method="post">
 
                             <div class="form-group mb-3">
-                                <label class="form-label" for="name">Name</label>
+                                <label class="form-label" for="name">Usuario</label>
                                 <input class="form-control" type="text" name="usuario" id="name" required="" placeholder="Enter your Name">
                             </div>
 
@@ -30,6 +30,16 @@
                                 <!-- <a class="text-muted float-end" href="/dashtrap/pages-recoverpw"><small></small></a> -->
                                 <label class="form-label" for="password">Password</label>
                                 <input class="form-control" type="password" required="" name="pasw" id="password" placeholder="Enter your password">
+                            </div>
+
+                            <div class="form-group mb-3">
+                                <label class="form-label" for="name">Nombre</label>
+                                <input class="form-control" type="text" name="nombre" id="name" required="" placeholder="Enter your Name">
+                            </div>
+
+                            <div class="form-group mb-3">
+                                <label class="form-label" for="name">Apellido</label>
+                                <input class="form-control" type="text" name="apellido" id="name" required="" placeholder="Enter your LastName">
                             </div>
 
                             <div class="form-group mb-3">

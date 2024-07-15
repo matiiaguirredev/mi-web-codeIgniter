@@ -62,6 +62,7 @@
 </head>
 
 <body <?= (!$user) ? 'class="bg-primary d-flex justify-content-center align-items-center min-vh-100 p-5"' : ''; ?>>
+    <div class="alert-content"></div>
 
     <!-- Begin page -->
     <div class="layout-wrapper">
