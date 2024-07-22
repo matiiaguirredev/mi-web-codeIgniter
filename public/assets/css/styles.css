@@ -14,3 +14,11 @@ img.img-fluid.imgindex {
     mask-image: linear-gradient(black 80%, transparent);
 }
 
+.client-img {
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+    display: inline-block;
+    width: 85px;
+    border-radius: 50%;
+}

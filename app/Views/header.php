@@ -17,8 +17,11 @@
     <!-- Bootstraps icons-->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
+    
     <!-- Bootstrap Min CSS -->
     <link rel="stylesheet" href="web/css/bootstrap.min.css">
+    <!-- Jquery UI -->
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.3/themes/smoothness/jquery-ui.css">
     <!-- Font Awesome Min CSS -->
     <!-- <link rel="stylesheet" href="web/css/fontawesome.min.css"> -->
     <!-- Magnific Popup Min CSS -->

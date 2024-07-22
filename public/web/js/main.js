@@ -440,17 +440,17 @@ function toggleTheme() {
     }
 })();
 
-// showalert para la web 
-function showAlert(type, message) {
-    let errorMessagePrefix = message.split(":")[0];
-    let content = `
-    <div class="text-light alert bg-${type} alert-dismissible fade show" role="alert">
-        <strong>${errorMessagePrefix}</strong>:${message.substring(errorMessagePrefix.length + 1)}
-        <button type="button" class="btn-close close" data-bs-dismiss="alert" aria-label="Close"></button>
-    </div>
-    `;
-    $(".alert-content").html(content);
-    setTimeout(() => {
-        $(".alert-content .close").click();
-    }, 3000);
-}
+// showalert para la web  NO ES NECESARIO, solo se uso para ver como funcionaba el error.
+// function showAlert(type, message) {
+//     let errorMessagePrefix = message.split(":")[0];
+//     let content = `
+//     <div class="text-light alert bg-${type} alert-dismissible fade show" role="alert">
+//         <strong>${errorMessagePrefix}</strong>:${message.substring(errorMessagePrefix.length + 1)}
+//         <button type="button" class="btn-close close" data-bs-dismiss="alert" aria-label="Close"></button>
+//     </div>
+//     `;
+//     $(".alert-content").html(content);
+//     setTimeout(() => {
+//         $(".alert-content .close").click();
+//     }, 3000);
+// }

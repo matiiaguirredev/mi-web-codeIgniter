@@ -40,7 +40,7 @@
 
 <!-- Start Parallax Home Area -->
 <div id="home" class="main-banner parallax">
-    <!-- <?php debug($perfil, false); ?> -->
+    <?php /* debug($perfil, false); */ ?> 
     <style>
         .main-banner {
             background-image: url(<?= $perfil->img_fondo ?>);

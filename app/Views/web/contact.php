@@ -3,7 +3,7 @@
             <div class="container">
                 <div class="section-title">
                     <h2><?= $titulos ?></h2>
-                    <h3><?= $titulos ?></h3>
+                    <h3><?= $titulos ?></h3> <!-- se repire uno de los titulos por que es el que esta de fondo -->
                     <p><?= $descripciones ?></p>
                 </div>
                 <div class="row">
@@ -16,7 +16,7 @@
                         </div>
                     <?php }; ?>
 
-                    <div class="col-lg-4 col-md-6">
+                    <!-- <div class="col-lg-4 col-md-6">
                         <div class="contact-info">
                             <i class="fa fa-map-marker"></i>
                             <p>350 5th Ave, New York, <br> NY 10118, USA</p>
@@ -37,7 +37,7 @@
                             <p><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="167f7870795672737b793875797b">[email&#160;protected]</a></p>
                             <p><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="c3a2afa6bbedb0aeaab7ab83a4aea2aaafeda0acae">[email&#160;protected]</a></p>
                         </div>
-                    </div>
+                    </div> -->
                 </div>
 
                 <div class="row pt-5">

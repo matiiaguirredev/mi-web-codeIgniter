@@ -125,6 +125,54 @@
             </li>
 
             <li class="menu-item">
+                <a href="#menuTestimonios" data-bs-toggle="collapse" class="menu-link waves-effect waves-light">
+                    <span class="menu-icon"><i class="fa-solid fa-binary-circle-check"></i></span>
+                    <span class="menu-text"> Testimonios </span>
+                    <span class="menu-arrow"></span>
+                </a>
+                <div class="collapse" id="menuTestimonios">
+                    <ul class="sub-menu">
+
+                        <li class="menu-item">
+                            <a class='menu-link' href='/admin/testimonios'>
+                                <span class="menu-text">Lista de Testimonios</span>
+                            </a>
+                        </li>
+                        <li class="menu-item">
+                            <a class='menu-link' href='/admin/create/testimonios'>
+                                <span class="menu-text">Nuevo Testimonio</span>
+                            </a>
+                        </li>
+
+                    </ul>
+                </div>
+            </li>
+
+            <li class="menu-item">
+                <a href="#menuClientes" data-bs-toggle="collapse" class="menu-link waves-effect waves-light">
+                    <span class="menu-icon"><i class="fa-solid fa-binary-circle-check"></i></span>
+                    <span class="menu-text"> Clientes </span>
+                    <span class="menu-arrow"></span>
+                </a>
+                <div class="collapse" id="menuClientes">
+                    <ul class="sub-menu">
+
+                        <li class="menu-item">
+                            <a class='menu-link' href='/admin/clientes'>
+                                <span class="menu-text">Lista de Clientes</span>
+                            </a>
+                        </li>
+                        <li class="menu-item">
+                            <a class='menu-link' href='/admin/create/clientes'>
+                                <span class="menu-text">Nuevo Cliente</span>
+                            </a>
+                        </li>
+
+                    </ul>
+                </div>
+            </li>
+
+            <li class="menu-item">
                 <a href="#menuLenguajes" data-bs-toggle="collapse" class="menu-link waves-effect waves-light">
                     <span class="menu-icon"><i class="fa-solid fa-binary-circle-check"></i></span>
                     <span class="menu-text"> Lenguajes </span>

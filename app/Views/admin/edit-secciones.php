@@ -39,6 +39,13 @@
                                         </div>
 
                                         <div class="mb-2 row">
+                                            <label class="col-md-2 col-form-label" for="simpleinput">Sub Titulo de seccion</label>
+                                            <div class="col-md-10">
+                                                <input type="text" name="sub_titulo" id="simpleinput" class="form-control" value="<?= $secciones->sub_titulo ?>">
+                                            </div>
+                                        </div>
+
+                                        <div class="mb-2 row">
                                             <label class="col-md-2 col-form-label" for="example-textarea">Descripcion de seccion</label>
                                             <div class="col-md-10">
                                                 <textarea class="form-control" name="descripciones" id="example-textarea" rows="5"><?= $secciones->descripciones ?></textarea>
@@ -79,7 +86,7 @@
                                             </div>
                                         </div>
 
-                                        <div class="mb-2 row">
+                                        <!-- <div class="mb-2 row">
                                             <label class="col-md-2 col-form-label" for="simpleinput">Nombre de seccion</label>
                                             <div class="col-md-10">
                                                 <select class="form-control" name="alias" id="" require>
@@ -93,7 +100,7 @@
                                                     <option value="contactame" <?= ($secciones->alias == 'contactame') ? 'selected' : ''; ?>>Contáctame (7)</option>
                                                 </select>
                                             </div>
-                                        </div>
+                                        </div> -->
 
                                         <div class="mb-2 row">
                                             <label class="col-md-2 col-form-label" for="simpleinput">Orden</label>

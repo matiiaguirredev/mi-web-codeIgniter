@@ -73,13 +73,15 @@ class Home extends BaseController {
             // debug($secc);
             if (isset($secc->alias)) {
                 $this->data["titulos"] = ($secc->titulos) ?? null;
+                $this->data["sub_titulo"] = ($secc->sub_titulo) ?? null;
                 $this->data["descripciones"] = ($secc->descripciones) ?? null;
-                $this->data["bg_img"] = ($secc->bg_img) ?? null;
+                $this->data["img"] = ($secc->img) ?? null;
                 $this->data["bg_color"] = ($secc->bg_color) ?? null;
 
+                /* debug($secc->alias, false); */
                 switch ($secc->alias) {
-                        // debug($secc->alias, false);
                     case "acerca":
+                        // debug($secc, false);
                         $this->aboutmearea();
                         break;
                     case "servicios":
@@ -100,6 +102,9 @@ class Home extends BaseController {
                     case "contactame":
                         $this->contact();
                         break;
+                    case "testimonios":
+                        $this->testimonials();
+                        break;
                 }
             }
         }
@@ -112,6 +117,8 @@ class Home extends BaseController {
 
         $this->data['lenguajes'] = [];
         $lenguaje = json_decode(send_post($this->urlAPI . "lenguaje?activo=1"));
+        // debug($lenguaje, false);
+
         if (isset($lenguaje->error)) {
             $this->data['error'] = $lenguaje->error;
         } else {
@@ -129,7 +136,9 @@ class Home extends BaseController {
             $this->data['hobies'] = $hobies;
         }
 
-        echo view('web/about-me-area', $this->data);
+        // if (!empty($this->data['clientes'])) {
+            echo view('web/about-me-area', $this->data);
+        // }
     }
 
     private function servicesarea() {
@@ -141,11 +150,24 @@ class Home extends BaseController {
             $this->data['servicios'] = $servicios;
         }
 
-        echo view('web/services-area', $this->data);
+        if (!empty($this->data['servicios'])) {
+            echo view('web/services-area', $this->data);
+        }
     }
 
     private function funfactsarea() {
-        echo view('web/fun-facts-area', $this->data);
+
+        $this->data['clientes'] = [];
+        $clientes = json_decode(send_post($this->urlAPI . "clientes?activo=1"));
+        if (isset($clientes->error)) {
+            $this->data['error'] = $clientes->error;
+        } else { 
+            $this->data['clientes'] = $clientes;
+        }
+
+        if (!empty($this->data['clientes'])) {
+            echo view('web/fun-facts-area', $this->data);
+        }
     }
 
     private function resumearea() {
@@ -157,7 +179,9 @@ class Home extends BaseController {
             $this->data['curriculum'] = $curriculum;
         }
 
-        echo view('web/resume-area', $this->data);
+        if (!empty($this->data['curriculum'])) {
+            echo view('web/resume-area', $this->data);
+        }
     }
 
     private function portfolioarea() {
@@ -178,10 +202,13 @@ class Home extends BaseController {
             $this->data['proyectos'] = $proyect;
         }
 
-        echo view('web/portfolio-area', $this->data);
+        if (!empty($this->data['categorias']) && !empty($this->data['proyectos'])) {
+            echo view('web/portfolio-area', $this->data);
+        }
     }
 
     private function hireme() {
+
         echo view('web/hire-me', $this->data);
     }
 
@@ -190,7 +217,18 @@ class Home extends BaseController {
     }
 
     private function testimonials() {
-        echo view('web/testimonials');
+        $this->data['testimonios'] = [];
+        $testimonios = json_decode(send_post($this->urlAPI . "testimonios?activo=1")); //["token" => $token]
+        // debug($testimonios, false);
+        if (isset($testimonios->error)) {
+            $this->data['error'] = $testimonios->error;
+        } else {
+            $this->data['testimonios'] = $testimonios;
+        }
+
+        if (!empty($this->data['testimonios'])) {
+            echo view('web/testimonials', $this->data);
+        }
     }
 
     private function contact() {
@@ -204,8 +242,15 @@ class Home extends BaseController {
             $this->data['contacto'] = $contacto;
         }
 
-        echo view('web/contact', $this->data);
+        if (!empty($this->data['contacto'])) {
+            echo view('web/contact', $this->data);
+        } else {
+            // Agregamos un elemento al array $this->data['deletenavbar']
+            $this->data['deletenavbar'] = []; // Puedes ajustar el valor como necesites
+            // debug($this->data['deletenavbar'], false);
+        }
     }
+        
 
     //  finish el orden de la web !!!!
 

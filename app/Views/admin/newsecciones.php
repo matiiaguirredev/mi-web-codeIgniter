@@ -1,4 +1,4 @@
-<div class="px-3">
+    <div class="px-3">
 
     <!-- Start Content-->
     <div class="container-fluid">
@@ -32,9 +32,23 @@
 
                                     <form action="" method="post" enctype="multipart/form-data">
                                         <div class="mb-2 row">
+                                            <label class="col-md-2 col-form-label" for="alias">Alias</label>
+                                            <div class="col-md-10">
+                                                <input type="text" name="alias" id="alias" class="form-control">
+                                            </div>
+                                        </div>
+
+                                        <div class="mb-2 row">
                                             <label class="col-md-2 col-form-label" for="simpleinput">Titulo de seccion</label>
                                             <div class="col-md-10">
                                                 <input type="text" name="titulos" id="simpleinput" class="form-control">
+                                            </div>
+                                        </div>
+
+                                        <div class="mb-2 row">
+                                            <label class="col-md-2 col-form-label" for="simpleinput">Sub Titulo de seccion</label>
+                                            <div class="col-md-10">
+                                                <input type="text" name="sub_titulo" id="simpleinput" class="form-control">
                                             </div>
                                         </div>
 
@@ -73,7 +87,7 @@
                                             </div>
                                         </div>
 
-                                        <div class="mb-2 row">
+                                        <!-- <div class="mb-2 row">
                                             <label class="col-md-2 col-form-label" for="simpleinput">Categoria</label>
                                             <div class="col-md-10">
                                                 <select class="form-control" name="alias" id="" require>
@@ -87,12 +101,14 @@
                                                     <option value="contactame">Contáctame (7)</option>
                                                 </select>
                                             </div>
-                                        </div>
+                                        </div> -->
 
                                         <div class="mb-2 row">
-                                            <label class="col-md-2 col-form-label" for="simpleinput">Categoria</label>
+                                            <label class="col-md-2 col-form-label" for="simpleinput">Orden</label>
                                             <div class="col-md-10">
-                                                <select class="form-control" name="orden" id="" require>
+                                            <input type="number" name="orden" id="ordenId" class="form-control">
+
+                                                <!-- <select class="form-control" name="orden" id="" require>
                                                     <option value="">Orden</option>
                                                     <option value="1">1</option>
                                                     <option value="2">2</option>
@@ -101,7 +117,7 @@
                                                     <option value="5">5</option>
                                                     <option value="6">6</option>
                                                     <option value="7">7</option>
-                                                </select>
+                                                </select> -->
                                             </div>
                                         </div>
 

@@ -46,6 +46,8 @@ $routes->group('admin', function ($routes) {
         'secciones',
         'navbar',
         'txtbanner',
+        'clientes',
+        'testimonios',
         
     ];
     foreach ($entitySegments as $entitySegment) {
@@ -72,6 +74,7 @@ $routes->group('api', function ($routes) {
     $routes->match(['get', 'post'], 'login', 'Api::login');
     $routes->match(['get', 'post'], 'checktoken', 'Api::checkToken');
     $routes->match(['get', 'post'], 'delete/img', 'Api::delete_img');
+    $routes->match(['get', 'post'], 'bgimg/(:segment)/(:segment)', 'Api::bgimg/$1/$2');
     $routes->get('/', 'Api::index');
 
     $entitySegments = [
@@ -87,6 +90,8 @@ $routes->group('api', function ($routes) {
         'secciones',
         'navbar',
         'txtbanner',
+        'clientes',
+        'testimonios',
     ];
 
     foreach ($entitySegments as $entitySegment) {

@@ -44,22 +44,23 @@
                         </div>
                     </div>
 
-                    <div class="col-lg-12 col-md-12 prueba">
-                        <div class="hobbies-interest">
-                            <h3 class="title"><?= $titulos ?></h3>
-                            <div class="row">
-
-                                <?php foreach ($hobies as $key => $hobie) {; ?>
-                                    <div class="col-lg-3 col-md-4">
-                                        <div class="box">
-                                            <h3><?= $hobie->titulo ;?></h3>
-                                            <h3><?= $hobie->descripcion  ;?></h3> <!-- NO LA LLAMAMOS POR QUE NO LA QUEREMOS AL MOMENTO -->
+                    <?php if (count($hobies) > 0) { ?>
+                        <div class="col-lg-12 col-md-12 prueba">
+                            <div class="hobbies-interest">
+                                <h3 class="title"><?= $titulos ?></h3>
+                                <div class="row">
+                                    <?php foreach ($hobies as $key => $hobie) { ?>
+                                        <div class="col-lg-3 col-md-4">
+                                            <div class="box">
+                                                <h3><?= $hobie->titulo; ?></h3>
+                                                <h3><?= $hobie->descripcion; ?></h3> <!-- NO LA LLAMAMOS POR QUE NO LA QUEREMOS AL MOMENTO -->
+                                            </div>
                                         </div>
-                                    </div>
-                                <?php }; ?>
+                                    <?php } ?>
+                                </div>
                             </div>
                         </div>
-                    </div>
+                    <?php } ?>
                 </div>
             </div>
         </section>

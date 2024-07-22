@@ -16,10 +16,9 @@ class Admin extends BaseController {
         $this->db = \Config\Database::connect();
         $this->key = getenv('KEYENCRIPT');
         $this->data = [];
-
     }
 
-    public function login($var=true) {
+    public function login($var = true) {
         // $this->data = [];
         // debug($this->data);
         if ($var && $this->request->getGetPost()) {
@@ -380,15 +379,15 @@ class Admin extends BaseController {
     public function update_lenguaje($id) {
 
         // debug('aqui', false);
-        
+
         $this->valtoken();
-        
+
         $view = true;
         $token = $this->request->getCookie("token");
-        
+
         if ($this->request->getGetPost()) {
             // debug('aqui dentro del if');
-            
+
             $requestData = array_merge($this->request->getGetPost(), ["token" => $token]); // en una variable tengo que guardar el merge 
             // debug($_FILES);
             foreach ($_FILES as $k => $v) {
@@ -407,7 +406,7 @@ class Admin extends BaseController {
             }
         }
         // debug('aqui FUERA DEL  if', false);
-        
+
         if ($view) {
             // debug('viewwww', false);
             // debug($view,false );
@@ -1257,7 +1256,8 @@ class Admin extends BaseController {
             }
             // debug($requestData, false);
             $update_secciones = json_decode(send_post($this->urlAPI . "update/secciones/" . $id, $requestData)); // envio directamente la variable que tiene todo ya concatenado
-            // debug($update_secciones, false);
+            // $update_secciones = send_post($this->urlAPI . "update/secciones/" . $id, $requestData); // envio directamente la variable que tiene todo ya concatenado
+            // json_debug($update_secciones);
             if (isset($update_secciones->error)) {
                 $this->data['error'] = $update_secciones->error;
             } else {
@@ -1412,6 +1412,232 @@ class Admin extends BaseController {
         $this->get_txtbanner();
     }
     // FIN FUNCIONES TEXTO BANNER
+
+    // FUNCIONES TEXTO CLIENTES
+    public function get_clientes() {
+        $this->valtoken();
+        $token = $this->request->getCookie("token");
+
+        $this->data['clientes'] = [];
+        $clientes = json_decode(send_post($this->urlAPI . "clientes", ["token" => $token]));
+        if (isset($clientes->error)) {
+            $this->data['error'] = $clientes->error;
+        } else {
+            $this->data['clientes'] = $clientes;
+        }
+
+        $this->header();
+        $this->sidebar();
+        echo view('admin/clientes', $this->data);
+        $this->footer();
+    }
+
+    public function create_clientes() {
+
+        $this->valtoken();
+        $view = true;
+
+        if ($this->request->getGetPost()) {
+            $token = $this->request->getCookie("token");
+            $requestData = array_merge($this->request->getGetPost(), ["token" => $token]); // en una variable tengo que guardar el merge 
+
+            $create_clientes = json_decode(send_post($this->urlAPI . "create/clientes", $requestData)); // envio directamente la variable que tiene todo ya concatenado
+            // debug($create_clientes, false);
+            if (isset($create_clientes->error)) {
+                $this->data['error'] = $create_clientes->error;
+            } else {
+                $this->data['success'] = "Informacion de clientes creada exitosamente";
+                $this->get_clientes();
+                $view = false;
+            }
+            // debug($create_clientes, false);
+
+        }
+
+        if ($view) {
+            $this->header();
+            $this->sidebar();
+            echo view('admin/newclientes');
+            $this->footer();
+        }
+    }
+
+    public function update_clientes($id) {
+
+        $this->valtoken();
+        $view = true;
+        $token = $this->request->getCookie("token");
+
+        if ($this->request->getGetPost()) {
+
+            $requestData = array_merge($this->request->getGetPost(), ["token" => $token]); // en una variable tengo que guardar el merge 
+
+            // debug($requestData, false);
+            $update_clientes = json_decode(send_post($this->urlAPI . "update/clientes/" . $id, $requestData)); // envio directamente la variable que tiene todo ya concatenado
+            // debug($update_clientes, false);
+            if (isset($update_clientes->error)) {
+                $this->data['error'] = $update_clientes->error;
+            } else {
+                $this->data['success'] = "Informacion de texto modificada exitosamente";
+                $this->get_clientes();
+                $view = false;
+            }
+            // debug($update_clientes, false);
+
+        }
+
+        if ($view) {
+            $this->data['clientes'] = [];
+            $clientes = json_decode(send_post($this->urlAPI . "clientes/" . $id, ["token" => $token]));
+            if (isset($clientes->error)) {
+                $this->data['error'] = $clientes->error;
+            } else {
+                $this->data['clientes'] = $clientes;
+            }
+            $this->header();
+            $this->sidebar();
+            echo view('admin/edit-clientes');
+            $this->footer();
+        }
+    }
+
+    public function delete_clientes($id) {
+        // $this->valtoken();
+        $token = $this->request->getCookie("token");
+
+        // $this->data = [];
+        if ($id) {
+            $requestData = ["token" => $token]; // Datos para enviar a la API
+            $delete_clientes = json_decode(send_post($this->urlAPI . "delete/clientes/" . $id, $requestData));
+
+            if (isset($delete_clientes->error)) {
+                $this->data['error'] = $delete_clientes->error;
+            } else {
+                // El proyecto se eliminó exitosamente
+                $this->data['success'] = "Informacion de clientes eliminada exitosamente";
+            }
+        }
+        $this->get_clientes();
+    }
+    // FIN FUNCIONES TEXTO CLIENTES
+
+    // CRUD TESTIMONIOS
+
+    public function get_testimonios() {
+        $this->valtoken();
+        $token = $this->request->getCookie("token");
+
+        $this->data['testimonios'] = [];
+        $testimonios = json_decode(send_post($this->urlAPI . "testimonios", ["token" => $token]));
+        if (isset($testimonios->error)) {
+            $this->data['error'] = $testimonios->error;
+        } else {
+            $this->data['testimonios'] = $testimonios;
+        }
+
+        $this->header();
+        $this->sidebar();
+        echo view('admin/testimonios', $this->data);
+        $this->footer();
+    }
+
+    public function create_testimonios() {
+        $this->valtoken();
+        $view = true;
+
+        if ($this->request->getGetPost()) {
+            $token = $this->request->getCookie("token");
+            $requestData = array_merge($this->request->getGetPost(), ["token" => $token]); // en una variable tengo que guardar el merge 
+            
+            foreach ($_FILES as $k => $v) {
+                if (strlen($v['name'])) {
+                    $requestData[$k] = curl_file_create($v['tmp_name'], $v['type'], basename($v['name']));
+                }
+            }
+            $create_testimonios = json_decode(send_post($this->urlAPI . "create/testimonios", $requestData)); // envio directamente la variable que tiene todo ya concatenado
+            // debug($create_testimonios);
+            if (isset($create_testimonios->error)) {
+                $this->data['error'] = $create_testimonios->error;
+            } else {
+                $this->data['success'] = "Testimonio creado exitosamente";
+                $this->get_testimonios();
+                $view = false;
+            }
+            // debug($create_testimonios, false);
+
+        }
+
+        if ($view) {
+            $this->header();
+            $this->sidebar();
+            echo view('admin/newtestimonios');
+            $this->footer();
+        }
+    }
+
+    public function update_testimonios($id) {
+        $this->valtoken();
+        $view = true;
+        $token = $this->request->getCookie("token");
+
+        if ($this->request->getGetPost()) {
+
+            $requestData = array_merge($this->request->getGetPost(), ["token" => $token]); // en una variable tengo que guardar el merge 
+            
+            foreach ($_FILES as $k => $v) {
+                if (strlen($v['name'])) {
+                    $requestData[$k] = curl_file_create($v['tmp_name'], $v['type'], basename($v['name']));
+                }
+            }
+            // debug($requestData, false);
+            $update_testimonios = json_decode(send_post($this->urlAPI . "update/testimonios/" . $id, $requestData)); // envio directamente la variable que tiene todo ya concatenado
+            // debug($update_testimonios, false);
+            if (isset($update_testimonios->error)) {
+                $this->data['error'] = $update_testimonios->error;
+            } else {
+                $this->data['success'] = "Informacion de texto modificada exitosamente";
+                $this->get_testimonios();
+                $view = false;
+            }
+            // debug($update_testimonios, false);
+
+        }
+
+        if ($view) {
+            $this->data['testimonios'] = [];
+            $testimonios = json_decode(send_post($this->urlAPI . "testimonios/" . $id, ["token" => $token]));
+            if (isset($testimonios->error)) {
+                $this->data['error'] = $testimonios->error;
+            } else {
+                $this->data['testimonios'] = $testimonios;
+            }
+            $this->header();
+            $this->sidebar();
+            echo view('admin/edit-testimonios');
+            $this->footer();
+        }
+    }
+
+    public function delete_testimonios($id) {
+        // $this->valtoken();
+        $token = $this->request->getCookie("token");
+
+        // $this->data = [];
+        if ($id) {
+            $requestData = ["token" => $token]; // Datos para enviar a la API
+            $delete_testimonios = json_decode(send_post($this->urlAPI . "delete/testimonios/" . $id, $requestData));
+
+            if (isset($delete_testimonios->error)) {
+                $this->data['error'] = $delete_testimonios->error;
+            } else {
+                // El proyecto se eliminó exitosamente
+                $this->data['success'] = "Informacion de testimonios eliminada exitosamente";
+            }
+        }
+        $this->get_testimonios();
+    }
+
+    // CRUD FIN TESTIMONIOS
 
     private function valtoken() {
         $this->token = $this->request->getCookie("token");

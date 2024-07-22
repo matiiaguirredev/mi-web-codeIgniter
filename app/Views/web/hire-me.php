@@ -3,8 +3,7 @@
         <section class="hire-me ptb-80">
         <style>
                 .hire-me {
-                    /* background-color: <?= $bg_color ?>; */
-
+                    background-image: url(<?= $img ?>);
                 }
             </style>
             <div class="container">

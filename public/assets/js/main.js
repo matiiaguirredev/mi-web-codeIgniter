@@ -21,9 +21,9 @@ function showAlert(type, message) {
     </div>
     `;
     $(".alert-content").html(content);
-    // setTimeout(() => {
-    //     $(".alert-content .close").click();
-    // }, 3000);
+    setTimeout(() => {
+        $(".alert-content .close").click();
+    }, 3000);
 }
 
 function deleteproyect(id) {
@@ -353,7 +353,8 @@ function changeactivocontacto(id) {
             "?token=" +
             getCookie("token") +
             "&activo=" +
-            activo,
+            activo + 
+            "&notnull=1",
         data: data,
         contentType: "application/json; charset=utf-8",
         // contentType: false,
@@ -363,9 +364,9 @@ function changeactivocontacto(id) {
             //do something when get response
             showAlert(
                 type,
-                `El contacto ${Response.titulo} se ha ${msj} correctamente`
+                `El contacto ${Response.info_secundaria} se ha ${msj} correctamente`
             );
-            console.log(Response);
+            console.log("es esto¿????",Response);
         })
         .fail(function (Response) {
             //do something when any error occurs.
@@ -468,6 +469,235 @@ function changeactivotxt(id) {
         });
 }
 
+// funcion con ajax realizada por mi, feliz !
+function deleteclientes(id) {
+    /* $(".todelete").attr("href", "admin/delete/clientes/" + id); */
+    data = [];
+    data["activo"] = $(".ch-txtbanner-" + id).is(":checked") ? 1 : 0;
+    data["notnull"] = 1;
+    data["token"] = getCookie("token");
+    activo = $(".ch-txtbanner-" + id).is(":checked") ? 1 : 0;
+    msj = activo ? "Activado" : "Desactivado";
+    type = activo ? "success" : "danger";
+
+    console.log("data", data);
+    Swal.fire({
+        title: '¿Estás seguro?',
+        text: '¡No podrás revertir esto!',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Sí, eliminarlo',
+        cancelButtonText: 'Cancelar'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            $.ajax({
+                async: true,
+                type: "POST",
+                dataType: "json",
+                url:
+                    "./api/delete/clientes/" +
+                    id +
+                    "?token=" +
+                    getCookie("token") +
+                    "&activo=" +
+                    activo +
+                    "&notnull=1",
+                data: data,
+                contentType: "application/json; charset=utf-8",
+                processData: false,
+
+                success: function (response) {
+                    console.log('Respuesta del servidor:', response);
+                    Swal.fire(
+                        '¡Eliminado!',
+                        'Tu archivo ha sido eliminado.',
+                        'success'
+                    ).then(() => {
+                        window.location.href = "./admin/clientes";
+                    });
+                },
+                error: function (xhr, status, error) {
+                    console.error('Error en la solicitud AJAX:', error);
+                    Swal.fire(
+                        'Abortado',
+                        'El servidor no pudo eliminar el archivo',
+                        'error'
+                    );
+                }
+            });
+
+        } else if (result.dismiss === Swal.DismissReason.cancel) {
+            Swal.fire(
+                'Cancelado',
+                'Tu archivo está a salvo :)',
+                'error'
+            );
+        }
+    });
+}
+
+function changeactivocli(id) {
+    data = [];
+    data["activo"] = $(".ch-clientes-" + id).is(":checked") ? 1 : 0;
+    data["notnull"] = 1;
+    data["token"] = getCookie("token");
+    activo = $(".ch-clientes-" + id).is(":checked") ? 1 : 0;
+    msj = activo ? "Activado" : "Desactivado";
+    type = activo ? "success" : "danger";
+
+    console.log("data", data);
+
+    $.ajax({
+        async: true,
+        type: "POST",
+        dataType: "json",
+        url:
+            "./api/update/clientes/" +
+            id +
+            "?token=" +
+            getCookie("token") +
+            "&activo=" +
+            activo +
+            "&notnull=1",
+        data: data,
+        contentType: "application/json; charset=utf-8",
+        // contentType: false,
+        processData: false,
+    })
+        .done(function (Response) {
+            //do something when get response
+            showAlert(
+                type,
+                `El cliente ${Response.titulo} se ha ${msj} correctamente`
+            );
+            console.log(Response);
+        })
+        .fail(function (Response) {
+            //do something when any error occurs.
+            showAlert("danger", Response.error);
+            console.error(Response);
+        });
+}
+
+function deletetestimonios(id) {
+    /* $(".todelete").attr("href", "admin/delete/clientes/" + id); */
+    data = [];
+    data["activo"] = $(".ch-testimonios-" + id).is(":checked") ? 1 : 0;
+    data["notnull"] = 1;
+    data["token"] = getCookie("token");
+    activo = $(".ch-testimonios-" + id).is(":checked") ? 1 : 0;
+    msj = activo ? "Activado" : "Desactivado";
+    type = activo ? "success" : "danger";
+
+    console.log("data", data);
+    Swal.fire({
+        title: '¿Estás seguro?',
+        text: '¡No podrás revertir esto!',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Sí, eliminarlo',
+        cancelButtonText: 'Cancelar'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            $.ajax({
+                async: true,
+                type: "POST",
+                dataType: "json",
+                url:
+                    "./api/delete/testimonios/" +
+                    id +
+                    "?token=" +
+                    getCookie("token") +
+                    "&activo=" +
+                    activo +
+                    "&notnull=1",
+                data: data,
+                contentType: "application/json; charset=utf-8",
+                processData: false,
+
+                success: function (response) {
+                    console.log('Respuesta del servidor:', response);
+                    Swal.fire(
+                        '¡Eliminado!',
+                        'Tu archivo ha sido eliminado.',
+                        'success'
+                    ).then(() => {
+                        // window.location.href = "./admin/testimonios";
+                        $(".tr-" + id).html("<td colspan='99' class='bg-success text-center text-white'>Eliminado satisfactoriamente</td>");
+                        setTimeout(() => {
+                            $(".tr-" + id).hide('slide');
+                        }, 2000);
+
+                    });
+                },
+                error: function (xhr, status, error) {
+                    console.error('Error en la solicitud AJAX:', error);
+                    Swal.fire(
+                        'Abortado',
+                        'El servidor no pudo eliminar el archivo',
+                        'error'
+                    );
+                }
+            });
+
+        } else if (result.dismiss === Swal.DismissReason.cancel) {
+            Swal.fire(
+                'Cancelado',
+                'Tu archivo está a salvo :)',
+                'error'
+            );
+        }
+    });
+}
+
+function changeactivotestimonios(id) {
+    data = [];
+    data["activo"] = $(".ch-testimonios-" + id).is(":checked") ? 1 : 0;
+    data["notnull"] = 1;
+    data["token"] = getCookie("token");
+    activo = $(".ch-testimonios-" + id).is(":checked") ? 1 : 0;
+    msj = activo ? "Activado" : "Desactivado";
+    type = activo ? "success" : "danger";
+
+    console.log("data", data);
+
+    $.ajax({
+        async: true,
+        type: "POST",
+        dataType: "json",
+        url:
+            "./api/update/testimonios/" +
+            id +
+            "?token=" +
+            getCookie("token") +
+            "&activo=" +
+            activo +
+            "&notnull=1",
+        data: data,
+        contentType: "application/json; charset=utf-8",
+        // contentType: false,
+        processData: false,
+    })
+        .done(function (Response) {
+            //do something when get response
+            showAlert(
+                type,
+                `El testimonio ${Response.titulo} se ha ${msj} correctamente`
+            );
+            console.log(Response);
+        })
+        .fail(function (Response) {
+            //do something when any error occurs.
+            showAlert("danger", Response.error);
+            console.error(Response);
+        });
+}
+
+
 //MODAL DE DESCRIPCIONES DE PROYECTOS.
 $(document).on("click", ".showdescrip", function (e) {
     e.preventDefault();
@@ -515,7 +745,7 @@ $(document).on("click", ".del-img", function (e) {
             // Crear un elemento URL para descomponerla
             const urlObj = new URL(url);
             // console.log("utl", urlObj);
-            
+
             // Separando el pathname en partes individuales
             const pathSegments = urlObj.pathname.split('/').filter(segment => segment.length > 0);
             // console.log("path", pathSegments);

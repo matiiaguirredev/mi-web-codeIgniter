@@ -3,7 +3,7 @@
     <div class="container">
         <div class="row">
             <div class="col-lg-12 col-md-12">
-                <p>© Phkr is Proudly Owned by <a href="https://envytheme.com/" target="_blank">EnvyTheme</a></p>
+                <p>© Shortae & Matias Aguirre <a href="#" target="_blank">VenEsp</a></p>
             </div>
         </div>
     </div>
@@ -17,6 +17,8 @@
 <!-- jQuery Min JS -->
 <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script>
 <script src="web/js/jquery.min.js"></script>
+<!-- Jquery UI -->
+<!-- <script src="https://code.jquery.com/ui/1.13.3/jquery-ui.min.js" integrity="sha256-sw0iNNXmOJbQhYFuC9OF2kOlD5KQKe1y5lfBn4C9Sjg=" crossorigin="anonymous"></script> -->
 <!-- Bootstrap Min JS -->
 <script src="web/js/bootstrap.bundle.min.js"></script>
 <!-- Owl Carousel Min Js -->

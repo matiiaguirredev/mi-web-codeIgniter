@@ -2,19 +2,22 @@
         <section class="fun-facts ptb-80">
             <style>
                 .fun-facts {
-                    /* background-image: url(<?= $bg_img ?>); */
+                    background-image: url(<?= $img ?>);
 
                 }
             </style>
             <div class="container">
                 <div class="row">
-                    <div class="col-lg-3 col-md-6">
-                        <div class="funFact">
-                            <h2><span class="counter">754</span>+</h2>
-                            <p>Projects Completed</p>
+                    <?php foreach ($clientes as $key => $cli) { ?>
+                        <div class="col-lg-3 col-md-6">
+                            <div class="funFact">
+                                <h2><span class="counter"><?= $cli->cant ?></span>+</h2>
+                                <p><?= $cli->titulo ?></p>
+                            </div>
                         </div>
-                    </div>
+                    <?php  }; ?>
 
+<?php /* esto es lo original que traia, aun no borrar ?>
                     <div class="col-lg-3 col-md-6">
                         <div class="funFact">
                             <h2><span class="counter">200</span>+</h2>
@@ -35,6 +38,8 @@
                             <p>Awards Achieved</p>
                         </div>
                     </div>
+<?php */?>
+
                 </div>
             </div>
         </section>

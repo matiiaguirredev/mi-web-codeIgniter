@@ -22,14 +22,15 @@
                                     <thead>
                                         <tr>
                                             <!-- <th class="text-center">Posicion</th> -->
+                                            <th class="text-center">Orden</th>
                                             <th class="text-center">Titulos</th>
+                                            <th class="text-center">Sub Titulo</th>
                                             <th class="text-center">Descripciones</th>
                                             <th class="text-center">Txt Btn</th>
                                             <th class="text-center">Link Secc</th>
                                             <th class="text-center">Image</th>
                                             <th class="text-center">Color BG</th>
                                             <th class="text-center">Alias seccion</th>
-                                            <th class="text-center">Orden</th>
                                             <th class="text-center">Opciones</th>
                                         </tr>
                                     </thead>
@@ -42,14 +43,15 @@
                                         ?>
                                             <tr>
                                                 <!-- <th class="text-center" scope="row"><?= $key ; ?></th> -->
+                                                <td><?= $sec->orden; ?></td>
                                                 <td><?= $sec->titulos; ?></td>
+                                                <td><?= $sec->sub_titulo; ?></td>
                                                 <td class="text-center " ><a class="showdescrip"  data-description="<?= $sec->descripciones; ?>">Ver descripcion</a></td>
                                                 <td><?= $sec->txt_btn; ?></td>
                                                 <td><?= $sec->link_secc; ?></td>
                                                 <td class="text-center"><a href="<?= ($sec->img) ? $sec->img : '#'; ?>" target="_blank">Ver</a></td>
                                                 <td><?= $sec->bg_color; ?></td>
                                                 <td><?= $sec->alias; ?></td>
-                                                <td><?= $sec->orden; ?></td>
                                                 <td class="text-center d-flex justify-content-center gap-1" colspan="">
                                                     <a href="admin/update/secciones/<?= $sec->id; ?>"><i class="fa-sharp fa-solid fa-pen-to-square "></i></a>
                                                     <a href="" onclick="deletesecciones(<?= $sec->id; ?>)" data-bs-toggle="modal" data-bs-target="#exampleModal"><i class="fa-sharp fa-solid fa-trash"></i></a>
@@ -74,6 +76,7 @@
         </div> <!-- end card -->
     </div> <!-- end col -->
 </div>
+
 <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">

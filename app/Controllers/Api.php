@@ -397,11 +397,7 @@ class Api extends BaseController {
             }
         }
 
-        $data["img_lenguajes"] = $this->uploadImage("lenguajes", "img_lenguajes"); // nombre de carpeta y desp campo de bd 
-        if (!$data["img_lenguajes"]) {
-            // $valRequire[] = "img_lenguajes";
-            $data["img_lenguajes"] = "300x300.jpg"; // aca esta opcional y tenemos una por defecto, si queremos obligatoria descomentar arriba.
-        }
+
 
         if ($valRequire) {
             // validar error que te faltan datos
@@ -417,7 +413,6 @@ class Api extends BaseController {
         }
 
 
-        $data["img_lenguajes"] = base_url() . "assets/images/lenguajes/" . $data["img_lenguajes"];
 
         $id = $this->db->insertID(); // ultimo identificador insertado !
 
@@ -485,11 +480,6 @@ class Api extends BaseController {
             }
         }
 
-        $data["img_lenguajes"] = $this->uploadImage("lenguajes", "img_lenguajes"); // nombre de carpeta y desp campo de bd 
-        if (!$data["img_lenguajes"]) {
-            // $valRequire[] = "img_lenguajes";
-            $data["img_lenguajes"] = $datos->img_lenguajes;
-        }
 
         $data["user_id"] = $this->user->id;
         $data["activo"] = ($this->request->getGetPost("activo")) ? 1 : 0;
@@ -500,7 +490,6 @@ class Api extends BaseController {
             custom_error(506, $this->lang, "lenguajes");
         }
 
-        $data["img_lenguajes"] = base_url() . "assets/images/lenguajes/" . $data["img_lenguajes"];
 
         json_debug(array_merge((array)$datos, $data));
     }
@@ -1508,7 +1497,6 @@ class Api extends BaseController {
         // $data["user_id"] = $this->user->id;
         $data["info_secundaria"] = ($this->request->getGetPost("info_secundaria"));
         $data["activo"] = ($this->request->getGetPost("activo")) ? 1 : 0;
-
         $iconHTML = $data['iconHTML'];
         $url = $data['url'];
 
@@ -1578,17 +1566,17 @@ class Api extends BaseController {
             $value = $this->request->getGetPost($name);
             if ($value) {
                 $data[$name] = validateValue($value, $type, $this->lang);
-            } else {
-                $valRequire[] = $name;
             }
         }
         // debug($value,false);
 
-
         // $data["user_id"] = $this->user->id;
-        $data["info_secundaria"] = ($this->request->getGetPost("info_secundaria"));
+
+        if (!$this->request->getGetPost("notnull")) {
+            $data["info_secundaria"] = ($this->request->getGetPost("info_secundaria"));
+        }
         $data["activo"] = ($this->request->getGetPost("activo")) ? 1 : 0;
-        // debug($data,false);
+        //debug($data);
 
 
         if ($this->request->getGetPost("iconHTML")) {
@@ -1663,6 +1651,7 @@ class Api extends BaseController {
 
         $optionals = [ // datos opcionales 
             "titulos",
+            "sub_titulo",
             "descripciones",
             "img",
             "bg_color",
@@ -1736,11 +1725,11 @@ class Api extends BaseController {
             custom_error(504, $this->lang, "secciones");
         }
 
-        $datos = $datos[0];
-
+        $datos = $datos[0]; // por que estamos seleccionadno desde un identificdor y siempre el resltado es unico 
 
         $optionals = [ // datos opcionales 
             "titulos",
+            "sub_titulo",
             "descripciones",
             "img",
             "bg_color",
@@ -1749,6 +1738,8 @@ class Api extends BaseController {
             "alias",
             "orden",
         ];
+
+        // json_debug($this->request->getGetPost());
 
         if (!$this->request->getGetPost("notnull")) {
             foreach ($optionals as $name) {
@@ -1862,7 +1853,7 @@ class Api extends BaseController {
             $query .= ($id) ? " AND" : " WHERE";
             $query .= " activo = 1";
         }
-        
+
         $query .= " ORDER BY `txtbanner`.`id` ASC";
         // debug($query);
         $query = $this->db->query($query);
@@ -1955,6 +1946,322 @@ class Api extends BaseController {
         json_debug($datos);
     }
     // FIN CRUD TEXTO BANNER
+
+    // CRUD CLIENTES
+    public function create_clientes() {
+        $this->valToken();
+
+        $require = [
+            "titulo" => "text",
+            "cant" => "text",
+        ];
+
+        $valRequire = [];
+
+        foreach ($require as $name => $type) {
+            $value = $this->request->getGetPost($name);
+            if ($value) {
+                $data[$name] = validateValue($value, $type, $this->lang);
+            } else {
+                $valRequire[] = $name;
+            }
+        }
+
+        if ($valRequire) {
+            // validar error que te faltan datos
+            custom_error(101, "es", $valRequire);
+        }
+
+        $optionals = [ // datos opcionales 
+            "orden",
+
+        ];
+
+        foreach ($optionals as $name) {
+            $data[$name] = $this->request->getGetPost($name);
+        }
+
+        $data["activo"] = ($this->request->getGetPost("activo")) ? 1 : 0;
+
+        $insert = $this->db->table("clientes")->insert($data);
+        if (!$insert) {
+            custom_error(204, $this->lang);
+        }
+
+        $id = $this->db->insertID(); // ultimo identificador insertado !
+
+        json_debug(array_merge(["id" => $id], $data));
+    }
+
+    public function get_clientes($id = null) {
+        $this->variables();
+        // $this->valToken(); // las unicas que no se pide el token son las consultas publicas,  login y registro
+
+        // $query = "SELECT * FROM txtbanner ";
+        $query = "SELECT * FROM `clientes` ";
+        if ($id) { // esto se utilza para consultar 1 especifico
+            $query .= "WHERE id = '$id'";
+        }
+        if ($this->activo) {
+            $query .= ($id) ? " AND" : " WHERE";
+            $query .= " activo = 1";
+        }
+
+        $query .= " ORDER BY `clientes`.`id` ASC";
+        // debug($query);
+        $query = $this->db->query($query);
+        $datos = $query->getResult();
+
+        if (!$datos) {
+            custom_error(504, $this->lang, "clientes");
+        }
+
+        if ($id) {
+            $datos = $datos[0];
+        }
+
+        json_debug($datos);
+    }
+
+    public function update_clientes($id) {
+        $this->valToken();
+
+        $query = "SELECT * FROM clientes WHERE id = '$id'";
+        $query = $this->db->query($query);
+        $datos = $query->getResult();
+
+        if (!$datos) {
+            custom_error(504, $this->lang, "clientes");
+        }
+
+        $datos = $datos[0];
+
+        $require = [
+            "titulo" => "text",
+            "cant" => "text",
+        ];
+
+        foreach ($require as $name => $type) {
+            $value = $this->request->getGetPost($name);
+            if ($value) {
+                $data[$name] = validateValue($value, $type, $this->lang);
+            } else {
+                $valRequire[] = $name;
+            }
+        }
+
+        $optionals = [ // datos opcionales 
+            "orden",
+
+        ];
+
+        if (!$this->request->getGetPost("notnull")) {
+            foreach ($optionals as $name) {
+                $data[$name] = $this->request->getGetPost($name);
+            }
+        }
+
+        $data["activo"] = ($this->request->getGetPost("activo")) ? 1 : 0;
+        // debug($this->request->getGetPost(), false);
+        // debug($data);
+
+        $update = $this->db->table("clientes")->update($data, ["id" => $id]); // ver query de mysql para entender bien cuales son los 2 paremetros q recibimos (set y where)
+        // debug($datos);
+        if (!$update) {
+            custom_error(506, $this->lang, "clientes");
+        }
+
+        json_debug(array_merge((array)$datos, $data));
+    }
+
+    public function delete_clientes($id) {
+
+        $this->valToken(); // las unicas que no se pide el token son las consultas publicas,  login y registro
+
+        $query = "SELECT * FROM clientes WHERE id = '$id'";
+        $query = $this->db->query($query);
+        $datos = $query->getResult();
+
+        if (!$datos) {
+            custom_error(504, $this->lang, "clientes");
+        }
+
+        $delete = $this->db->table("clientes")->delete(["id" => $id]);
+        if (!$delete) {
+            custom_error(507, $this->lang, "general");
+        }
+
+        if ($id) {
+            $datos = $datos[0];
+        }
+
+        json_debug($datos);
+    }
+
+    // FIN CRUD CLIENTES
+
+    // CRUD TESTIMONIOS
+
+    public function create_testimonios() {
+        $this->valToken();
+
+        // json_debug([
+        //     "post"=>$this->request->getGetPost(),
+        //     "file"=>$_FILES
+        // ]);
+
+        $require = [
+            "nombre" => "text",
+            "rama_laboral" => "text",
+            "descrip_exp" => "text",
+        ];
+
+        $valRequire = [];
+
+        foreach ($require as $name => $type) {
+            $value = $this->request->getGetPost($name);
+            if ($value) {
+                $data[$name] = validateValue($value, $type, $this->lang);
+            } else {
+
+                $valRequire[] = $name;
+            }
+        }
+
+        // debug($data);
+        $data["img"] = $this->uploadImage("testimonios", "img"); // nombre de carpeta y desp campo de bd 
+
+        if (!$data["img"]) {
+            $valRequire[] = "img";
+        }
+
+        if ($valRequire) {
+            // validar error que te faltan datos
+            custom_error(101, "es", $valRequire);
+        }
+
+        $data["activo"] = ($this->request->getGetPost("activo")) ? 1 : 0;
+        // json_debug($data);
+        $insert = $this->db->table("testimonios")->insert($data);
+        if (!$insert) {
+            custom_error(204, $this->lang);
+        }
+
+        $data["img"] = base_url() . "assets/images/testimonios/" . $data["img"];
+        $id = $this->db->insertID(); // ultimo identificador insertado !
+
+        json_debug(array_merge(["id" => $id], $data));
+    }
+
+    public function get_testimonios($id = null) {
+        $this->variables();
+        // $this->valToken(); // las unicas que no se pide el token son las consultas publicas,  login y registro
+
+        // $query = "SELECT * FROM txtbanner ";
+        $query = "SELECT * FROM `testimonios` ";
+        if ($id) { // esto se utilza para consultar 1 especifico
+            $query .= "WHERE id = '$id'";
+        }
+        if ($this->activo) {
+            $query .= ($id) ? " AND" : " WHERE";
+            $query .= " activo = 1";
+        }
+
+        $query .= " ORDER BY `testimonios`.`id` ASC";
+        // debug($query);
+        $query = $this->db->query($query);
+        $datos = $query->getResult();
+
+        if (!$datos) {
+            custom_error(504, $this->lang, "testimonios");
+        }
+
+        foreach ($datos as $key => $value) {
+            if ($value->img) {
+                $datos[$key]->img = base_url() . "assets/images/testimonios/" . $value->img;
+            }
+        }
+
+        if ($id) {
+            $datos = $datos[0];
+        }
+
+        json_debug($datos);
+    }
+
+    public function update_testimonios($id) {
+        $this->valToken();
+
+        $query = "SELECT * FROM testimonios WHERE id = '$id'";
+        $query = $this->db->query($query);
+        $datos = $query->getResult();
+
+        if (!$datos) {
+            custom_error(504, $this->lang, "testimonios");
+        }
+
+        $datos = $datos[0];
+
+        $require = [
+            "nombre" => "text",
+            "rama_laboral" => "text",
+            "descrip_exp" => "text",
+        ];
+
+        foreach ($require as $name => $type) {
+            $value = $this->request->getGetPost($name);
+            if ($value) {
+                $data[$name] = validateValue($value, $type, $this->lang);
+            } else {
+                $valRequire[] = $name;
+            }
+        }
+
+        $data["img"] = $this->uploadImage("testimonios", "img"); // nombre de carpeta y desp campo de bd 
+        if (!$data["img"]) {
+            // $valRequire[] = "img";
+            $data["img"] = $datos->img;
+        }
+
+        $data["activo"] = ($this->request->getGetPost("activo")) ? 1 : 0;
+        // debug($this->request->getGetPost(), false);
+        // debug($data);
+
+        $update = $this->db->table("testimonios")->update($data, ["id" => $id]); // ver query de mysql para entender bien cuales son los 2 paremetros q recibimos (set y where)
+        // debug($datos);
+        if (!$update) {
+            custom_error(506, $this->lang, "testimonios");
+        }
+
+        $data["img"] = base_url() . "assets/images/testimonios/" . $data["img"];
+
+        json_debug(array_merge((array)$datos, $data));
+    }
+
+    public function delete_testimonios($id) {
+        $this->valToken(); // las unicas que no se pide el token son las consultas publicas,  login y registro
+
+        $query = "SELECT * FROM testimonios WHERE id = '$id'";
+        $query = $this->db->query($query);
+        $datos = $query->getResult();
+
+        if (!$datos) {
+            custom_error(504, $this->lang, "testimonios");
+        }
+
+        $delete = $this->db->table("testimonios")->delete(["id" => $id]);
+        if (!$delete) {
+            custom_error(507, $this->lang, "general");
+        }
+
+        if ($id) {
+            $datos = $datos[0];
+        }
+
+        json_debug($datos);
+    }
+
+    // FIN CRUD TESTIMONIOS
 
     private function valToken() {
         $require = [
@@ -2178,6 +2485,45 @@ class Api extends BaseController {
         if ($this->activo && $this->activo != 1) {
             $this->activo = 1;
         }
+    }
+
+    public function bgimg($width, $height, $color = '808080') {
+        // Verificar que width y height sean números válidos
+        if (!is_numeric($width) || !is_numeric($height) || $width <= 0 || $height <= 0) {
+            return $this->response->setStatusCode(400)->setBody('Invalid dimensions');
+        }
+
+        // Eliminar el símbolo # si está presente en el color
+        $color = str_replace('#', '', $color);
+
+        // Verificar que el color tenga exactamente 6 caracteres
+        if (strlen($color) !== 6) {
+            return $this->response->setStatusCode(400)->setBody('Invalid color format');
+        }
+
+        // Convertir el color hexadecimal a RGB
+        $red = hexdec(substr($color, 0, 2));
+        $green = hexdec(substr($color, 2, 2));
+        $blue = hexdec(substr($color, 4, 2));
+
+        // Crear una imagen en blanco
+        $image = imagecreatetruecolor($width, $height);
+
+        // Asignar el color a la imagen
+        $backgroundColor = imagecolorallocate($image, $red, $green, $blue);
+        imagefill($image, 0, 0, $backgroundColor);
+
+        // Enviar los encabezados adecuados para que el navegador sepa que es una imagen
+        header('Content-Type: image/png');
+
+        // Generar la imagen
+        imagepng($image);
+
+        // Liberar la memoria
+        imagedestroy($image);
+
+        // Detener la ejecución para no enviar datos adicionales después de la imagen
+        exit;
     }
 
     public function test() {
