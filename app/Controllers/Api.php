@@ -2388,8 +2388,8 @@ class Api extends BaseController {
 
         $data["img"] = $this->uploadImage("blog", "img"); // nombre de carpeta y desp campo de bd 
         if (!$data["img"]) {
-            $valRequire[] = "img";
-            // $data["img"] = $datos->img;
+            // $valRequire[] = "img";
+            $data["img"] = $datos->img;
         }
 
         $data["activo"] = ($this->request->getGetPost("activo")) ? 1 : 0;

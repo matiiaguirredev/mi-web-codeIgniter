@@ -1668,6 +1668,7 @@ class Admin extends BaseController {
     public function get_blog() {
         $this->valtoken();
         $token = $this->request->getCookie("token");
+        // $requestData = array_merge($this->request->getGetPost(), ["token" => $token]); // en una variable tengo que guardar el merge 
 
         $this->data['blog'] = [];
         $blog = json_decode(send_post($this->urlAPI . "blog", ["token" => $token]));
@@ -1677,13 +1678,21 @@ class Admin extends BaseController {
             $this->data['blog'] = $blog;
         }
 
-        $this->data['categorias'] = [];
-        $categorias = json_decode(send_post($this->urlAPI . "categorias", ["token" => $token]));
-        if (isset($categorias->error)) {
-            $this->data['error'] = $categorias->error;
+        $this->data['blogCat'] = [];
+        $blogCat = json_decode(send_post($this->urlAPI . "blogCat", ["token" => $token]));
+        // debug($blogCat, false);
+        if (isset($blogCat->error)) {
+            $this->data['error'] = $blogCat->error;
         } else {
-            $this->data['categorias'] = $categorias;
+            $this->data['blogCat'] = $blogCat;
         }
+        // debug($blog);
+        // $checkPerfil = json_decode(send_post($this->urlAPI . "create/perfil", $requestData)); // envio directamente la variable que tiene todo ya concatenado
+        // // debug($checkPerfil);
+        // // debug(send_post($this->urlAPI . "create/perfil", $requestData));
+        // if (!isset($checkPerfil->error)) {
+        //     $this->user->informacion = $checkPerfil;
+        // }
 
         $view = true;
 
@@ -1782,7 +1791,7 @@ class Admin extends BaseController {
             $token = $this->request->getCookie("token");
 
             $this->data['blog'] = [];
-            $blog = json_decode(send_post($this->urlAPI . "blog/" . $id, ["token" => $token]));
+            $blog = json_decode(send_post($this->urlAPI . "blog/" . $id , ["token" => $token]));
             // debug($blog, false);
             if (isset($blog->error)) {
                 $this->data['error'] = $blog->error;
@@ -1791,7 +1800,7 @@ class Admin extends BaseController {
             }
 
             $this->data['blogCat'] = [];
-            $blogCat = json_decode(send_post($this->urlAPI . "blogCat", ["token" => $token]));
+            $blogCat = json_decode(send_post($this->urlAPI . "blogCat?activo=1", ["token" => $token]));
             // debug($blogCat, false);
             if (isset($blogCat->error)) {
                 $this->data['error'] = $blogCat->error;

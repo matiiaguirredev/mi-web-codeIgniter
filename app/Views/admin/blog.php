@@ -21,7 +21,9 @@
                                 <table id="basic-datatable" class="table dt-responsive nowrap w-100 table-bordered">
                                     <thead>
                                         <tr>
-                                            <th class="text-center">Fecha Post</th>
+                                            <th class="text-center">Fecha Create</th>
+                                            <th class="text-center">Fecha Edit</th>
+                                            <!-- <th class="text-center">Autor</th> -->
                                             <th class="text-center">Titulo</th>
                                             <th class="text-center">Descripcion</th>
                                             <th class="text-center">Imagen</th>
@@ -32,13 +34,15 @@
 
                                     <tbody>
                                         <?php
-                                        // debug($blog, false);
+                                        // debug($this->data);
                                         foreach ($blog as $key => $b) {
                                             // debug($b, false);
                                         ?>
                                                 <tr class="tr-<?= $b->id ; ?>">
                                                     <!-- <th class="text-center" scope="row"><?= $key; ?></th> -->
                                                     <td><?= $b->create_at; ?></td>
+                                                    <td><?= $b->edit_at; ?></td>
+                                                    <!-- <td><?/* = $b->edit_at; */ ?></td> -->
                                                     <td><?= $b->titulo; ?></td>
                                                     <td class="text-center "><a class="showdescrip" data-description="<?= $b->descripcion; ?>">Ver descripcion</a></td>
                                                     <td class="text-center"><a href="<?= ($b->img) ? $b->img : '#'; ?>" target="_blank">Ver</a></td>
@@ -56,7 +60,7 @@
                                         ?>
                                     </tbody>
 
-                                    <tbody>
+                                    <!-- <tbody>
                                         <?php /*
                                         // Supongamos que $categorias es un array de objetos de categoría
                                         // y $blog es un array de objetos de blog.
@@ -95,7 +99,7 @@
                                             }
                                         }
                                         */ ?>
-                                    </tbody>
+                                    </tbody> -->
 
                                 </table>
 

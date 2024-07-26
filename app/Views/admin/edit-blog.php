@@ -62,7 +62,7 @@
                                                 <select name="categoria" id="selectize-select">
                                                     <option data-display="Select">Selecciona un categoria.</option>
                                                     <?php foreach ($blogCat as $key => $bCat) { ?>
-                                                        <option value="<?= $bCat->id ?>" <?= ($bCat->nombre == $blog->categoria) ? 'selected' : ''; ?>><?= $bCat->nombre ?></option>
+                                                        <option value="<?= $bCat->nombre ?>" <?= ($bCat->nombre == $blog->categoria) ? 'selected' : ''; ?>><?= $bCat->nombre ?></option>
                                                     <?php }; ?>
                                                 </select>
                                             </div>

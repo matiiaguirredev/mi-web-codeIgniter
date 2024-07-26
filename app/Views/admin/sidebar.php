@@ -141,14 +141,14 @@
                         </li>
                     </ul>
 
-                    <!-- <div class="collapse" id="menuProyects"></div> -->
+                    <!-- Categoria Blog -->
                     <ul class="sub-menu">
                         <li class="menu-item">
-                            <a href="#menuMultilevel1" data-bs-toggle="collapse" class="menu-link waves-effect waves-light">
+                            <a href="#menuMultilevelBlogCategory" data-bs-toggle="collapse" class="menu-link waves-effect waves-light">
                                 <span class="menu-text"> Categoria Blog </span>
                                 <span class="menu-arrow"></span>
                             </a>
-                            <div class="collapse" id="menuMultilevel1">
+                            <div class="collapse" id="menuMultilevelBlogCategory">
                                 <ul class="sub-menu">
                                     <li class="menu-item">
                                         <a href="/admin/blogCat" class="menu-link">
@@ -165,21 +165,22 @@
                         </li>
                     </ul>
 
+                    <!-- Comentarios de Blog -->
                     <ul class="sub-menu">
                         <li class="menu-item">
-                            <a href="#menuMultilevel2" data-bs-toggle="collapse" class="menu-link waves-effect waves-light">
+                            <a href="#menuMultilevelBlogComments" data-bs-toggle="collapse" class="menu-link waves-effect waves-light">
                                 <span class="menu-text"> Comentarios de Blog </span>
                                 <span class="menu-arrow"></span>
                             </a>
-                            <div class="collapse" id="menuMultilevel2">
+                            <div class="collapse" id="menuMultilevelBlogComments">
                                 <ul class="sub-menu">
                                     <li class="menu-item">
-                                        <a href="/admin/blogCat" class="menu-link">
+                                        <a href="/admin/blogCom" class="menu-link">
                                             <span class="menu-text">Lista de Com de blog</span>
                                         </a>
                                     </li>
                                     <li class="menu-item">
-                                        <a href="/admin/create/blogCat" class="menu-link">
+                                        <a href="/admin/create/blogCom" class="menu-link">
                                             <span class="menu-text">Crear Com de Blog</span>
                                         </a>
                                     </li>
@@ -189,6 +190,7 @@
                     </ul>
                 </div>
             </li>
+
 
             <li class="menu-item">
                 <a href="#menuTestimonios" data-bs-toggle="collapse" class="menu-link waves-effect waves-light">
