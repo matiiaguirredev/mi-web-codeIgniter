@@ -1550,6 +1550,10 @@ Blog Area CSS
 .single-blog-post .thumb {
   position: relative;
   overflow: hidden;
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
+  
 }
 
 .single-blog-post .thumb img {

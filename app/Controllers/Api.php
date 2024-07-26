@@ -623,8 +623,6 @@ class Api extends BaseController {
 
         $datos = $datos[0];
 
-
-
         $require = [
             "nombre" => "text",
             "url" => "url",
@@ -2123,7 +2121,6 @@ class Api extends BaseController {
             if ($value) {
                 $data[$name] = validateValue($value, $type, $this->lang);
             } else {
-
                 $valRequire[] = $name;
             }
         }
@@ -2262,6 +2259,307 @@ class Api extends BaseController {
     }
 
     // FIN CRUD TESTIMONIOS
+
+    // CRUD BLOG
+
+    public function create_blog() {
+        $this->valToken();
+
+        $require = [
+            "categoria" => "text",
+        ];
+
+        $valRequire = [];
+
+        foreach ($require as $name => $type) {
+            $value = $this->request->getGetPost($name);
+            if ($value) {
+                $data[$name] = validateValue($value, $type, $this->lang);
+            } else {
+                $valRequire[] = $name;
+            }
+        }
+
+        $data["img"] = $this->uploadImage("blog", "img"); // nombre de carpeta y desp campo de bd 
+        if (!$data["img"]) {
+            $valRequire[] = "img";
+            // $data["img"] = "api/bgimg/300/300"; // aca esta opcional y tenemos una por defecto, si queremos obligatoria descomentar arriba.
+        }
+
+        if ($valRequire) {
+            // validar error que te faltan datos
+            custom_error(101, "es", $valRequire);
+        }
+
+        $optionals = [ // datos opcionales 
+            "titulo",
+            "descripcion",
+        ];
+
+        foreach ($optionals as $name) {
+            $data[$name] = $this->request->getGetPost($name);
+        }
+
+        $data["activo"] = ($this->request->getGetPost("activo")) ? 1 : 0;
+
+        $insert = $this->db->table("blog")->insert($data);
+        if (!$insert) {
+            custom_error(204, $this->lang);
+        }
+
+        $data["img"] = base_url() . "assets/images/blog/" . $data["img"];
+        $id = $this->db->insertID(); // ultimo identificador insertado !
+
+        json_debug(array_merge(["id" => $id], $data));
+    }
+
+    public function get_blog($id = null) {
+        $this->variables();
+        // $this->valToken(); // las unicas que no se pide el token son las consultas publicas,  login y registro
+
+        // $query = "SELECT * FROM secciones ";
+        $query = "SELECT * FROM `blog` ";
+        if ($id) { // esto se utilza para consultar 1 especifico
+            $query .= "WHERE id = '$id'";
+        }
+        if ($this->activo) {
+            $query .= ($id) ? " AND" : " WHERE";
+            $query .= " activo = 1";
+        }
+
+        $query .= " ORDER BY `blog`.`id` ASC";
+        $query = $this->db->query($query);
+        $datos = $query->getResult();
+
+        if (!$datos) {
+            custom_error(504, $this->lang, "blog");
+        }
+
+        //esto es para agregar url a la imagen !
+        foreach ($datos as $key => $value) {
+            if ($value->img) {
+                $datos[$key]->img = base_url() . "assets/images/blog/" . $value->img;
+            }
+        }
+
+        if ($id) {
+            $datos = $datos[0];
+        }
+
+        json_debug($datos);
+    }
+
+    public function update_blog($id) {
+        $this->valToken();
+
+        $query = "SELECT * FROM blog WHERE id = '$id'";
+        $query = $this->db->query($query);
+        $datos = $query->getResult();
+
+        if (!$datos) {
+            custom_error(504, $this->lang, "blog");
+        }
+
+        $datos = $datos[0]; // por que estamos seleccionadno desde un identificdor y siempre el resltado es unico 
+
+        $require = [
+            "categoria" => "text",
+        ];
+
+        foreach ($require as $name => $type) {
+            $value = $this->request->getGetPost($name);
+            if ($value) {
+                $data[$name] = validateValue($value, $type, $this->lang);
+            }
+        }
+
+        $optionals = [ // datos opcionales 
+            "titulo",
+            "descripcion",
+        ];
+
+        // json_debug($this->request->getGetPost());
+
+        if (!$this->request->getGetPost("notnull")) {
+            foreach ($optionals as $name) {
+                $data[$name] = $this->request->getGetPost($name);
+            }
+        }
+
+        $data["img"] = $this->uploadImage("blog", "img"); // nombre de carpeta y desp campo de bd 
+        if (!$data["img"]) {
+            $valRequire[] = "img";
+            // $data["img"] = $datos->img;
+        }
+
+        $data["activo"] = ($this->request->getGetPost("activo")) ? 1 : 0;
+        $data["edit_at"] = $this->currentDate;
+
+        // debug($this->request->getGetPost(), false);
+        // debug($data);
+
+        // data es un parametro y representa el set
+        // luego separado por , tenemos el where
+        $update = $this->db->table("blog")->update($data, ["id" => $id]); // ver query de mysql para entender bien cuales son los 2 paremetros q recibimos (set y where)
+        // debug($datos);
+        if (!$update) {
+            custom_error(506, $this->lang, "blog");
+        }
+
+        $data["img"] = base_url() . "assets/images/blog/" . $data["img"];
+        json_debug(array_merge((array)$datos, $data));
+    }
+
+    public function delete_blog($id) {
+        $this->valToken(); // las unicas que no se pide el token son las consultas publicas,  login y registro
+
+        $query = "SELECT * FROM blog WHERE id = '$id'";
+        $query = $this->db->query($query);
+        $datos = $query->getResult();
+
+        if (!$datos) {
+            custom_error(504, $this->lang, "blog");
+        }
+
+        $delete = $this->db->table("blog")->delete(["id" => $id]);
+        if (!$delete) {
+            custom_error(507, $this->lang, "general");
+        }
+
+        if ($id) {
+            $datos = $datos[0];
+        }
+
+        json_debug($datos);
+    }
+
+    // FIN CRUD BLOG
+
+    // CRUD BLOG CATEGORIAS
+
+    public function create_blogCat() {
+        $this->valToken();
+
+        $require = [
+            "nombre" => "text",
+        ];
+
+        $valRequire = [];
+
+        foreach ($require as $name => $type) {
+            $value = $this->request->getGetPost($name);
+            if ($value) {
+                $data[$name] = validateValue($value, $type, $this->lang);
+            } else {
+                $valRequire[] = $name;
+            }
+        }
+
+        $data["activo"] = ($this->request->getGetPost("activo")) ? 1 : 0;
+
+        $insert = $this->db->table("blog_cat")->insert($data);
+        if (!$insert) {
+            custom_error(204, $this->lang);
+        }
+
+        $id = $this->db->insertID(); // ultimo identificador insertado !
+
+        json_debug(array_merge(["id" => $id], $data));
+    }
+
+    public function get_blogCat($id = null) {
+        $this->variables();
+        // $this->valToken(); // las unicas que no se pide el token son las consultas publicas,  login y registro
+
+        // $query = "SELECT * FROM secciones ";
+        $query = "SELECT * FROM `blog_cat` ";
+        if ($id) { // esto se utilza para consultar 1 especifico
+            $query .= "WHERE id = '$id'";
+        }
+        if ($this->activo) {
+            $query .= ($id) ? " AND" : " WHERE";
+            $query .= " activo = 1";
+        }
+
+        $query .= " ORDER BY `blog_cat`.`id` ASC";
+        $query = $this->db->query($query);
+        $datos = $query->getResult();
+
+        if (!$datos) {
+            custom_error(504, $this->lang, "blog_cat");
+        }
+
+        if ($id) {
+            $datos = $datos[0];
+        }
+
+        json_debug($datos);
+    }
+
+    public function update_blogCat($id) {
+        $this->valToken();
+
+        $query = "SELECT * FROM blog_cat WHERE id = '$id'";
+        $query = $this->db->query($query);
+        $datos = $query->getResult();
+
+        if (!$datos) {
+            custom_error(504, $this->lang, "blog_cat");
+        }
+
+        $datos = $datos[0]; // por que estamos seleccionadno desde un identificdor y siempre el resltado es unico 
+
+        $require = [
+            "nombre" => "text",
+        ];
+
+        foreach ($require as $name => $type) {
+            $value = $this->request->getGetPost($name);
+            if ($value) {
+                $data[$name] = validateValue($value, $type, $this->lang);
+            }
+        }
+
+        $data["activo"] = ($this->request->getGetPost("activo")) ? 1 : 0;
+
+        // debug($this->request->getGetPost(), false);
+        // debug($data);
+
+        // data es un parametro y representa el set
+        // luego separado por , tenemos el where
+        $update = $this->db->table("blog_cat")->update($data, ["id" => $id]); // ver query de mysql para entender bien cuales son los 2 paremetros q recibimos (set y where)
+        // debug($datos);
+        if (!$update) {
+            custom_error(506, $this->lang, "blog_cat");
+        }
+
+        json_debug(array_merge((array)$datos, $data));
+    }
+
+    public function delete_blogCat($id) {
+        $this->valToken(); // las unicas que no se pide el token son las consultas publicas,  login y registro
+
+        $query = "SELECT * FROM blog_cat WHERE id = '$id'";
+        $query = $this->db->query($query);
+        $datos = $query->getResult();
+
+        if (!$datos) {
+            custom_error(504, $this->lang, "blog_cat");
+        }
+
+        $delete = $this->db->table("blog_cat")->delete(["id" => $id]);
+        if (!$delete) {
+            custom_error(507, $this->lang, "general");
+        }
+
+        if ($id) {
+            $datos = $datos[0];
+        }
+
+        json_debug($datos);
+    }
+
+    // FIN CRUD BLOG CATEGORIAS
 
     private function valToken() {
         $require = [

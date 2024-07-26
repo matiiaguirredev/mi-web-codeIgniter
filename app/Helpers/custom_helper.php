@@ -292,3 +292,24 @@ if (!function_exists('array_count_by_condition')) {
         }));
     }
 }
+
+if (!function_exists('dia_mes')) {
+    function dia_mes($fechaOriginal) {
+        // Crear un objeto DateTime a partir de la cadena de fecha
+        $fecha = new DateTime($fechaOriginal);
+
+        // Definir un arreglo de meses en español
+        $meses = [
+            1 => 'Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun',
+            'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'
+        ];
+
+        // Obtener el día y el mes de la fecha
+        $dia = $fecha->format('d');
+        $mes = $meses[intval($fecha->format('m'))];
+
+        // Imprimir el resultado en el formato deseado
+        return $dia . '<br>'. $mes;
+    }
+}
+

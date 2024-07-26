@@ -6,6 +6,9 @@ use CodeIgniter\Router\RouteCollection;
  * @var RouteCollection $routes
  */
 $routes->get('/', 'Home::index');
+$routes->get('single-blog/(:segment)', 'Home::single_blog/$1');
+
+
 
 $routes->get('/test', 'Home::test'); // ruta de pruebas
 
@@ -48,6 +51,9 @@ $routes->group('admin', function ($routes) {
         'txtbanner',
         'clientes',
         'testimonios',
+        'blog',
+        'blogCat',
+        'blogComments',
         
     ];
     foreach ($entitySegments as $entitySegment) {
@@ -92,6 +98,11 @@ $routes->group('api', function ($routes) {
         'txtbanner',
         'clientes',
         'testimonios',
+        'blog',
+        'blogCat',
+        'blogComments',
+        
+
     ];
 
     foreach ($entitySegments as $entitySegment) {

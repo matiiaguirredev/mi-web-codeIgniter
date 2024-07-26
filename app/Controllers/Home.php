@@ -14,7 +14,17 @@ class Home extends BaseController {
     }
 
     private function header() {
+        $this->data['secciones'] = [];
+        $secciones = json_decode(send_post($this->urlAPI . "secciones?activo=1")); //["token" => $token]
+        // debug($secciones, false);
+        if (isset($secciones->error)) {
+            $this->data['error'] = $secciones->error;
+        } else {
+            $this->data['secciones'] = $secciones;
+        }
+
         echo view('header', $this->data);
+        
     }
 
     private function footer() {
@@ -99,16 +109,38 @@ class Home extends BaseController {
                     case "contratame":
                         $this->hireme();
                         break;
-                    case "contactame":
-                        $this->contact();
+                    case "blog":
+                        $this->blog();
                         break;
                     case "testimonios":
                         $this->testimonials();
+                        break;
+                    case "contactame":
+                        $this->contact();
                         break;
                 }
             }
         }
 
+        $this->footer();
+    }
+
+    public function single_blog($id) {
+        $token = $this->request->getCookie("token");
+
+        $this->data = [];
+        $this->header();
+        // debug($this->data);
+
+        $this->data['blog'] = [];
+        $blog = json_decode(send_post($this->urlAPI . "blog/" . $id, ["token" => $token]));
+        if (isset($blog->error)) {
+            $this->data['error'] = $blog->error;
+        } else {
+            $this->data['blog'] = $blog;
+        }
+
+        echo view('web/single-blog', $this->data);
         $this->footer();
     }
 
@@ -118,7 +150,6 @@ class Home extends BaseController {
         $this->data['lenguajes'] = [];
         $lenguaje = json_decode(send_post($this->urlAPI . "lenguaje?activo=1"));
         // debug($lenguaje, false);
-
         if (isset($lenguaje->error)) {
             $this->data['error'] = $lenguaje->error;
         } else {
@@ -137,7 +168,7 @@ class Home extends BaseController {
         }
 
         // if (!empty($this->data['clientes'])) {
-            echo view('web/about-me-area', $this->data);
+        echo view('web/about-me-area', $this->data);
         // }
     }
 
@@ -161,7 +192,7 @@ class Home extends BaseController {
         $clientes = json_decode(send_post($this->urlAPI . "clientes?activo=1"));
         if (isset($clientes->error)) {
             $this->data['error'] = $clientes->error;
-        } else { 
+        } else {
             $this->data['clientes'] = $clientes;
         }
 
@@ -213,9 +244,20 @@ class Home extends BaseController {
     }
 
     private function blog() {
-        echo view('web/blog');
-    }
+        $this->data['blog'] = [];
+        $blog = json_decode(send_post($this->urlAPI . "blog?activo=1"));
+        // debug($blog, false);
+        if (isset($blog->error)) {
+            $this->data['error'] = $blog->error;
+        } else {
+            $this->data['blog'] = $blog;
+        }
 
+        if (!empty($this->data['blog'])) {
+            echo view('web/blog', $this->data);
+        }
+    } // aca sigue la de single blog que esta arriba por que es publica
+    
     private function testimonials() {
         $this->data['testimonios'] = [];
         $testimonios = json_decode(send_post($this->urlAPI . "testimonios?activo=1")); //["token" => $token]
@@ -244,13 +286,8 @@ class Home extends BaseController {
 
         if (!empty($this->data['contacto'])) {
             echo view('web/contact', $this->data);
-        } else {
-            // Agregamos un elemento al array $this->data['deletenavbar']
-            $this->data['deletenavbar'] = []; // Puedes ajustar el valor como necesites
-            // debug($this->data['deletenavbar'], false);
         }
     }
-        
 
     //  finish el orden de la web !!!!
 
