@@ -31,7 +31,7 @@
 
                                 <div class="content">
                                     <h4><a href="single-blog.html"><?= $value->titulo; ?></a></h4>
-                                    <p><?= $value->descripcion; ?></p>
+                                    <p><?= $value->descrip_corta; ?></p>
                                 </div>
                                 <a href="single-blog/<?= $value->id; ?>" class="btn btn-primary">Read More <i class="fa fa-angle-double-right"></i></a>
                             </div>

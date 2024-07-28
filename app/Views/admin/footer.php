@@ -7,7 +7,7 @@
                                <div>
                                    <script>
                                        document.write(new Date().getFullYear())
-                                   </script> © Dashtrap
+                                   </script> © Shortae & MatiAguirre
                                </div>
                            </div>
                            <div class="col-md-6">
@@ -105,7 +105,7 @@
            <!-- Plugins js -->
            <script src="assets/libs/quill/quill.min.js"></script>
            <!-- Demo js-->
-           <script src="assets/js/pages/form-quilljs.js"></script>
+           <!-- <script src="assets/js/pages/form-quilljs.js"></script> -->
            <!-- HASTA! aca form quill. -->
 
            <script src="assets/js/pages/range-sliders.js"></script>
@@ -124,6 +124,34 @@
                    showAlert("success", $success);
                </script>
            <?php endif; ?>
+
+           <script>
+            var quill = new Quill("#snow-editor", {
+                theme: "snow",
+                modules: {
+                    toolbar: [
+                    [{ font: [] }, { size: [] }],
+                    ["bold", "italic", "underline", "strike"],
+                    [{ color: [] }, { background: [] }],
+                    [{ script: "super" }, { script: "sub" }],
+                    [{ header: [!1, 1, 2, 3, 4, 5, 6] }, "blockquote", "code-block"],
+                    [
+                        { list: "ordered" },
+                        { list: "bullet" },
+                        { indent: "-1" },
+                        { indent: "+1" },
+                    ],
+                    ["direction", { align: [] }],
+                    ["link", "image", "video"],
+                    ["clean"],
+                    ],
+                },
+                });
+
+            quill.on("text-change", function () {
+            document.getElementById("content").value = quill.root.innerHTML;
+            });
+           </script>
 
            </body>
 

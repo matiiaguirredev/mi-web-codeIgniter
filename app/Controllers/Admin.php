@@ -1668,7 +1668,6 @@ class Admin extends BaseController {
     public function get_blog() {
         $this->valtoken();
         $token = $this->request->getCookie("token");
-        // $requestData = array_merge($this->request->getGetPost(), ["token" => $token]); // en una variable tengo que guardar el merge 
 
         $this->data['blog'] = [];
         $blog = json_decode(send_post($this->urlAPI . "blog", ["token" => $token]));
@@ -1686,7 +1685,10 @@ class Admin extends BaseController {
         } else {
             $this->data['blogCat'] = $blogCat;
         }
-        // debug($blog);
+
+        // debug($this->data['blog'][3]);
+
+        // $requestData = array_merge($this->request->getGetPost(), ["token" => $token]); // en una variable tengo que guardar el merge 
         // $checkPerfil = json_decode(send_post($this->urlAPI . "create/perfil", $requestData)); // envio directamente la variable que tiene todo ya concatenado
         // // debug($checkPerfil);
         // // debug(send_post($this->urlAPI . "create/perfil", $requestData));
@@ -1726,20 +1728,20 @@ class Admin extends BaseController {
                 $this->get_blog();
                 $view = false;
             }
-            // debug($create_blog, false);
+            // debug($create_blog);
         }
 
         if ($view) {
             $token = $this->request->getCookie("token");
 
-            // $this->data['blog'] = [];
-            // $blog = json_decode(send_post($this->urlAPI . "blog", ["token" => $token]));
-            // if (isset($blog->error)) {
-            //     $this->data['error'] = $blog->error;
-            //     // debug($this->data['error']);
-            // } else {
-            //     $this->data['blog'] = $blog;
-            // }
+            $this->data['blog'] = [];
+            $blog = json_decode(send_post($this->urlAPI . "blog", ["token" => $token]));
+            if (isset($blog->error)) {
+                $this->data['error'] = $blog->error;
+                // debug($this->data['error']);
+            } else {
+                $this->data['blog'] = $blog;
+            }
 
             $this->data['blogCat'] = [];
             $blogCat = json_decode(send_post($this->urlAPI . "blogCat?activo=1", ["token" => $token]));
@@ -1791,8 +1793,8 @@ class Admin extends BaseController {
             $token = $this->request->getCookie("token");
 
             $this->data['blog'] = [];
-            $blog = json_decode(send_post($this->urlAPI . "blog/" . $id , ["token" => $token]));
-            // debug($blog, false);
+            $blog = json_decode(send_post($this->urlAPI . "blog/" . $id, ["token" => $token]));
+            // debug($blog);
             if (isset($blog->error)) {
                 $this->data['error'] = $blog->error;
             } else {
@@ -1962,6 +1964,152 @@ class Admin extends BaseController {
     }
 
     // FIN CRUD BLOG CATEGORIAS
+
+    // CRUD BLOG COMENTARIOS
+
+    public function get_blogComm() {
+        $this->valtoken();
+        $token = $this->request->getCookie("token");
+
+        $this->data['blogComm'] = [];
+        $blogComm = json_decode(send_post($this->urlAPI . "blogComm", ["token" => $token]));
+        if (isset($blogComm->error)) {
+            $this->data['error'] = $blogComm->error;
+        } else {
+            $this->data['blogComm'] = $blogComm;
+        }
+
+        // $requestData = array_merge($this->request->getGetPost(), ["token" => $token]); // en una variable tengo que guardar el merge 
+        // $checkPerfil = json_decode(send_post($this->urlAPI . "create/perfil", $requestData)); // envio directamente la variable que tiene todo ya concatenado
+        // // debug($checkPerfil);
+        // // debug(send_post($this->urlAPI . "create/perfil", $requestData));
+        // if (!isset($checkPerfil->error)) {
+        //     $this->user->informacion = $checkPerfil;
+        // }
+
+        $view = true;
+
+        if ($view) {
+            $this->header();
+            $this->sidebar();
+            echo view('admin/blogComm', $this->data);
+            $this->footer();
+        }
+    }
+
+    public function create_blogComm() {
+
+        $this->valtoken();
+        $view = true;
+        if ($this->request->getGetPost()) {
+            $token = $this->request->getCookie("token");
+            $requestData = array_merge($this->request->getGetPost(), ["token" => $token]); // en una variable tengo que guardar el merge 
+            // debug($this->request->getGetPost());
+
+            $create_blogComm = json_decode(send_post($this->urlAPI . "create/blogComm", $requestData)); // envio directamente la variable que tiene todo ya concatenado
+            if (isset($create_blogComm->error)) {
+                $this->data['error'] = $create_blogComm->error;
+            } else {
+                $this->data['success'] = "Informacion de comentarios de blog creada exitosamente";
+                $this->get_blogComm();
+                $view = false;
+            }
+            // debug($create_blogComm);
+        }
+
+        if ($view) {
+            $token = $this->request->getCookie("token");
+
+            $this->data['blog'] = [];
+            $blog = json_decode(send_post($this->urlAPI . "blog?activo=1", ["token" => $token]));
+            // debug($blog, false);
+            if (isset($blog->error)) {
+                $this->data['error'] = $blog->error;
+            } else {
+                $this->data['blog'] = $blog;
+            }
+
+            $this->header();
+            $this->sidebar();
+            echo view('admin/newblogComm', $this->data);
+            $this->footer();
+        }
+    }
+
+    public function update_blogComm($id) {
+
+        $this->valtoken();
+        $view = true;
+        $token = $this->request->getCookie("token");
+
+        if ($this->request->getGetPost()) {
+
+            $requestData = array_merge($this->request->getGetPost(), ["token" => $token]); // en una variable tengo que guardar el merge 
+
+            // debug($requestData, false);
+            $update_blogComm = json_decode(send_post($this->urlAPI . "update/blogComm/" . $id, $requestData)); // envio directamente la variable que tiene todo ya concatenado
+            // $update_blogComm = send_post($this->urlAPI . "update/blog/" . $id, $requestData); // envio directamente la variable que tiene todo ya concatenado
+            // json_debug($update_blogComm);
+            if (isset($update_blogComm->error)) {
+                $this->data['error'] = $update_blogComm->error;
+            } else {
+                $this->data['success'] = "Informacion de comentario de blog modificada exitosamente";
+                $this->get_blogComm();
+                $view = false;
+            }
+            // debug($update_blogComm, false);
+
+        }
+
+        if ($view) {
+
+            $token = $this->request->getCookie("token");
+
+            $this->data['blogComm'] = [];
+            $blogComm = json_decode(send_post($this->urlAPI . "blogComm/" . $id, ["token" => $token]));
+            // debug($blogComm, false);
+            if (isset($blogComm->error)) {
+                $this->data['error'] = $blogComm->error;
+            } else {
+                $this->data['blogComm'] = $blogComm;
+            }
+
+            $this->data['blog'] = [];
+            $blog = json_decode(send_post($this->urlAPI . "blog", ["token" => $token]));
+            // debug($blog);
+            if (isset($blog->error)) {
+                $this->data['error'] = $blog->error;
+            } else {
+                $this->data['blog'] = $blog;
+            }
+
+            $this->header();
+            $this->sidebar();
+            echo view('admin/edit-blogComm');
+            $this->footer();
+        }
+    }
+
+    public function delete_blogComm($id) {
+        // $this->valtoken();
+        $token = $this->request->getCookie("token");
+
+        // $this->data = [];
+        if ($id) {
+            $requestData = ["token" => $token]; // Datos para enviar a la API
+            $delete_blogComm = json_decode(send_post($this->urlAPI . "delete/blogComm/" . $id, $requestData));
+
+            if (isset($delete_blogComm->error)) {
+                $this->data['error'] = $delete_blogComm->error;
+            } else {
+                // El proyecto se eliminó exitosamente
+                $this->data['success'] = "Informacion de comentario de blog eliminada exitosamente";
+            }
+        }
+        $this->get_blogComm();
+    }
+
+    // FIN CRUD BLOG COMENTARIOS
 
     private function valtoken() {
         $this->token = $this->request->getCookie("token");

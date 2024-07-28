@@ -929,6 +929,121 @@ function changeactivobCat(id) {
         });
 }
 
+function deleteblogComm(id) {
+    /* $(".todelete").attr("href", "admin/delete/clientes/" + id); */
+    data = [];
+    data["activo"] = $(".ch-blogComm-" + id).is(":checked") ? 1 : 0;
+    data["notnull"] = 1;
+    data["token"] = getCookie("token");
+    activo = $(".ch-blogComm-" + id).is(":checked") ? 1 : 0;
+    msj = activo ? "Activado" : "Desactivado";
+    type = activo ? "success" : "danger";
+
+    console.log("data", data);
+    Swal.fire({
+        title: '¿Estás seguro?',
+        text: '¡No podrás revertir esto!',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Sí, eliminarlo',
+        cancelButtonText: 'Cancelar'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            $.ajax({
+                async: true,
+                type: "POST",
+                dataType: "json",
+                url:
+                    "./api/delete/blogComm/" +
+                    id +
+                    "?token=" +
+                    getCookie("token") +
+                    "&activo=" +
+                    activo +
+                    "&notnull=1",
+                data: data,
+                contentType: "application/json; charset=utf-8",
+                processData: false,
+
+                success: function (response) {
+                    console.log('Respuesta del servidor:', response);
+                    Swal.fire(
+                        '¡Eliminado!',
+                        'Tu archivo ha sido eliminado.',
+                        'success'
+                    ).then(() => {
+                        // window.location.href = "./admin/blogComm";
+                        $(".tr-" + id).html("<td colspan='99' class='bg-success text-center text-white'>Eliminado satisfactoriamente</td>");
+                        setTimeout(() => {
+                            $(".tr-" + id).hide('slide');
+                        }, 2000);
+
+                    });
+                },
+                error: function (xhr, status, error) {
+                    console.error('Error en la solicitud AJAX:', error);
+                    Swal.fire(
+                        'Abortado',
+                        'El servidor no pudo eliminar el archivo',
+                        'error'
+                    );
+                }
+            });
+
+        } else if (result.dismiss === Swal.DismissReason.cancel) {
+            Swal.fire(
+                'Cancelado',
+                'Tu archivo está a salvo :)',
+                'error'
+            );
+        }
+    });
+}
+
+function changeactivoblogComm(id) {
+    data = [];
+    data["activo"] = $(".ch-blogComm-" + id).is(":checked") ? 1 : 0;
+    data["notnull"] = 1;
+    data["token"] = getCookie("token");
+    activo = $(".ch-blogComm-" + id).is(":checked") ? 1 : 0;
+    msj = activo ? "Activado" : "Desactivado";
+    type = activo ? "success" : "danger";
+
+    console.log("data", data);
+
+    $.ajax({
+        async: true,
+        type: "POST",
+        dataType: "json",
+        url:
+            "./api/update/blogComm/" +
+            id +
+            "?token=" +
+            getCookie("token") +
+            "&activo=" +
+            activo +
+            "&notnull=1",
+        data: data,
+        contentType: "application/json; charset=utf-8",
+        // contentType: false,
+        processData: false,
+    })
+        .done(function (Response) {
+            //do something when get response
+            showAlert(
+                type,
+                `El blogComm ${Response.autor} se ha ${msj} correctamente`
+            );
+            console.log(Response);
+        })
+        .fail(function (Response) {
+            //do something when any error occurs.
+            showAlert("danger", Response.error);
+            console.error(Response);
+        });
+}
 
 //MODAL DE DESCRIPCIONES DE PROYECTOS.
 $(document).on("click", ".showdescrip", function (e) {
@@ -996,7 +1111,7 @@ $(document).on("click", ".del-img", function (e) {
                 token: getCookie("token"),
                 ruta: ruta
             };
-            // console.log("data", data);
+            console.log("ACA ESTA LA DATA A VER QUE ME TRAE", data);
             // Crear un nuevo FormData
             const formData = new FormData();
 

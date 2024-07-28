@@ -1,3 +1,5 @@
+<?php /* debug($this->data['blog']) */ ?>
+
 <div class="px-3">
 
     <!-- Start Content-->
@@ -42,7 +44,7 @@
                                         <div class="mb-2 row">
                                             <label class="col-md-2 col-form-label" for="example-textarea">Descripcion</label>
                                             <div class="col-md-10">
-                                                <textarea class="form-control" name="descripcion" id="example-textarea" rows="5"><?= $blog->descripcion ?></textarea>
+                                                <textarea class="form-control" name="descrip_corta" id="example-textarea" rows="1"><?= $blog->descrip_corta ?></textarea>
                                             </div>
                                         </div>
 
@@ -52,6 +54,16 @@
                                                 <div class="input-group">
                                                     <a href="<?= $blog->img ?>" target="_blank" class="input-group-text" id="basic-addon1"><i class="fa-sharp fa-solid fa-image"></i></a>
                                                     <input multiple type="file" name="img" class="form-control" id="example-fileinput">
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="mb-2 row">
+                                            <label class="col-md-2 col-form-label" for="example-fileinput">Imagen</label>
+                                            <div class="col-md-10">
+                                                <div class="input-group">
+                                                    <a href="<?= $blog->img_post ?>" target="_blank" class="input-group-text" id="basic-addon1"><i class="fa-sharp fa-solid fa-image"></i></a>
+                                                    <input multiple type="file" name="img_post" class="form-control" id="example-fileinput">
                                                 </div>
                                             </div>
                                         </div>
@@ -67,6 +79,20 @@
                                                 </select>
                                             </div>
                                         </div>
+
+                                        <hr>
+                                        <div class="row">
+                                            <div class="col-12">
+                                                <h4 class="header-title">Contenido del post</h4>
+                                                <p class="sub-header">Diseña tu post.</p>
+                                                <div id="snow-editor" style="height: 300px;">
+                                                    <?= $blog->contenido ?>
+                                                </div>
+                                                <textarea class="form-control d-none" name="contenido" id="content" rows="5"><?= $blog->contenido ?></textarea>
+                                            </div>
+                                        </div>
+
+                                        <hr>
 
                                         <div class="mb-2 row">
                                             <label class="col-md-2 col-form-label" for="example-fileinput">Activo</label>

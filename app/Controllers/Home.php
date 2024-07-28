@@ -140,6 +140,31 @@ class Home extends BaseController {
             $this->data['blog'] = $blog;
         }
 
+        $this->data['blogComm'] = [];
+        $blogComm = json_decode(send_post($this->urlAPI . "blogComm", ["token" => $token]));
+        if (isset($blogComm->error)) {
+            $this->data['error'] = $blogComm->error;
+        } else {
+            $this->data['blogComm'] = $blogComm;
+        }
+
+        $this->data['blogCat'] = [];
+        $blogCat = json_decode(send_post($this->urlAPI . "blogCat", ["token" => $token]));
+        // debug($blogCat, false);
+        if (isset($blogCat->error)) {
+            $this->data['error'] = $blogCat->error;
+        } else {
+            $this->data['blogCat'] = $blogCat;
+        }
+
+        $this->data['redes'] = [];
+        $redes = json_decode(send_post($this->urlAPI . "redes" , ["token" => $token]));
+        if (isset($redes->error)) {
+            $this->data['error'] = $redes->error;
+        } else {
+            $this->data['redes'] = $redes;
+        }
+
         echo view('web/single-blog', $this->data);
         $this->footer();
     }

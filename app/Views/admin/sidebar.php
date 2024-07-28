@@ -175,12 +175,12 @@
                             <div class="collapse" id="menuMultilevelBlogComments">
                                 <ul class="sub-menu">
                                     <li class="menu-item">
-                                        <a href="/admin/blogCom" class="menu-link">
+                                        <a href="/admin/blogComm" class="menu-link">
                                             <span class="menu-text">Lista de Com de blog</span>
                                         </a>
                                     </li>
                                     <li class="menu-item">
-                                        <a href="/admin/create/blogCom" class="menu-link">
+                                        <a href="/admin/create/blogComm" class="menu-link">
                                             <span class="menu-text">Crear Com de Blog</span>
                                         </a>
                                     </li>

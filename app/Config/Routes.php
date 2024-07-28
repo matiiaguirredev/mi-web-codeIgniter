@@ -53,7 +53,7 @@ $routes->group('admin', function ($routes) {
         'testimonios',
         'blog',
         'blogCat',
-        'blogComments',
+        'blogComm',
         
     ];
     foreach ($entitySegments as $entitySegment) {
@@ -100,8 +100,7 @@ $routes->group('api', function ($routes) {
         'testimonios',
         'blog',
         'blogCat',
-        'blogComments',
-        
+        'blogComm',
 
     ];
 

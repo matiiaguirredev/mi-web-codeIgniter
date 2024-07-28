@@ -27,16 +27,23 @@
         <div class="row">
             <div class="col-lg-12 col-md-12">
                 <div class="blog-details">
-                    <div class="thumb">
-                        <img src="web/img/blog-details.jpg" alt="blog-details">
+                    <div class="thumb thumb-imgpost">
+                        <style>
+                            .thumb-imgpost {
+                                background-image: url(<?= $blog->img_post; ?>);
+                            }
+                        </style>
+                        <img class="opacity-0" src="./api/bgimg/1250/700" alt="blog-details">
 
                         <div class="date">
-                            <span>12 Dec</span>
+                            <span><?= dia_mes($blog->create_at); ?></span>
                         </div>
                     </div>
 
                     <div class="blog-details-heading">
-                        <h3>The best tips of web design</h3>
+                        <!-- <h3>The best tips of web design</h3> -->
+                        <h3><?= $blog->titulo ?></h3>
+
                         <ul>
                             <li>Posted By: <a href="#">Admin</a></li>
                             <li><a href="#"><i class="fa fa-comments-o"></i> 05</a></li>
@@ -45,7 +52,9 @@
                     </div>
 
                     <div class="blog-details-content">
-                        <p>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.</p>
+                        <?= $blog->contenido ?>
+
+                        <!-- <p>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.</p>
 
                         <p class="mb-0">It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum as their default model text, and a search for 'lorem ipsum' will uncover many web sites still in their infancy. Various versions have evolved over the years, sometimes by accident, sometimes on purpose (injected humour and the like).</p>
 
@@ -58,25 +67,65 @@
 
                         <p>Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots in a piece of classical Latin literature from 45 BC, making it over 2000 years old. Richard McClintock, a Latin professor at Hampden-Sydney College in Virginia, looked up one of the more obscure Latin words, consectetur, from a Lorem Ipsum passage, and going through the cites of the word in classical literature, discovered the undoubtable source. Lorem Ipsum comes from sections 1.10.32 and 1.10.33 of "de Finibus Bonorum et Malorum" (The Extremes of Good and Evil) by Cicero, written in 45 BC. This book is a treatise on the theory of ethics, very popular during the Renaissance. The first line of Lorem Ipsum, "Lorem ipsum dolor sit amet..", comes from a line in section 1.10.32.</p>
 
-                        <p class="mb-0">The standard chunk of Lorem Ipsum used since the 1500s is reproduced below for those interested. Sections 1.10.32 and 1.10.33 from "de Finibus Bonorum et Malorum" by Cicero are also reproduced in their exact original form, accompanied by English versions from the 1914 translation by H. Rackham.</p>
+                        <p class="mb-0">The standard chunk of Lorem Ipsum used since the 1500s is reproduced below for those interested. Sections 1.10.32 and 1.10.33 from "de Finibus Bonorum et Malorum" by Cicero are also reproduced in their exact original form, accompanied by English versions from the 1914 translation by H. Rackham.</p> -->
 
                         <div class="blog-details-meta">
                             <div class="tags">
                                 <ul>
                                     <li class="title">Tags:</li>
-                                    <li><a href="#">Design</a></li>
+                                    <?php
+                                    // Primero, imprimimos la categoría actual si existe.
+                                    $blogCategoriaActual = null;
+
+                                    foreach ($blogCat as $bC) {
+                                        if ($blog->categoria == $bC->nombre) {
+                                            $blogCategoriaActual = $bC;
+                                            break;
+                                        }
+                                    }
+
+                                    if ($blogCategoriaActual) {
+                                        // Imprimir la categoría actual primero
+                                        echo '<li><a href="#">' . $blogCategoriaActual->nombre . '</a></li>';
+                                    }
+
+                                    // Luego, imprimimos las demás categorías
+                                    foreach ($blogCat as $bC) {
+                                        if ($blogCategoriaActual && $bC->nombre == $blogCategoriaActual->nombre) {
+                                            // Saltamos la categoría actual ya que ya se ha impreso
+                                            continue;
+                                        }
+                                        echo '<li><a href="#">' . $bC->nombre . '</a></li>';
+                                    }
+                                    ?>
+
+                                    <?php
+                                    /* foreach ($blogCat as $key => $bC) { ?>
+                                        <?php if ($blog->categoria == $blogCat->nombre) { ?>
+
+                                            <li><a href="#"><?= $bC->nombre ?></a></li>
+                                        <?php } ?>
+                                    <?php } */ 
+                                    ?>
+
+                                    <!-- <li><a href="#">Design</a></li>
                                     <li><a href="#">Creative</a></li>
-                                    <li><a href="#">Graphic</a></li>
+                                    <li><a href="#">Graphic</a></li> -->
                                 </ul>
                             </div>
 
                             <div class="share">
                                 <ul>
                                     <li class="title">Share:</li>
-                                    <li><a href="#"><i class="fa-brands fa-facebook-f"></i></a></li>
+                                    <?php foreach ($redes as $key => $r) { ?>
+                                        <li><a href="<?= $r->url ?>"><i class=""><?= $r->iconHTML ?></i></a></li>
+                                    <?php } ?>
+
+                                    <!-- 
                                     <li><a href="#"><i class="fa-brands fa-twitter"></i></a></li>
                                     <li><a href="#"><i class="fa-brands fa-instagram"></i></a></li>
-                                    <li><a href="#"><i class="fa-brands fa-linkedin-in"></i></a></li>
+                                    <li><a href="#"><i class="fa-brands fa-linkedin-in"></i></a></li> 
+                                    -->
                                 </ul>
                             </div>
                         </div>

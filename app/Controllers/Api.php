@@ -2282,8 +2282,14 @@ class Api extends BaseController {
 
         $data["img"] = $this->uploadImage("blog", "img"); // nombre de carpeta y desp campo de bd 
         if (!$data["img"]) {
-            $valRequire[] = "img";
-            // $data["img"] = "api/bgimg/300/300"; // aca esta opcional y tenemos una por defecto, si queremos obligatoria descomentar arriba.
+            // $valRequire[] = "img";
+            $data["img"] = "300x300.jpg"; // aca esta opcional y tenemos una por defecto, si queremos obligatoria descomentar arriba.
+        }
+
+        $data["img_post"] = $this->uploadImage("blog", "img_post"); // nombre de carpeta y desp campo de bd 
+        if (!$data["img_post"]) {
+            // $valRequire[] = "img_post";
+            $data["img_post"] = "300x300.jpg"; // aca esta opcional y tenemos una por defecto, si queremos obligatoria descomentar arriba.
         }
 
         if ($valRequire) {
@@ -2293,7 +2299,8 @@ class Api extends BaseController {
 
         $optionals = [ // datos opcionales 
             "titulo",
-            "descripcion",
+            "descrip_corta",
+            "contenido",
         ];
 
         foreach ($optionals as $name) {
@@ -2308,6 +2315,7 @@ class Api extends BaseController {
         }
 
         $data["img"] = base_url() . "assets/images/blog/" . $data["img"];
+        $data["img_post"] = base_url() . "assets/images/blog/" . $data["img_post"];
         $id = $this->db->insertID(); // ultimo identificador insertado !
 
         json_debug(array_merge(["id" => $id], $data));
@@ -2339,6 +2347,9 @@ class Api extends BaseController {
         foreach ($datos as $key => $value) {
             if ($value->img) {
                 $datos[$key]->img = base_url() . "assets/images/blog/" . $value->img;
+            }
+            if ($value->img_post) {
+                $datos[$key]->img_post = base_url() . "assets/images/blog/" . $value->img_post;
             }
         }
 
@@ -2375,9 +2386,9 @@ class Api extends BaseController {
 
         $optionals = [ // datos opcionales 
             "titulo",
-            "descripcion",
+            "descrip_corta",
+            "contenido",
         ];
-
         // json_debug($this->request->getGetPost());
 
         if (!$this->request->getGetPost("notnull")) {
@@ -2385,11 +2396,17 @@ class Api extends BaseController {
                 $data[$name] = $this->request->getGetPost($name);
             }
         }
-
+        
         $data["img"] = $this->uploadImage("blog", "img"); // nombre de carpeta y desp campo de bd 
         if (!$data["img"]) {
             // $valRequire[] = "img";
             $data["img"] = $datos->img;
+        }
+
+        $data["img_post"] = $this->uploadImage("blog", "img"); // nombre de carpeta y desp campo de bd
+        if (!$data["img_post"]) {
+            // $valRequire[] = "img_post";
+            $data["img_post"] = $datos->img_post;
         }
 
         $data["activo"] = ($this->request->getGetPost("activo")) ? 1 : 0;
@@ -2402,11 +2419,13 @@ class Api extends BaseController {
         // luego separado por , tenemos el where
         $update = $this->db->table("blog")->update($data, ["id" => $id]); // ver query de mysql para entender bien cuales son los 2 paremetros q recibimos (set y where)
         // debug($datos);
+
         if (!$update) {
             custom_error(506, $this->lang, "blog");
         }
 
         $data["img"] = base_url() . "assets/images/blog/" . $data["img"];
+        $data["img_post"] = base_url() . "assets/images/blog/" . $data["img_post"];
         json_debug(array_merge((array)$datos, $data));
     }
 
@@ -2457,7 +2476,7 @@ class Api extends BaseController {
 
         $data["activo"] = ($this->request->getGetPost("activo")) ? 1 : 0;
 
-        $insert = $this->db->table("blog_cat")->insert($data);
+        $insert = $this->db->table("blogCat")->insert($data);
         if (!$insert) {
             custom_error(204, $this->lang);
         }
@@ -2472,7 +2491,7 @@ class Api extends BaseController {
         // $this->valToken(); // las unicas que no se pide el token son las consultas publicas,  login y registro
 
         // $query = "SELECT * FROM secciones ";
-        $query = "SELECT * FROM `blog_cat` ";
+        $query = "SELECT * FROM `blogCat` ";
         if ($id) { // esto se utilza para consultar 1 especifico
             $query .= "WHERE id = '$id'";
         }
@@ -2481,12 +2500,12 @@ class Api extends BaseController {
             $query .= " activo = 1";
         }
 
-        $query .= " ORDER BY `blog_cat`.`id` ASC";
+        $query .= " ORDER BY `blogCat`.`id` ASC";
         $query = $this->db->query($query);
         $datos = $query->getResult();
 
         if (!$datos) {
-            custom_error(504, $this->lang, "blog_cat");
+            custom_error(504, $this->lang, "blogCat");
         }
 
         if ($id) {
@@ -2499,12 +2518,12 @@ class Api extends BaseController {
     public function update_blogCat($id) {
         $this->valToken();
 
-        $query = "SELECT * FROM blog_cat WHERE id = '$id'";
+        $query = "SELECT * FROM `blogCat` WHERE id = '$id'";
         $query = $this->db->query($query);
         $datos = $query->getResult();
 
         if (!$datos) {
-            custom_error(504, $this->lang, "blog_cat");
+            custom_error(504, $this->lang, "blogCat");
         }
 
         $datos = $datos[0]; // por que estamos seleccionadno desde un identificdor y siempre el resltado es unico 
@@ -2527,10 +2546,10 @@ class Api extends BaseController {
 
         // data es un parametro y representa el set
         // luego separado por , tenemos el where
-        $update = $this->db->table("blog_cat")->update($data, ["id" => $id]); // ver query de mysql para entender bien cuales son los 2 paremetros q recibimos (set y where)
+        $update = $this->db->table("blogCat")->update($data, ["id" => $id]); // ver query de mysql para entender bien cuales son los 2 paremetros q recibimos (set y where)
         // debug($datos);
         if (!$update) {
-            custom_error(506, $this->lang, "blog_cat");
+            custom_error(506, $this->lang, "blogCat");
         }
 
         json_debug(array_merge((array)$datos, $data));
@@ -2539,15 +2558,15 @@ class Api extends BaseController {
     public function delete_blogCat($id) {
         $this->valToken(); // las unicas que no se pide el token son las consultas publicas,  login y registro
 
-        $query = "SELECT * FROM blog_cat WHERE id = '$id'";
+        $query = "SELECT * FROM `blogCat` WHERE id = '$id'";
         $query = $this->db->query($query);
         $datos = $query->getResult();
 
         if (!$datos) {
-            custom_error(504, $this->lang, "blog_cat");
+            custom_error(504, $this->lang, "blogCat");
         }
 
-        $delete = $this->db->table("blog_cat")->delete(["id" => $id]);
+        $delete = $this->db->table("blogCat")->delete(["id" => $id]);
         if (!$delete) {
             custom_error(507, $this->lang, "general");
         }
@@ -2560,6 +2579,136 @@ class Api extends BaseController {
     }
 
     // FIN CRUD BLOG CATEGORIAS
+
+    // CRUD BLOG COMENTARIOS
+
+    public function create_blogComm() {
+        $this->valToken();
+
+        $require = [
+            "titulo_blog" => "text",
+            "comentario" => "text",
+        ];
+
+        $valRequire = [];
+
+        foreach ($require as $name => $type) {
+            $value = $this->request->getGetPost($name);
+            if ($value) {
+                $data[$name] = validateValue($value, $type, $this->lang);
+            } else {
+                $valRequire[] = $name;
+            }
+        }
+
+        if ($valRequire) {
+            // validar error que te faltan datos
+            custom_error(101, "es", $valRequire);
+        }
+
+        $data["activo"] = ($this->request->getGetPost("activo")) ? 1 : 0;
+
+        $insert = $this->db->table("blogComm")->insert($data);
+        if (!$insert) {
+            custom_error(204, $this->lang);
+        }
+
+        $id = $this->db->insertID(); // ultimo identificador insertado !
+
+        json_debug(array_merge(["id" => $id], $data));
+    }
+
+    public function get_blogComm($id = null) {
+        $this->variables();
+        // $this->valToken(); // las unicas que no se pide el token son las consultas publicas,  login y registro
+
+        // $query = "SELECT * FROM secciones ";
+        $query = "SELECT * FROM `blogComm` ";
+        if ($id) { // esto se utilza para consultar 1 especifico
+            $query .= "WHERE id = '$id'";
+        }
+        if ($this->activo) {
+            $query .= ($id) ? " AND" : " WHERE";
+            $query .= " activo = 1";
+        }
+
+        $query .= " ORDER BY `blogComm`.`id` ASC";
+        $query = $this->db->query($query);
+        $datos = $query->getResult();
+
+        if (!$datos) {
+            custom_error(504, $this->lang, "blogComm");
+        }
+
+        if ($id) {
+            $datos = $datos[0];
+        }
+
+        json_debug($datos);
+    }
+
+    public function update_blogComm($id) {
+        $this->valToken();
+
+        $query = "SELECT * FROM blogComm WHERE id = '$id'";
+        $query = $this->db->query($query);
+        $datos = $query->getResult();
+
+        if (!$datos) {
+            custom_error(504, $this->lang, "blogComm");
+        }
+
+        $datos = $datos[0]; // por que estamos seleccionadno desde un identificdor y siempre el resltado es unico 
+
+        $require = [
+            "titulo_blog" => "text",
+            "comentario" => "text",
+        ];
+
+        foreach ($require as $name => $type) {
+            $value = $this->request->getGetPost($name);
+            if ($value) {
+                $data[$name] = validateValue($value, $type, $this->lang);
+            }
+        }
+
+        $data["activo"] = ($this->request->getGetPost("activo")) ? 1 : 0;
+        $data["edit_at"] = $this->currentDate;
+
+        $update = $this->db->table("blogComm")->update($data, ["id" => $id]); // ver query de mysql para entender bien cuales son los 2 paremetros q recibimos (set y where)
+        // debug($datos);
+        if (!$update) {
+            custom_error(506, $this->lang, "blogComm");
+        }
+
+        json_debug(array_merge((array)$datos, $data));
+    }
+
+    public function delete_blogComm($id) {
+        $this->valToken(); // las unicas que no se pide el token son las consultas publicas,  login y registro
+
+        $query = "SELECT * FROM blogComm WHERE id = '$id'";
+        $query = $this->db->query($query);
+        $datos = $query->getResult();
+
+        if (!$datos) {
+            custom_error(504, $this->lang, "blogComm");
+        }
+
+        $delete = $this->db->table("blogComm")->delete(["id" => $id]);
+        if (!$delete) {
+            custom_error(507, $this->lang, "general");
+        }
+
+        if ($id) {
+            $datos = $datos[0];
+        }
+
+        json_debug($datos);
+    }
+
+    // FIN CRUD BLOG COMENTARIOS
+
 
     private function valToken() {
         $require = [

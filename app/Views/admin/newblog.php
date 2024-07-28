@@ -42,7 +42,7 @@
                                             <div class="mb-2 row">
                                                 <label class="col-md-2 col-form-label" for="example-textarea">Descripcion</label>
                                                 <div class="col-md-10">
-                                                    <textarea class="form-control" name="descripcion" id="example-textarea" rows="5"></textarea>
+                                                    <textarea class="form-control" name="descrip_corta" id="example-textarea" rows="1"></textarea>
                                                 </div>
                                             </div>
 
@@ -54,21 +54,43 @@
                                             </div>
 
                                             <div class="mb-2 row">
-                                            <label class="form-label col-md-2 col-form-label">Categorias</label> <br />
-                                            <div class="col-md-10">
-                                                <select name="categoria" id="selectize-select">
-                                                    <option data-display="Select">Selecciona un categoria.</option>
-                                                    <?php foreach ($blogCat as $key => $bCat) { ?>
-                                                        <option value="<?= $bCat->nombre ?>"><?= $bCat->nombre ?></option>
-                                                    <?php } ?>
-                                                </select>
+                                                <label class="col-md-2 col-form-label" for="example-fileinput">Imagen dentro del post</label>
+                                                <div class="col-md-10">
+                                                    <input multiple type="file" name="img_post" class="form-control" id="example-fileinput">
+                                                </div>
                                             </div>
-                                        </div>
+
+                                            <div class="mb-2 row">
+                                                <label class="form-label col-md-2 col-form-label">Categorias</label> <br />
+                                                <div class="col-md-10">
+                                                    <select name="categoria" id="selectize-select">
+                                                        <option data-display="Select">Selecciona un categoria.</option>
+                                                        <?php foreach ($blogCat as $key => $bCat) { ?>
+                                                            <option value="<?= $bCat->nombre ?>"><?= $bCat->nombre ?></option>
+                                                        <?php } ?>
+                                                    </select>
+                                                </div>
+                                            </div>
+
+                                            <hr>
+
+                                            <div class="row">
+                                                <div class="col-12">
+                                                    <h4 class="header-title">Contenido del post</h4>
+                                                    <p class="sub-header">Diseña tu post.</p>
+                                                    <div id="snow-editor" style="height: 300px;">
+                                                        <!-- Este es el contenedor para Quill -->
+                                                    </div>
+                                                    <textarea class="form-control d-none" name="contenido" id="content" rows="5"></textarea>
+                                                </div>
+                                            </div>
+
+                                            <hr>
 
                                             <div class="mb-2 row">
                                                 <label class="col-md-2 col-form-label" for="example-fileinput">Activo</label>
                                                 <div class="col-md-10">
-                                                    <div class="form-check form-switch">
+                                                    <div class="form-check form-switch col-form-label">
                                                         <input class="form-check-input" name="activo" type="checkbox" role="switch" id="flexSwitchCheckChecked">
                                                     </div>
                                                 </div>

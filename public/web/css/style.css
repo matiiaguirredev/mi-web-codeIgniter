@@ -1800,6 +1800,13 @@ Blog Details Area CSS
   position: relative;
 }
 
+.blog-details .thumb-imgpost {
+  position: relative;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;
+}
+
 .blog-details .date {
   position: absolute;
   left: 0;
