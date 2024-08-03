@@ -64,7 +64,7 @@
                                                 <label class="form-label col-md-2 col-form-label">Categorias</label> <br />
                                                 <div class="col-md-10">
                                                     <select name="categoria" id="selectize-select">
-                                                        <option data-display="Select">Selecciona un categoria.</option>
+                                                        <option value="" data-display="Select">Selecciona un categoria.</option>
                                                         <?php foreach ($blogCat as $key => $bCat) { ?>
                                                             <option value="<?= $bCat->nombre ?>"><?= $bCat->nombre ?></option>
                                                         <?php } ?>
@@ -78,10 +78,8 @@
                                                 <div class="col-12">
                                                     <h4 class="header-title">Contenido del post</h4>
                                                     <p class="sub-header">Diseña tu post.</p>
-                                                    <div id="snow-editor" style="height: 300px;">
-                                                        <!-- Este es el contenedor para Quill -->
-                                                    </div>
-                                                    <textarea class="form-control d-none" name="contenido" id="content" rows="5"></textarea>
+                                                    <!-- <div id="editor" style="height: 300px;"></div> -->
+                                                    <textarea class="form-control" name="contenido" id="content" rows="5"></textarea>
                                                 </div>
                                             </div>
 

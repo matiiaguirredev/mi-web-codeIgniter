@@ -1167,4 +1167,34 @@ $(document).on("click", ".del-img", function (e) {
     });
 });
 
-
+    tinymce.init({
+        selector: '#content',
+        plugins: 'anchor autolink charmap codesample emoticons image link lists media searchreplace table visualblocks wordcount checklist mediaembed casechange export formatpainter pageembed linkchecker a11ychecker tinymcespellchecker permanentpen powerpaste advtable advcode editimage advtemplate ai mentions tinycomments tableofcontents footnotes mergetags autocorrect typography inlinecss markdown',
+        toolbar: 'undo redo | blocks fontfamily fontsize | bold italic underline strikethrough | link image media table mergetags | addcomment showcomments | spellcheckdialog a11ycheck typography | align lineheight | checklist numlist bullist indent outdent | emoticons charmap | removeformat',
+        tinycomments_mode: 'embedded',
+        tinycomments_author: 'Author name',
+        mergetags_list: [
+        { value: 'First.Name', title: 'First Name' },
+        { value: 'Email', title: 'Email' },
+        ],
+        ai_request: (request, respondWith) => respondWith.string(() => Promise.reject("See docs to implement AI Assistant")),
+        branding: false,
+        setup: function (editor) {
+        // Evento que se dispara cuando el contenido del editor cambia
+        editor.on('SetContent Change', function () {
+            // Selecciona todos los elementos blockquote dentro del editor
+            const blockquotes = editor.getBody().querySelectorAll('blockquote');
+    
+            // Añadir clase 'blockquote' a cada blockquote
+            blockquotes.forEach(blockquote => {
+            if (!blockquote.classList.contains('blockquote')) {
+                blockquote.classList.add('blockquote');
+            }
+            });
+            
+            // Actualiza el valor del textarea con el contenido del editor
+            document.getElementById('content').value = editor.getContent();
+        });
+        }
+    });
+    

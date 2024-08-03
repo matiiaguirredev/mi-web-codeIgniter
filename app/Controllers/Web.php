@@ -2,18 +2,27 @@
 
 namespace App\Controllers;
 
-class Home extends BaseController {
+class Web extends BaseController {
 
     private $db = null;
     private $urlAPI = "http://mi-web/api/";
     private $data = null;
+    private $user = null;
+    private $token = null;
+    private $lang = "es";
+
 
     public function __construct() {
 
         $this->db = \Config\Database::connect();
     }
 
-    private function header() {
+    public function pages_404() {
+        echo view('web/pages-404');
+    }
+
+    public function navbar() {
+
         $this->data['secciones'] = [];
         $secciones = json_decode(send_post($this->urlAPI . "secciones?activo=1")); //["token" => $token]
         // debug($secciones, false);
@@ -22,9 +31,11 @@ class Home extends BaseController {
         } else {
             $this->data['secciones'] = $secciones;
         }
+        echo view('web/navbar', $this->data);
+    }
 
+    private function header() {
         echo view('header', $this->data);
-        
     }
 
     private function footer() {
@@ -32,6 +43,7 @@ class Home extends BaseController {
     }
 
     public function index() {
+        $this->navbar();
 
         $this->data['perfil'] = [];
         $usuario = json_decode(send_post($this->urlAPI . "login", ["usuario" => "matiasaaa", "pasw" => "A123456789*"]));
@@ -126,18 +138,89 @@ class Home extends BaseController {
     }
 
     public function single_blog($id) {
+
+        // $postData = $_POST;
+        // $getData = $_GET;
+        // $requestData = $_REQUEST;
+
+        // // Para debuggear los datos recibidos
+        // debug([
+        //     "post" => $postData,
+        //     "get" => $getData,
+        //     "request" => $requestData,
+        // ]);
+
+
         $token = $this->request->getCookie("token");
 
         $this->data = [];
+
         $this->header();
-        // debug($this->data);
+        // Procesar el formulario de envío de comentarios
+        // debug($this->request->getPost(),false);
+        if ($this->request->getGetPost()) {
+            if (!$token) {
+                $loginData = [
+                    "usuario" => "web",
+                    "pasw" => "A123456789*"
+                ];
+                $login = json_decode(send_post($this->urlAPI . "login", $loginData));
+
+                if (isset($login->error)) {
+                    $this->data['error'] = $login->error;
+                } else {
+                    $token = $login->token;
+                    // debug($token);
+                }
+            }
+
+            $requestData = array_merge($this->request->getGetPost(), ["token" => $token, "id_post" => $id]);
+            // debug($requestData);
+            $create_blogComm2 = json_decode(send_post($this->urlAPI . "create/blogComm2", $requestData));
+            // debug($create_blogComm2);
+            if (isset($create_blogComm2->error)) {
+                $this->data['error'] = $create_blogComm2->error;
+            } else {
+                $this->data['success'] = "Información de comentarios de blog creada exitosamente";
+            }
+        }
+
+        // Obtener todos los comentarios
+        $blogComm2List = json_decode(send_post($this->urlAPI . "blogComm2", ["token" => $token]));
+        if (isset($blogComm2List->error)) {
+            $this->data['error'] = $blogComm2List->error;
+        } else {
+            // Filtrar los comentarios que corresponden al post actual
+            $filteredComments = array_filter($blogComm2List, function ($bc2) use ($id) {
+                return $bc2->id_post == $id && $bc2->activo == 1;
+            });
+
+            // Contar los comentarios filtrados
+            $numComm = count($filteredComments);
+
+            $this->data['blogComm2'] = $filteredComments;
+            $this->data['numComm'] = $numComm;
+        }
+
+        // HASTA ACA ESTOY INVENTANDO
+
 
         $this->data['blog'] = [];
-        $blog = json_decode(send_post($this->urlAPI . "blog/" . $id, ["token" => $token]));
+        $blog = json_decode(send_post($this->urlAPI . "blog/" . $id . '?activo=1', ["token" => $token]));
+        // debug($blog);
         if (isset($blog->error)) {
             $this->data['error'] = $blog->error;
         } else {
             $this->data['blog'] = $blog;
+        }
+
+        // si no hay blog activo me lleva a esta vista, ya que si no salia 
+        // error por las variables y tmb le tuve q  poner un ?activo=1 
+        // sino seguian con acceso al blog aun cuando no estaba activo
+        if (!$this->data['blog']) {
+            return $this->pages_404();
+        } else {
+            $this->navbar();
         }
 
         $this->data['blogComm'] = [];
@@ -158,16 +241,47 @@ class Home extends BaseController {
         }
 
         $this->data['redes'] = [];
-        $redes = json_decode(send_post($this->urlAPI . "redes" , ["token" => $token]));
+        $redes = json_decode(send_post($this->urlAPI . "redes", ["token" => $token]));
         if (isset($redes->error)) {
             $this->data['error'] = $redes->error;
         } else {
             $this->data['redes'] = $redes;
         }
 
+
+        $this->data['user'] = [];
+        $this->token = $this->request->getCookie("token");
+        // debug($this->token = $this->request->getCookie("token"));
+        // debug($this->token);
+        $checkToken = json_decode(send_post($this->urlAPI . "checktoken", ["token" => $this->token]));
+        // debug($checkToken); // borrar esto
+        // debug($this->urlAPI ."checkToken", false);
+
+        // if (isset($checkToken->error)) {
+        //     header("Location: /admin/login");
+        //     exit();
+        // } else {
+        $this->user = $checkToken;
+        // debug($this->user, false);
+
+        $checkPerfil = json_decode(send_post($this->urlAPI . "perfil", ["token" => $this->token]));
+        // debug(send_post($this->urlAPI . "perfil", ["token" => $token]));
+        // debug($checkPerfil);
+
+        if (!isset($checkPerfil->error)) {
+            $this->user->informacion = $checkPerfil;
+        }
+        // debug($this->user);
+        // } esto viene del if arriba comentado
+
+        // Aquí asignamos $this->user a $this->data['user']
+        $this->data['user'] = $this->user;
+        // debug($this->data['user']);
+
         echo view('web/single-blog', $this->data);
         $this->footer();
     }
+
 
     //estan en orden como iria la web original !!!!
     private function aboutmearea() {
@@ -282,7 +396,7 @@ class Home extends BaseController {
             echo view('web/blog', $this->data);
         }
     } // aca sigue la de single blog que esta arriba por que es publica
-    
+
     private function testimonials() {
         $this->data['testimonios'] = [];
         $testimonios = json_decode(send_post($this->urlAPI . "testimonios?activo=1")); //["token" => $token]
@@ -299,6 +413,39 @@ class Home extends BaseController {
     }
 
     private function contact() {
+
+        $token = $this->request->getCookie("token");
+        if ($this->request->getGetPost()) {
+            // debug($this->request->getGetPost());
+            if (!$token) {
+                $loginData = [
+                    "usuario" => "web",
+                    "pasw" => "A123456789*"
+                ];
+                $login = json_decode(send_post($this->urlAPI . "login", $loginData));
+
+                if (isset($login->error)) {
+                    $this->data['error'] = $login->error;
+                } else {
+                    $token = $login->token;
+                    // debug($token);
+                }
+            }
+
+            // debug($this->request->getGetPost());
+            $requestData = array_merge($this->request->getGetPost(), ["token" => $token]);
+            // debug($requestData);
+            $mailing = json_decode(send_post($this->urlAPI . "mailing", $requestData));
+            // debug($mailing);
+            if (isset($mailing->error)) {
+                $this->data['error'] = $mailing->error;
+            } else {
+                $this->data['success'] = "Mensaje enviado satisfactoriamente";
+            }
+
+        }
+
+
 
         $this->data['contacto'] = [];
         $contacto = json_decode(send_post($this->urlAPI . "contacto?activo=1")); //["token" => $token]

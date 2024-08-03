@@ -42,7 +42,7 @@
                                             <label class="form-label col-md-2 col-form-label">Categorias</label> <br />
                                             <div class="col-md-10">
                                                 <select name="cat_id" id="selectize-select">
-                                                    <option data-display="Select">Selecciona un categoria.</option>
+                                                    <option value="" data-display="Select">Selecciona un categoria.</option>
                                                     <?php foreach ($categorias as $key => $categoria) { ?>
                                                         <option value="<?= $categoria->id ?>"><?= $categoria->nombre ?></option>
                                                     <?php }; ?>

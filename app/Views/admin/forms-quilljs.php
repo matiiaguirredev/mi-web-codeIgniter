@@ -29,7 +29,7 @@
                                         <h4 class="header-title">Snow Editor</h4>
                                         <p class="sub-header">Snow is a clean, flat toolbar theme.</p>
 
-                                        <div id="snow-editor" style="height: 300px;">
+                                        <div id="editor" style="height: 300px;">
                                             <h3><span class="ql-size-large">Hello World!</span></h3>
                                             <p><br></p>
                                             <h3>This is an simple editable area.</h3>

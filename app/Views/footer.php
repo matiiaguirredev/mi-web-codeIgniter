@@ -12,6 +12,14 @@
 
 <div class="go-top"><i class="fa fa-angle-up"></i></div>
 
+<!-- reCAPTCHA -->
+<script src="https://www.google.com/recaptcha/api.js"></script>
+<script>
+    function onSubmit(token) {
+        document.getElementById("demo-form").submit();
+    }
+</script>
+
 <!-- JS libreria TypeIt -->
 <script src="https://unpkg.com/typeit@8.8.0/dist/index.umd.js"></script>
 <!-- jQuery Min JS -->
@@ -37,6 +45,8 @@
 <script src="web/js/contact-form-script.js"></script>
 <!-- Main JS -->
 <script src="web/js/main.js?v=<?= time() ?>"></script>
+<!-- Swall Fire -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.12.4/dist/sweetalert2.all.min.js"></script>
 
 <?php if (isset($error)) :  ?>
     <script>

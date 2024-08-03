@@ -1,5 +1,5 @@
 
-var quill = new Quill("#snow-editor", {
+const quill = new Quill("#editor", {
   theme: "snow",
   modules: {
     toolbar: [
@@ -21,8 +21,18 @@ var quill = new Quill("#snow-editor", {
   },
 });
 
+
 quill.on("text-change", function () {
+  // Obtén el contenido del editor
+  const blockquotes = quill.root.querySelectorAll("blockquote");
+
+  // Añadir clase 'blockquote' a cada blockquote
+  blockquotes.forEach(blockquote => {
+    if (!blockquote.classList.contains("blockquote")) {
+      blockquote.classList.add("blockquote");
+    }
+  });
+
+  // Actualizar el valor de algún elemento, por ejemplo un input hidden
   document.getElementById("content").value = quill.root.innerHTML;
 });
-
-quill = new Quill("#bubble-editor", { theme: "bubble" });

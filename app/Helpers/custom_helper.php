@@ -138,6 +138,9 @@ if (!function_exists('custom_error')) {
                 '104' => "Invalid String format for $variablesText.",
                 '105' => "Invalid Integer format for $variablesText.",
                 '106' => "Invalid Array format for $variablesText.",
+                '107' => "reCAPTCHA verification failed. Please try again.",
+                '108' => "Email could not be sent.",
+
 
                 //User Errors
                 '200' => 'Your session has expired. Please log in again.',
@@ -182,6 +185,8 @@ if (!function_exists('custom_error')) {
                 '104' => "Formato de String no válido para $variablesText.",
                 '105' => "Formato de Integer no válido para $variablesText.",
                 '106' => "Formato de Array no válido para $variablesText.",
+                '107' => "No se pudo verificar reCAPTCHA. Por favor, intenta nuevamente.",
+                '108' => "No se pudo enviar el correo electrónico.",
 
                 //User Errors
                 '200' => 'Tu sesión ha expirado. Por favor, inicia sesión nuevamente.',
@@ -313,3 +318,23 @@ if (!function_exists('dia_mes')) {
     }
 }
 
+if (!function_exists('dia_mes_ano')) {
+    function dia_mes_ano($fechaOriginal) {
+        // Crear un objeto DateTime a partir de la cadena de fecha
+        $fecha = new DateTime($fechaOriginal);
+
+        // Definir un arreglo de meses en español
+        $meses = [
+            1 => 'Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun',
+            'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'
+        ];
+
+        // Obtener el día y el mes de la fecha
+        $dia = $fecha->format('d');
+        $mes = $meses[intval($fecha->format('m'))];
+        $ano = $fecha->format('Y');
+
+        // Imprimir el resultado en el formato deseado
+        return $dia . ' ' . $mes  . ' '. $ano;
+    }
+}

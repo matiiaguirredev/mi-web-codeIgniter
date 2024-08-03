@@ -454,3 +454,52 @@ function toggleTheme() {
 //         $(".alert-content .close").click();
 //     }, 3000);
 // }
+
+
+const $form = $('#contactForm2');
+function onSubmit(token) {
+    // Comprobamos si el formulario es válido
+    if ($form[0].checkValidity()) {
+        // Deshabilitamos los campos del formulario
+        $form.find('input, select, textarea, button').prop("disabled", true);
+        
+        // Enviamos el formulario
+        $form.trigger('submit'); // Activamos el evento submit para capturarlo con jQuery
+    } else {
+        // Si no es válido, mostramos los mensajes de error del navegador
+        $form[0].reportValidity();
+    }
+}
+
+
+
+function showAlert(type, message) {
+    let errorMessagePrefix = message.split(':')[0];
+    let originalTitle = document.title;
+    let alertTitle = errorMessagePrefix;
+    let alertMessage = message.substring(errorMessagePrefix.length + 1);
+    let iconType = (type === 'success') ? 'success' : (type === 'warning') ? 'warning' : 'error';
+
+    // Cambiar el título de la página
+    document.title = '🔔 ' + alertTitle;
+
+    // // Reproducir un sonido
+    // let audio = new Audio('notification.mp3');
+    // audio.play();
+
+    Swal.fire({
+        title: alertTitle,
+        text: alertMessage,
+        icon: iconType,
+        timer: 5000,
+        showConfirmButton: false
+    }).then(() => {
+        // Restaurar el título de la página
+        document.title = originalTitle;
+    });
+
+    // Restaurar el título de la página después de 5 segundos si el usuario no interactúa con la alerta
+    setTimeout(() => {
+        document.title = originalTitle;
+    }, 5000);
+}

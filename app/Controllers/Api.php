@@ -14,6 +14,7 @@ class Api extends BaseController {
     private $currentDate = null;
     private $user = null;
     private $activo = 0;
+    private $captchaUrl = 'https://www.google.com/recaptcha/api/siteverify';
 
     public function __construct() {
 
@@ -185,7 +186,6 @@ class Api extends BaseController {
         }
 
         $valtoken = json_decode(decode($data['token'], $this->key));
-        // debug($valtoken, false);
 
         if (!$valtoken) {
             custom_error(103, $this->lang, 'token');
@@ -2396,14 +2396,14 @@ class Api extends BaseController {
                 $data[$name] = $this->request->getGetPost($name);
             }
         }
-        
+
         $data["img"] = $this->uploadImage("blog", "img"); // nombre de carpeta y desp campo de bd 
         if (!$data["img"]) {
             // $valRequire[] = "img";
             $data["img"] = $datos->img;
         }
 
-        $data["img_post"] = $this->uploadImage("blog", "img"); // nombre de carpeta y desp campo de bd
+        $data["img_post"] = $this->uploadImage("blog", "img_post"); // nombre de carpeta y desp campo de bd
         if (!$data["img_post"]) {
             // $valRequire[] = "img_post";
             $data["img_post"] = $datos->img_post;
@@ -2709,10 +2709,28 @@ class Api extends BaseController {
 
     // FIN CRUD BLOG COMENTARIOS
 
+    //PRUEBA DE VER SI ME SALE ALGO JAJA
+    public function create_blogComm2() {
 
-    private function valToken() {
+        $this->valToken();
+
+        $parametros = [
+            "secret" => getenv('CAPTCHA_KEY'),
+            "response" => $this->request->getGetPost("g-recaptcha-response"),
+        ];
+
+        $captcha = json_decode(send_post($this->captchaUrl, $parametros));
+        // debug($this->request->getGetPost(), false);
+        // debug($captcha);
+        if (!$captcha->success) {
+            custom_error(107, $this->lang);
+        }
+
         $require = [
-            "token" => "text",
+            "name" => "text",
+            "email" => "email",
+            "message" => "text",
+            "id_post" => "number",
         ];
 
         $valRequire = [];
@@ -2728,78 +2746,128 @@ class Api extends BaseController {
 
         if ($valRequire) {
             // validar error que te faltan datos
-            custom_error(101, $this->lang, $valRequire);
+            custom_error(101, "es", $valRequire);
         }
 
-        $valtoken = json_decode(decode($data['token'], $this->key)); // decodificamos y validamos el token
-        // debug($valtoken, false);
+        $data["activo"] = 0;
 
-        if (!$valtoken) {
-            custom_error(103, $this->lang, 'token'); // si el token no tiene formato correcto
+        $insert = $this->db->table("blogComm2")->insert($data);
+        if (!$insert) {
+            custom_error(204, $this->lang);
         }
 
-        // aqui va la validación de tiempo de token
-        // debug($this->currentDate, false);
+        $id = $this->db->insertID(); // ultimo identificador insertado !
 
-        $tokenTimestamp = strtotime($valtoken->date); // referencia al momento de creacion, la fecha que se puso en el momento de asignarlo
-        $currentTimestamp = strtotime($this->currentDate); // este hace referencia al ahora mismo. a la facha y hora actual
-
-        // Calcular la diferencia en segundos
-        $difference = $currentTimestamp - $tokenTimestamp;
-
-        $maxTime = getenv('SESION_TIME') * 60; // 60 minutos // esta funcion es para traer valores del arch env
-
-        if ($difference > $maxTime) {
-            // custom_error(502, $this->lang); esta comentado por el momento para que no expire el tiempo
-        }
-
-        $query = $this->db->query("SELECT * FROM usuarios WHERE id = '$valtoken->id'");
-        $checkUser = $query->getResult();
-        if (!$checkUser) {
-            custom_error(501, $this->lang); // si el usuario no existe
-        }
-
-        $checkUser = $checkUser[0];
-        // debug($checkUser);
-
-        unset($checkUser->pasw);
-        $this->user = $checkUser;
+        json_debug(array_merge(["id" => $id], $data));
     }
 
-    private function uploadImage($carpeta, $inputName) {
-        $rutaCarpeta = 'assets/images/' . $carpeta;
+    public function get_blogComm2($id = null) {
+        $this->variables();
+        // $this->valToken(); // las unicas que no se pide el token son las consultas publicas,  login y registro
 
-        // Obtener el archivo cargado
-        $file = $this->request->getFile($inputName);
+        // $query = "SELECT * FROM secciones ";
+        $query = "SELECT * FROM `blogComm2` ";
 
-        if (!$file) {
-            return false;
+        $query .= " ORDER BY `blogComm2`.`id` ASC";
+        $query = $this->db->query($query);
+        $datos = $query->getResult();
+
+        if (!$datos) {
+            custom_error(504, $this->lang, "blogComm2");
         }
 
-        if (!file_exists($rutaCarpeta)) {
-            // Intentar crear la carpeta con permisos
-            if (!mkdir($rutaCarpeta)) {
-                // No se pudo crear la carpeta, devuelve false
-                return false;
-            }
+        if ($id) {
+            $datos = $datos[0];
         }
 
-        // debug($file, false);
-        // show_error($file);
-        // Verificar si el archivo ha sido cargado
-        if (!$file->isValid()) {
-            return false;
+        json_debug($datos);
+    }
+    
+    // HASTA ACA PRUEBA DE VER SI ME SALE ALGO JAJA
+
+    public function mailing() {
+        $this->valToken();
+
+        $this->captchaUrl;
+
+        $parametros = [
+            "secret" => getenv('CAPTCHA_KEY'),
+            "response" => $this->request->getGetPost("g-recaptcha-response"),
+        ];
+
+        $captcha = json_decode(send_post($this->captchaUrl, $parametros));
+        // debug($this->request->getGetPost(), false);
+        // debug($captcha);
+        if (!$captcha->success) {
+            custom_error(107, $this->lang);
         }
 
-        // Generar un nombre encriptado para el archivo con extension
-        $nombreEncriptado = md5($file->getName() . microtime()) . '.' . $file->getClientExtension();
+        $email = \Config\Services::email();
 
-        // Mover el archivo a la carpeta especificada
-        $file->move($rutaCarpeta, $nombreEncriptado);
+        // $email->setFrom('matiasagui93@gmail.com', 'Matias Aguirre');
+        $email->setTo('mati_aa93@outlook.com');
+        $email->setCC($this->request->getGetPost('email'));
+        $email->setSubject('Contacto mi Web');
 
+        // Construcción del mensaje con HTML
+        $tabla = '
+            <html>
+                <head>
+                    <style>
+                        .table {
+                            width: 100%;
+                            border-collapse: collapse;
+                        }
+                        .table th, .table td {
+                            padding: 8px;
+                            text-align: left;
+                            border: 1px solid #ddd;
+                        }
+                        .table th {
+                            background-color: #f4f4f4;
+                        }
+                    </style>
+                </head>
+                <body>
+                    <h1>Contacto Web</h1>
+                    <table class="table">
+                        <tbody>
+                            <tr>
+                                <th scope="row">Nombre:</th>
+                                <td>' . htmlspecialchars($this->request->getGetPost('name')) . '</td>
+                            </tr>
+                            <tr>
+                                <th scope="row">Email:</th>
+                                <td>' . htmlspecialchars($this->request->getGetPost('email')) . '</td>
+                            </tr>
+                            <tr>
+                                <th scope="row">Asunto:</th>
+                                <td>' . htmlspecialchars($this->request->getGetPost('subject')) . '</td>
+                            </tr>
+                            <tr>
+                                <th scope="row">Mensaje:</th>
+                                <td>' . htmlspecialchars($this->request->getGetPost('message')) . '</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </body>
+            </html>';
 
-        // Devolver el nombre encriptado del archivo
-        return $nombreEncriptado;
+        $email->setMessage($tabla);
+
+        if (!$email->send()) {
+            custom_error(108, $this->lang);
+        }
+
+        $data = [
+            "success" => true,
+            "name" => $this->request->getGetPost('name'),
+            "email" => $this->request->getGetPost('email'),
+            "subject" => $this->request->getGetPost('subject'),
+            "message" => $this->request->getGetPost('message'),
+        ];
+
+        json_debug($data);
     }
 
     public function delete_img() {
@@ -2900,40 +2968,6 @@ class Api extends BaseController {
         json_debug(array_merge((array)$datos, $data));
     }
 
-    private function TrashFIle($carpeta, $name) {
-        // Verificar si el nombre del archivo es válido
-        if (empty($name)) {
-            return false;
-        }
-
-        // Rutas de las carpetas
-        $carpetaOrigen = 'assets/images/' . $carpeta . '/';
-        $carpetaDestino = 'assets/images/papelera/';
-
-        // Ruta completa de los archivos
-        $rutaArchivoOrigen = $carpetaOrigen . $name;
-        $rutaArchivoDestino = $carpetaDestino . $name;
-
-        // Verificar si el archivo existe en la carpeta de origen
-        if (file_exists($rutaArchivoOrigen)) {
-            // Mover el archivo a la carpeta de destino
-            if (rename($rutaArchivoOrigen, $rutaArchivoDestino)) {
-                return true;
-            } else {
-                return false;
-            }
-        } else {
-            return false; // El archivo no existe en la carpeta de origen
-        }
-    }
-
-    private function variables() {
-        $this->activo = $this->request->getGetPost('activo');
-        if ($this->activo && $this->activo != 1) {
-            $this->activo = 1;
-        }
-    }
-
     public function bgimg($width, $height, $color = '808080') {
         // Verificar que width y height sean números válidos
         if (!is_numeric($width) || !is_numeric($height) || $width <= 0 || $height <= 0) {
@@ -2971,6 +3005,132 @@ class Api extends BaseController {
 
         // Detener la ejecución para no enviar datos adicionales después de la imagen
         exit;
+    }
+
+    private function valToken() {
+        $require = [
+            "token" => "text",
+        ];
+
+        $valRequire = [];
+
+        foreach ($require as $name => $type) {
+            $value = $this->request->getGetPost($name);
+            if ($value) {
+                $data[$name] = validateValue($value, $type, $this->lang);
+            } else {
+                $valRequire[] = $name;
+            }
+        }
+
+        if ($valRequire) {
+            // validar error que te faltan datos
+            custom_error(101, $this->lang, $valRequire);
+        }
+
+        $valtoken = json_decode(decode($data['token'], $this->key)); // decodificamos y validamos el token
+        // debug($valtoken, false);
+
+        if (!$valtoken) {
+            custom_error(103, $this->lang, 'token'); // si el token no tiene formato correcto
+        }
+
+        // aqui va la validación de tiempo de token
+        // debug($this->currentDate, false);
+
+        $tokenTimestamp = strtotime($valtoken->date); // referencia al momento de creacion, la fecha que se puso en el momento de asignarlo
+        $currentTimestamp = strtotime($this->currentDate); // este hace referencia al ahora mismo. a la facha y hora actual
+
+        // Calcular la diferencia en segundos
+        $difference = $currentTimestamp - $tokenTimestamp;
+
+        $maxTime = getenv('SESION_TIME') * 60; // 60 minutos // esta funcion es para traer valores del arch env
+
+        if ($difference > $maxTime) {
+            // custom_error(502, $this->lang); esta comentado por el momento para que no expire el tiempo
+        }
+
+        $query = $this->db->query("SELECT * FROM usuarios WHERE id = '$valtoken->id'");
+        $checkUser = $query->getResult();
+        if (!$checkUser) {
+            custom_error(501, $this->lang); // si el usuario no existe
+        }
+
+        $checkUser = $checkUser[0];
+        // debug($checkUser);
+
+        unset($checkUser->pasw);
+        $this->user = $checkUser;
+    }
+
+    private function uploadImage($carpeta, $inputName) {
+        $rutaCarpeta = 'assets/images/' . $carpeta;
+
+        // Obtener el archivo cargado
+        $file = $this->request->getFile($inputName);
+
+        if (!$file) {
+            return false;
+        }
+
+        if (!file_exists($rutaCarpeta)) {
+            // Intentar crear la carpeta con permisos
+            if (!mkdir($rutaCarpeta)) {
+                // No se pudo crear la carpeta, devuelve false
+                return false;
+            }
+        }
+
+        // debug($file, false);
+        // show_error($file);
+        // Verificar si el archivo ha sido cargado
+        if (!$file->isValid()) {
+            return false;
+        }
+
+        // Generar un nombre encriptado para el archivo con extension
+        $nombreEncriptado = md5($file->getName() . microtime()) . '.' . $file->getClientExtension();
+
+        // Mover el archivo a la carpeta especificada
+        $file->move($rutaCarpeta, $nombreEncriptado);
+
+
+        // Devolver el nombre encriptado del archivo
+        return $nombreEncriptado;
+    }
+
+    private function TrashFIle($carpeta, $name) {
+        // Verificar si el nombre del archivo es válido
+        if (empty($name)) {
+            return false;
+        }
+
+        // Rutas de las carpetas
+        $carpetaOrigen = 'assets/images/' . $carpeta . '/';
+        $carpetaDestino = 'assets/images/papelera/';
+
+        // Ruta completa de los archivos
+        $rutaArchivoOrigen = $carpetaOrigen . $name;
+        $rutaArchivoDestino = $carpetaDestino . $name;
+
+        // Verificar si el archivo existe en la carpeta de origen
+        if (file_exists($rutaArchivoOrigen)) {
+            // Mover el archivo a la carpeta de destino
+            if (rename($rutaArchivoOrigen, $rutaArchivoDestino)) {
+                return true;
+            } else {
+                return false;
+            }
+        } else {
+            return false; // El archivo no existe en la carpeta de origen
+        }
+    }
+
+    private function variables() {
+        $this->activo = $this->request->getGetPost('activo');
+        if ($this->activo && $this->activo != 1) {
+            $this->activo = 1;
+        }
     }
 
     public function test() {

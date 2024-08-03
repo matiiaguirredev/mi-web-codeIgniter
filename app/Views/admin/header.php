@@ -29,9 +29,10 @@
     <link href="assets/libs/bootstrap-touchspin/jquery.bootstrap-touchspin.min.css" rel="stylesheet" type="text/css" />
 
     <!-- Include stylesheet -->
-    <link href="https://cdn.jsdelivr.net/npm/quill@2.0.2/dist/quill.snow.css" rel="stylesheet" />
+    <!-- <link href="https://cdn.jsdelivr.net/npm/quill@2.0.2/dist/quill.snow.css" rel="stylesheet" /> -->
+
     <!-- Include the Quill library -->
-    <script src="https://cdn.jsdelivr.net/npm/quill@2.0.2/dist/quill.js"></script>
+    <!-- <script src="https://cdn.jsdelivr.net/npm/quill@2.0.2/dist/quill.js"></script> -->
 
     <!-- HASTA ACA FORMS ADVANCE -->
 
@@ -44,10 +45,15 @@
 
     <!-- FORMS-quills -->
     <!-- Plugins css -->
-    <link href="assets/libs/quill/quill.core.css" rel="stylesheet" type="text/css" />
+    <!-- <link href="assets/libs/quill/quill.core.css" rel="stylesheet" type="text/css" />
     <link href="assets/libs/quill/quill.bubble.css" rel="stylesheet" type="text/css" />
-    <link href="assets/libs/quill/quill.snow.css" rel="stylesheet" type="text/css" />
+    <link href="assets/libs/quill/quill.snow.css" rel="stylesheet" type="text/css" /> -->
     <!-- HASTA ACA FORMS quills -->
+
+    <!-- FORMS-Tiny -->
+    <script src="tinymce/tinymce.min.js" referrerpolicy="origin"></script>
+    <!-- HASTA FORMS-Tiny -->
+
 
     <!-- App css -->
     <link href="assets/css/style.min.css" rel="stylesheet" type="text/css">
@@ -65,6 +71,7 @@
 
     <!-- mi css -->
     <link href="assets/css/styles.css" rel="stylesheet" type="text/css">
+
 </head>
 
 <body <?= (!$user) ? 'class="bg-primary d-flex justify-content-center align-items-center min-vh-100 p-5"' : ''; ?>>

@@ -35,7 +35,7 @@
                                         <div class="mb-2 row">
                                             <label class="form-label col-md-2 col-form-label">Categorias</label> <br />
                                             <div class="col-md-10">
-                                                <select name="categoria" id="selectize-select">
+                                                <select name="titulo_blog" id="selectize-select">
                                                     <option data-display="Select">Selecciona un categoria.</option>
                                                     <?php foreach ($blog as $key => $b) { ?>
                                                         <option value="<?= $b->titulo ?>" <?= ($b->titulo == $blogComm->titulo_blog) ? 'selected' : ''; ?>><?= $b->titulo ?></option>

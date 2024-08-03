@@ -5,12 +5,14 @@ use CodeIgniter\Router\RouteCollection;
 /**
  * @var RouteCollection $routes
  */
-$routes->get('/', 'Home::index');
-$routes->get('single-blog/(:segment)', 'Home::single_blog/$1');
+$routes->get('/', 'Web::index');
+$routes->post('/', 'Web::index');
+$routes->match(['get', 'post'], 'single-blog/(:segment)', 'Web::single_blog/$1');
+$routes->get('pages-404', 'Web::pages_404');
 
 
 
-$routes->get('/test', 'Home::test'); // ruta de pruebas
+$routes->get('/test', 'Web::test'); // ruta de pruebas
 
 
 
@@ -79,6 +81,7 @@ $routes->group('api', function ($routes) {
     $routes->match(['get', 'post'], 'register', 'Api::register');
     $routes->match(['get', 'post'], 'login', 'Api::login');
     $routes->match(['get', 'post'], 'checktoken', 'Api::checkToken');
+    $routes->match(['get', 'post'], 'mailing', 'Api::mailing');
     $routes->match(['get', 'post'], 'delete/img', 'Api::delete_img');
     $routes->match(['get', 'post'], 'bgimg/(:segment)/(:segment)', 'Api::bgimg/$1/$2');
     $routes->get('/', 'Api::index');
@@ -101,6 +104,7 @@ $routes->group('api', function ($routes) {
         'blog',
         'blogCat',
         'blogComm',
+        'blogComm2',
 
     ];
 

@@ -23,7 +23,9 @@ class Admin extends BaseController {
         // debug($this->data);
         if ($var && $this->request->getGetPost()) {
             $login = json_decode(send_post($this->urlAPI . "login", $this->request->getGetPost()));
-            // debug($this->urlAPI ."login", false);
+            // debug($this->urlAPI ."login");
+            // debug($login);
+
             if (isset($login->error)) {
                 $this->data['error'] = $login->error;
             } else {
@@ -31,7 +33,6 @@ class Admin extends BaseController {
                 header("Location: /admin");
                 exit();
             }
-            // debug($login);
         }
 
 
@@ -214,15 +215,19 @@ class Admin extends BaseController {
         $this->valtoken();
         $view = true;
 
+        // debug($this->request->getGetPost(), false);
+
         if ($this->request->getGetPost()) {
             $token = $this->request->getCookie("token");
             $requestData = array_merge($this->request->getGetPost(), ["token" => $token]); // en una variable tengo que guardar el merge 
+            // debug($requestData);
             // debug($_FILES);
             foreach ($_FILES as $k => $v) {
                 if (strlen($v['name'])) {
                     $requestData[$k] = curl_file_create($v['tmp_name'], $v['type'], basename($v['name']));
                 }
             }
+
             $create_proyect = json_decode(send_post($this->urlAPI . "create/proyect", $requestData)); // envio directamente la variable que tiene todo ya concatenado
             // debug($create_proyect, false);
             if (isset($create_proyect->error)) {
@@ -235,6 +240,7 @@ class Admin extends BaseController {
         }
 
         if ($view) {
+
             $this->data['categorias'] = [];
             $categorias = json_decode(send_post($this->urlAPI . "categorias?activo=1"));
             if (isset($categorias->error)) {
@@ -926,7 +932,7 @@ class Admin extends BaseController {
 
     public function perfil() {
         $this->valtoken();
-        // debug($this->user);
+        // debug($this->user); 
 
         if ($this->request->getGetPost()) {
             $token = $this->request->getCookie("token");
@@ -1773,7 +1779,7 @@ class Admin extends BaseController {
                     $requestData[$k] = curl_file_create($v['tmp_name'], $v['type'], basename($v['name']));
                 }
             }
-            // debug($requestData, false);
+            // debug($requestData);
             $update_blog = json_decode(send_post($this->urlAPI . "update/blog/" . $id, $requestData)); // envio directamente la variable que tiene todo ya concatenado
             // $update_blog = send_post($this->urlAPI . "update/blog/" . $id, $requestData); // envio directamente la variable que tiene todo ya concatenado
             // json_debug($update_blog);
@@ -2022,7 +2028,7 @@ class Admin extends BaseController {
 
             $this->data['blog'] = [];
             $blog = json_decode(send_post($this->urlAPI . "blog?activo=1", ["token" => $token]));
-            // debug($blog, false);
+            // debug($blog);
             if (isset($blog->error)) {
                 $this->data['error'] = $blog->error;
             } else {
@@ -2119,12 +2125,14 @@ class Admin extends BaseController {
         }
         // debug($this->token,false);
         $checkToken = json_decode(send_post($this->urlAPI . "checktoken", ["token" => $this->token]));
-        // debug($this->urlAPI ."checkToken", false);
+        // debug($this->urlAPI ."checkToken");
         if (isset($checkToken->error)) {
             header("Location: /admin/login");
             exit();
         } else {
             $this->user = $checkToken;
+            // debug($this->user['token']);
+
             $checkPerfil = json_decode(send_post($this->urlAPI . "perfil", ["token" => $this->token]));
             // debug(send_post($this->urlAPI . "perfil", ["token" => $token]));
             // debug($checkPerfil);

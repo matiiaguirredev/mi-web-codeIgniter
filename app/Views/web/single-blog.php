@@ -1,3 +1,6 @@
+<?php /* debug($this->data['user']) ; */ ?>
+
+
 <!-- Start Page Title Area -->
 <div class="page-title">
     <div id="particles-js"></div>
@@ -45,14 +48,20 @@
                         <h3><?= $blog->titulo ?></h3>
 
                         <ul>
-                            <li>Posted By: <a href="#">Admin</a></li>
+                            <?php if (isset($user) && isset($user->informacion)) { ?>
+                                <li>Posted By: <a href="#"><?= $user->informacion->nombre . ' ' . $user->informacion->apellido; ?></a></li>
+                            <?php } else { ?>
+                                <li>Posted By: Natalia Perez</li>
+                            <?php } ?>
+
                             <li><a href="#"><i class="fa fa-comments-o"></i> 05</a></li>
                             <li><a href="#"><i class="fa fa-thumbs-up"></i> 15</a></li>
                         </ul>
                     </div>
 
                     <div class="blog-details-content">
-                        <?= $blog->contenido ?>
+                        <?php /* $blog->contenido */; ?>
+                        <!-- <div class="ql-editor"><p class="ql-align-center"></p></div> -->
 
                         <!-- <p>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.</p>
 
@@ -86,7 +95,7 @@
 
                                     if ($blogCategoriaActual) {
                                         // Imprimir la categoría actual primero
-                                        echo '<li><a href="#">' . $blogCategoriaActual->nombre . '</a></li>';
+                                        echo '<li class="px-1"><a href="#">' . $blogCategoriaActual->nombre . '</a></li>';
                                     }
 
                                     // Luego, imprimimos las demás categorías
@@ -95,7 +104,7 @@
                                             // Saltamos la categoría actual ya que ya se ha impreso
                                             continue;
                                         }
-                                        echo '<li><a href="#">' . $bC->nombre . '</a></li>';
+                                        echo '<li class="px-1"><a href="#">' . $bC->nombre . '</a></li>';
                                     }
                                     ?>
 
@@ -105,9 +114,8 @@
 
                                             <li><a href="#"><?= $bC->nombre ?></a></li>
                                         <?php } ?>
-                                    <?php } */ 
+                                    <?php } */
                                     ?>
-
                                     <!-- <li><a href="#">Design</a></li>
                                     <li><a href="#">Creative</a></li>
                                     <li><a href="#">Graphic</a></li> -->
@@ -116,11 +124,10 @@
 
                             <div class="share">
                                 <ul>
-                                    <li class="title">Share:</li>
+                                    <li class="title">Compartir:</li>
                                     <?php foreach ($redes as $key => $r) { ?>
                                         <li><a href="<?= $r->url ?>"><i class=""><?= $r->iconHTML ?></i></a></li>
                                     <?php } ?>
-
                                     <!-- 
                                     <li><a href="#"><i class="fa-brands fa-twitter"></i></a></li>
                                     <li><a href="#"><i class="fa-brands fa-instagram"></i></a></li>
@@ -131,13 +138,84 @@
                         </div>
 
                         <div class="blog-details-comments">
-                            <h3 class="title">Comments (03)</h3>
-                            <div class="single-comments">
-                                <div class="thumb">
+                            <!-- <h3 class="title">Comentarios (03)</h3> -->
+                            <?php /* ESTE ES MI CODIGO QUE FUNCIONA MAL PERO FUNCION
+                            numComm = count($blogComm2); ?>
+                            <h3 class="title">Comentarios <?php echo "($numComm)" ?></h3>
+                            <?php if (isset($blogComm2) && is_array($blogComm2)) { ?>
+                                <?php foreach ($blogComm2 as $key => $bc2) { ?>
+                                    <div class="single-comments">
+                                        <div class="thumb thumb-imgsingleblog">
+                                            <?php if (isset($user) && isset($user->informacion)) { ?>
+                                                <style>
+                                                    .thumb-imgsingleblog {
+                                                        background-image: url(<?= $user->informacion->img ?>);
+                                                        background-position: center;
+                                                        background-repeat: no-repeat;
+                                                        background-size: cover;
+                                                        border-radius: 50%;
+                                                    }
+                                                </style>
+                                                <img class="opacity-0 thumb-imgsingleblog" src="./api/bgimg/85/85" alt="client">
+                                            <?php } else { ?>
+                                                <img class="thumb-imgsingleblog" src="./api/bgimg/85/85" alt="client">
+                                            <?php }; ?>
+                                        </div>
+
+                                        <div class="content">
+                                            <h4><?= $bc2->name; ?></h4>
+                                            <span><?= dia_mes_ano($blog->create_at); ?></span>
+                                            <p><?= $bc2->message; ?></p>
+                                            <a href="#">Reply <i class="fa fa-reply"></i></a>
+                                        </div>
+                                    </div>
+                                    <div class="border"></div>
+                                <?php } ?>
+                            <?php } */ ?>
+
+                            <?php if (empty($numComm)) { ?>
+                                <p>No hay comentarios para este post.</p>
+                            <?php } else { ?>
+                                <h3 class="title">Comentarios <?php echo "($numComm)" ?></h3>
+                                <?php if (isset($this->data['blogComm2']) && is_array($this->data['blogComm2'])) { ?>
+                                    <?php foreach ($this->data['blogComm2'] as $key => $bc2) { ?>
+                                        <div class="single-comments">
+                                            <div class="thumb thumb-imgsingleblog">
+                                                <?php if (isset($user) && isset($user->informacion)) { ?>
+                                                    <style>
+                                                        .thumb-imgsingleblog {
+                                                            background-image: url(<?= $user->informacion->img ?>);
+                                                            background-position: center;
+                                                            background-repeat: no-repeat;
+                                                            background-size: cover;
+                                                            border-radius: 50%;
+                                                        }
+                                                    </style>
+                                                    <img class="opacity-0 thumb-imgsingleblog" src="./api/bgimg/85/85" alt="client">
+                                                <?php } else { ?>
+                                                    <img class="thumb-imgsingleblog" src="./api/bgimg/85/85" alt="client">
+                                                <?php } ?>
+                                            </div>
+
+                                            <div class="content">
+                                                <h4><?= $bc2->name ?></h4>
+                                                <span><?= dia_mes_ano($blog->create_at); ?></span>
+                                                <p><?= $bc2->message; ?></p>
+                                                <a href="">Reply <i class="fa fa-reply"></i></a>
+                                            </div>
+                                        </div>
+                                        <div class="border"></div>
+                                    <?php } ?>
+                                <?php } ?>
+                            <?php } ?>
+
+
+                            <!-- <div class="single-comments" bis_skin_checked="1">
+                                <div class="thumb" bis_skin_checked="1">
                                     <img src="web/img/client-avatar1.jpg" alt="client">
                                 </div>
 
-                                <div class="content">
+                                <div class="content" bis_skin_checked="1">
                                     <h4>Steven Smith</h4>
                                     <span>December 30, 2024</span>
                                     <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer posuere erat a ante. It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout.</p>
@@ -156,8 +234,8 @@
                                     <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer posuere erat a ante. It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout.</p>
                                     <a href="#">Reply <i class="fa fa-reply"></i></a>
                                 </div>
-                            </div>
-
+                            </div> -->
+                            <!-- 
                             <div class="border"></div>
 
                             <div class="single-comments">
@@ -186,13 +264,15 @@
                                     <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer posuere erat a ante. It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout.</p>
                                     <a href="#">Reply <i class="fa fa-reply"></i></a>
                                 </div>
-                            </div>
+                            </div> -->
                         </div>
 
                         <div class="blog-details-comments-form">
                             <h3 class="title">Leave a Reply</h3>
-                            <form>
+
+                            <form id="contactForm2" action="" method="post" enctype="multipart/form-data">
                                 <div class="row">
+
                                     <div class="col-lg-6 col-md-6">
                                         <div class="form-group">
                                             <input type="text" id="name" name="name" class="form-control" placeholder="Name">
@@ -212,7 +292,8 @@
                                     </div>
 
                                     <div class="col-lg-12 col-md-12">
-                                        <button class="btn btn-primary" type="submit">Submit <i class="fa fa-angle-double-right"></i></button>
+                                        <!-- <button class="btn btn-primary" data-callback='onSubmit' type="submit">Submit <i class="fa fa-angle-double-right"></i></button> -->
+                                        <button class="g-recaptcha btn btn-primary" data-sitekey="6LdOYR4qAAAAAGsNCUjLk7RrXUNWevtcCXrOa1Tv" data-callback='onSubmit' data-action='submit'>Enviar comentario <i class="fa fa-angle-double-right"></i></button>
                                     </div>
                                 </div>
                             </form>
@@ -223,4 +304,5 @@
         </div>
     </div>
 </section>
+
 <!-- End Blog- Details Area -->

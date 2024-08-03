@@ -8,32 +8,32 @@
                 </div>
                 <div class="row">
                     <?php /* debug($blog) ; */ ?>
-                    <?php foreach ($blog as $key => $value) { ?>
-                        <div class="col-lg-4 col-md-6">
+                    <?php foreach ($blog as $key => $b) { ?>
+                        <div class="col-lg-4 col-md-6 py-3">
                             <div class="single-blog-post">
                                 <div class="thumb thumb-img position-relative">
                                     <style>
                                         .thumb-img-<?= $key; ?> {
-                                            background-image: url(<?= $value->img; ?>);
+                                            background-image: url(<?= $b->img; ?>);
                                         }
                                     </style>
                                     <div class="thumb-img-<?= $key; ?> thumb-img-repite"></div>
                                     <img class="opacity-0" src="./api/bgimg/350/307" alt="portfolio">
                                     <!-- <img src="web/img/portfolio-2.jpg" alt="portfolio"> -->
                                     <div class="date">
-                                        <span><?= dia_mes($value->create_at);?></span>
+                                        <span><?= dia_mes($b->create_at);?></span>
                                     </div>
 
                                     <div class="tag">
-                                        <a href="#"><?= $value->categoria; ?></a>
+                                        <a href="#"><?= $b->categoria; ?></a>
                                     </div>
                                 </div>
 
                                 <div class="content">
-                                    <h4><a href="single-blog.html"><?= $value->titulo; ?></a></h4>
-                                    <p><?= $value->descrip_corta; ?></p>
+                                    <h4><a href="single-blog.html"><?= $b->titulo; ?></a></h4>
+                                    <p><?= $b->descrip_corta; ?></p>
                                 </div>
-                                <a href="single-blog/<?= $value->id; ?>" class="btn btn-primary">Read More <i class="fa fa-angle-double-right"></i></a>
+                                <a href="single-blog/<?= $b->id; ?>" class="btn btn-primary">Read More<i class="fa fa-angle-double-right"></i></a>
                             </div>
                         </div>
                     <?php } ?>

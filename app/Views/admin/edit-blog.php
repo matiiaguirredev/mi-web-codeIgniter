@@ -85,10 +85,7 @@
                                             <div class="col-12">
                                                 <h4 class="header-title">Contenido del post</h4>
                                                 <p class="sub-header">Diseña tu post.</p>
-                                                <div id="snow-editor" style="height: 300px;">
-                                                    <?= $blog->contenido ?>
-                                                </div>
-                                                <textarea class="form-control d-none" name="contenido" id="content" rows="5"><?= $blog->contenido ?></textarea>
+                                                <textarea class="form-control " name="contenido" id="content" rows="5"><?= $blog->contenido ?></textarea>
                                             </div>
                                         </div>
 
