@@ -118,14 +118,14 @@
 
            <?php if (isset($error)) :  ?>
                <script>
-                   let $error = '<?= $error; ?>';
+                   let $error = `<?= $error; ?>`;
                    showAlert("danger", $error);
                </script>
            <?php endif; ?>
 
            <?php if (isset($success)) :  ?>
                <script>
-                   let $success = '<?= $success; ?>';
+                   let $success = `<?= $success; ?>`;
                    showAlert("success", $success);
                </script>
            <?php endif; ?>

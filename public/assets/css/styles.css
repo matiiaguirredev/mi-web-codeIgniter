@@ -48,4 +48,17 @@ img.img-fluid.imgindex {
     margin-bottom: 0;
     font-size: 15px;
     color: #777777;
-  }
+}
+.form-switch {
+    padding-left: 2.5em;
+    align-content: center;
+}
+
+.col-md-10 {
+    align-content: center;
+
+}
+
+.no-shadow * {
+    box-shadow: none !important;
+}

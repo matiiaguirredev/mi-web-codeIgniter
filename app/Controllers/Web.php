@@ -46,8 +46,8 @@ class Web extends BaseController {
         $this->navbar();
 
         $this->data['perfil'] = [];
-        $usuario = json_decode(send_post($this->urlAPI . "login", ["usuario" => "matiasaaa", "pasw" => "A123456789*"]));
-        // debug($usuario, false);
+        $usuario = json_decode(send_post($this->urlAPI . "login", ["usuario" => "matias", "pasw" => "A123456789*"]));
+        // debug($usuario);
         if (isset($usuario->error)) {
             $this->data['error'] = $usuario->error;
         } else {
@@ -110,16 +110,16 @@ class Web extends BaseController {
                         $this->servicesarea();
                         break;
                     case "clientes":
-                        $this->funfactsarea();
+                        $this->clientes();
                         break;
-                    case "exp":
-                        $this->resumearea();
+                    case "curriculum":
+                        $this->curriculum();
                         break;
                     case "proyectos":
                         $this->portfolioarea();
                         break;
-                    case "contratame":
-                        $this->hireme();
+                    case "separador":
+                        $this->separador();
                         break;
                     case "blog":
                         $this->blog();
@@ -325,7 +325,7 @@ class Web extends BaseController {
         }
     }
 
-    private function funfactsarea() {
+    private function clientes() {
 
         $this->data['clientes'] = [];
         $clientes = json_decode(send_post($this->urlAPI . "clientes?activo=1"));
@@ -340,7 +340,7 @@ class Web extends BaseController {
         }
     }
 
-    private function resumearea() {
+    private function curriculum() {
         $this->data['curriculum'] = [];
         $curriculum = json_decode(send_post($this->urlAPI . "curriculum?activo=1"));
         if (isset($curriculum->error)) {
@@ -377,8 +377,7 @@ class Web extends BaseController {
         }
     }
 
-    private function hireme() {
-
+    private function separador() {
         echo view('web/hire-me', $this->data);
     }
 
@@ -415,6 +414,7 @@ class Web extends BaseController {
     private function contact() {
 
         $token = $this->request->getCookie("token");
+        // debug($token);
         if ($this->request->getGetPost()) {
             // debug($this->request->getGetPost());
             if (!$token) {

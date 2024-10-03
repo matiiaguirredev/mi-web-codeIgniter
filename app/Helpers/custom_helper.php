@@ -152,6 +152,7 @@ if (!function_exists('custom_error')) {
                 '206' => "The user '$variablesText' is currently inactive. Please contact support for assistance.",
                 '207' => 'User registration is disabled. Please contact the administrator.',
                 '208' => 'Username or email already registered.',
+                '209' => 'Role already registered.',
 
                 //Server Errors
                 '403' => "You do not have permission to use the '$variablesText' function.",
@@ -198,6 +199,7 @@ if (!function_exists('custom_error')) {
                 '206' => "El usuario '$variablesText' está inactivo actualmente. Por favor, comunícate con soporte para obtener ayuda.",
                 '207' => 'El registro de usuarios está deshabilitado. Ponte en contacto con el administrador.',
                 '208' => 'Nombre de usuario o correo electrónico ya registrados.',
+                '209' => 'Rol ya registrados.',
 
                 //Server Errors
                 '403' => "No tienes permiso para usar la función '$variablesText'.",
@@ -305,8 +307,18 @@ if (!function_exists('dia_mes')) {
 
         // Definir un arreglo de meses en español
         $meses = [
-            1 => 'Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun',
-            'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'
+            1 => 'Ene',
+            'Feb',
+            'Mar',
+            'Abr',
+            'May',
+            'Jun',
+            'Jul',
+            'Ago',
+            'Sep',
+            'Oct',
+            'Nov',
+            'Dic'
         ];
 
         // Obtener el día y el mes de la fecha
@@ -314,7 +326,7 @@ if (!function_exists('dia_mes')) {
         $mes = $meses[intval($fecha->format('m'))];
 
         // Imprimir el resultado en el formato deseado
-        return $dia . '<br>'. $mes;
+        return $dia . '<br>' . $mes;
     }
 }
 
@@ -325,8 +337,18 @@ if (!function_exists('dia_mes_ano')) {
 
         // Definir un arreglo de meses en español
         $meses = [
-            1 => 'Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun',
-            'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'
+            1 => 'Ene',
+            'Feb',
+            'Mar',
+            'Abr',
+            'May',
+            'Jun',
+            'Jul',
+            'Ago',
+            'Sep',
+            'Oct',
+            'Nov',
+            'Dic'
         ];
 
         // Obtener el día y el mes de la fecha
@@ -335,6 +357,7 @@ if (!function_exists('dia_mes_ano')) {
         $ano = $fecha->format('Y');
 
         // Imprimir el resultado en el formato deseado
-        return $dia . ' ' . $mes  . ' '. $ano;
+        return $dia . ' ' . $mes  . ' ' . $ano;
     }
 }
+

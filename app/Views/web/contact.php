@@ -54,6 +54,7 @@
 
                     <div class="col-lg-8 col-md-8">
                         <h3 class="title">Send Me a Message</h3>
+                        <!-- <form action="./api/mailing" method="POST" id="contactForm2"> -->
                         <form action="" method="POST" id="contactForm2">
                             <div class="row">
                                 <div class="col-lg-6 col-md-12">
@@ -87,7 +88,10 @@
 
                                 <div class="col-lg-12 col-md-12">
                                     <!-- <button type="submit" class="btn btn-primary">Send Message <i class="fa fa-angle-double-right"></i></button> -->
-                                    <button class="g-recaptcha btn btn-primary" data-sitekey="6LdOYR4qAAAAAGsNCUjLk7RrXUNWevtcCXrOa1Tv" data-callback='onSubmit' data-action='submit'>Enviar mensaje <i class="fa fa-angle-double-right"></i></button>
+                                    <!-- <button class="g-recaptcha btn btn-primary" data-sitekey="6LdOYR4qAAAAAGsNCUjLk7RrXUNWevtcCXrOa1Tv" data-callback='onSubmit' data-action='submit'>Enviar mensaje <i class="fa fa-angle-double-right"></i></button> -->
+                                    
+                                    <!-- clave de prueba de captcha -->
+                                    <button class="g-recaptcha btn btn-primary" data-sitekey="6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI" data-callback='onSubmit' data-action='submit'>Enviar mensaje <i class="fa fa-angle-double-right"></i></button> 
                                     <div id="msgSubmit" class="h3 text-center hidden"></div>
                                     <div class="clearfix"></div>
                                 </div>

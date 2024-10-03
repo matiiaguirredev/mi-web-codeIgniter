@@ -457,21 +457,28 @@ function toggleTheme() {
 
 
 const $form = $('#contactForm2');
+let $exist = true;
+
 function onSubmit(token) {
-    // Comprobamos si el formulario es válido
-    if ($form[0].checkValidity()) {
-        // Deshabilitamos los campos del formulario
-        $form.find('input, select, textarea, button').prop("disabled", true);
+    console.log("TOKEN: ",  token);
+
+    if ($exist) {
+        // Comprobamos si el formulario es válido
+        if ($form[0].checkValidity()) {
+            // Deshabilitamos los campos del formulario
+            // $form.find('input, select, textarea, button').prop("disabled", true);
+            $form.find('button').prop("disabled", true);
+
+            $exist = false;
+            // Enviamos el formulario
+            $form.trigger('submit'); // Activamos el evento submit para capturarlo con jQuery
+        } else {
+            // Si no es válido, mostramos los mensajes de error del navegador
+            $form[0].reportValidity();
+        }
         
-        // Enviamos el formulario
-        $form.trigger('submit'); // Activamos el evento submit para capturarlo con jQuery
-    } else {
-        // Si no es válido, mostramos los mensajes de error del navegador
-        $form[0].reportValidity();
     }
 }
-
-
 
 function showAlert(type, message) {
     let errorMessagePrefix = message.split(':')[0];

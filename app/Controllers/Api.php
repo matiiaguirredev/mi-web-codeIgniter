@@ -16,6 +16,12 @@ class Api extends BaseController {
     private $activo = 0;
     private $captchaUrl = 'https://www.google.com/recaptcha/api/siteverify';
 
+    private $perm = [
+        "Root" => null,
+        "Administrador" => null,
+        "UsuarioEstandar" => null,
+    ];
+
     public function __construct() {
 
         $this->db = \Config\Database::connect();
@@ -28,9 +34,16 @@ class Api extends BaseController {
             "register" => filter_var(getenv('GENERAL_REGISTER'), FILTER_VALIDATE_BOOLEAN), // esto conviente el valor de env en booleano
         ];
 
+        // debug($this->perm, false);
+        foreach ($this->perm as $key => $value) {
+            $this->perm[$key] = getenv("ROLE_ID_$key");
+        }
+        // debug($this->perm);
+
         // $this->currentDate = Time::now(); // funcion de codeige
 
         $hoy = getdate();
+        // es para establecer fecha actual de toda la ejecucion, asi evitamos problemas.
         $this->currentDate = $hoy['year'] . '-' . $hoy['mon'] . '-' . $hoy['mday'] . ' ' . $hoy['hours'] . ':' . $hoy['minutes'] . ':' . $hoy['seconds'];
     }
 
@@ -164,7 +177,7 @@ class Api extends BaseController {
         json_debug($checkUser);
     }
 
-    public function checkToken() {
+    public function checktoken() {
         $require = [
             "token" => "text",
         ];
@@ -206,8 +219,9 @@ class Api extends BaseController {
             // custom_error(502, $this->lang); esta comentado por el momento para que no expire el tiempo
         }
 
-        $query = $this->db->query("SELECT * FROM usuarios WHERE id = '$valtoken->id'");
+        $query = $this->db->query("SELECT usuarios.*, roles.nombre FROM usuarios, roles WHERE usuarios.role_id = roles.id AND usuarios.id = '$valtoken->id'");
         $checkUser = $query->getResult(); // los datos del usuario
+
         if (!$checkUser) {
             custom_error(501, $this->lang);
         }
@@ -223,6 +237,16 @@ class Api extends BaseController {
     // CRUD proyect
     public function create_proyect() {
         $this->valToken();
+
+        // intentado poner los permisos
+        $rolesAllowed = [
+            $this->perm['Root'],
+        ];
+
+        if (!in_array($this->user->role_id, $rolesAllowed)) {
+            // Sin permisos
+            custom_error(403, "es", "create/proyect");
+        }
 
         $require = [
             "nombre" => "text",
@@ -2782,8 +2806,405 @@ class Api extends BaseController {
 
         json_debug($datos);
     }
-    
+
     // HASTA ACA PRUEBA DE VER SI ME SALE ALGO JAJA
+
+    // CRUD USUARIOS
+
+    public function create_usuarios() {
+        $this->valToken();
+
+        $require = [ // datos obligatorios
+            "usuario" => "alias",
+            "email" => "email",
+            "pasw" => "password",
+            "role_id" => "number",
+
+        ];
+
+        $valRequire = [];
+
+        foreach ($require as $name => $type) {
+            $value = $this->request->getGetPost($name);
+            if ($value) {
+                $data[$name] = validateValue($value, $type, $this->lang);
+            } else {
+                $valRequire[] = $name;
+            }
+        }
+
+        if ($valRequire) {
+            // validar error que te faltan datos
+            custom_error(101, "es", $valRequire);
+        }
+
+        // $usuario = $data['usuario'];
+        // $email = $data['email'];
+
+        // $query = $this->db->query("SELECT * FROM usuarios WHERE usuario = '$usuario' OR email = '$email'"); // estamos chekeando si existe el usuario o emial
+        // $checkUser = $query->getResult();
+        // if ($checkUser) {
+        //     custom_error(208, $this->lang);
+        // }
+
+        $usuario = $data['usuario'];
+        $email = $data['email'];
+
+        $query = $this->db->table('usuarios')
+            ->where('usuario', $usuario)
+            ->orWhere('email', $email)
+            ->get();
+
+        $checkUser = $query->getResult();
+
+        if ($checkUser) {
+            custom_error(208, $this->lang); // Error: El usuario o el email ya existen
+        }
+
+
+        $optionals = [ // datos opcionales 
+            "nombre",
+            "apellido",
+        ];
+
+        foreach ($optionals as $name) {
+            $data[$name] = $this->request->getGetPost($name);
+        }
+
+        $data['pasw'] = encode($data['pasw'], $this->key);
+
+        $data["activo"] = ($this->request->getGetPost("activo")) ? 1 : 0;
+
+        $insert = $this->db->table("usuarios")->insert($data);
+        if (!$insert) {
+            custom_error(204, $this->lang);
+        }
+
+        $id = $this->db->insertID(); // ultimo identificador insertado !
+
+        // $data['token'] = encode(json_encode([
+        //     'id' => $id,
+        //     'date' => $this->currentDate
+        // ]), $this->key);
+
+        unset($data['pasw']);
+
+        json_debug(array_merge(["id" => $id], $data));
+    }
+
+    public function get_usuarios($id = null) {
+        $this->variables();
+
+        // esta hicimos con alberto, la de abajo es chatgpt
+        $query = "SELECT usuarios.*, roles.nombre AS role_nombre FROM `usuarios`, roles WHERE 1=1";
+        if ($id) { // esto se utilza para consultar 1 especifico
+            $query .= " AND usuarios.id = '$id'";
+        }
+        if ($this->activo) {
+            $query .= ($id) ? " AND" : "";
+            $query .= " activo = 1";
+        }
+
+        $query .= " AND usuarios.role_id = roles.id AND usuarios.id <> 1 ORDER BY `usuarios`.`id` ASC";
+
+        // json_debug($query);
+
+
+        // $query = "SELECT usuarios.*, roles.nombre FROM usuarios INNER JOIN roles ON usuarios.role_id = roles.id WHERE usuarios.id <> 1";
+        // if ($id) { // Esto se utiliza para consultar un usuario específico
+        //     $query .= " AND usuarios.id = '$id'";
+        // }
+
+        // if ($this->activo) {
+        //     $query .= " AND usuarios.activo = 1";
+        // }
+
+        // $query .= " ORDER BY usuarios.id ASC";
+
+
+        // Ejecutar la consulta
+        $query = $this->db->query($query);
+        $datos = $query->getResult();
+
+        // Manejo de error si no hay datos
+        if (!$datos) {
+            custom_error(504, $this->lang, "usuarios");
+        }
+
+        // Si se proporciona un id específico, devolver solo el primer resultado
+        if ($id) {
+            $datos = $datos[0];
+        }
+
+        // Devolver los datos en formato JSON
+        json_debug($datos);
+    }
+
+    public function update_usuarios($id) {
+        $this->valToken();
+
+        $query = "SELECT usuarios.*, roles.nombre AS role_nombre FROM `usuarios`, roles WHERE 1=1";
+        if ($id) { // esto se utilza para consultar 1 especifico
+            $query .= " AND usuarios.id = '$id'";
+        }
+        if ($this->activo) {
+            $query .= ($id) ? " AND" : "";
+            $query .= " activo = 1";
+        }
+
+        $query .= " AND usuarios.role_id = roles.id AND usuarios.id <> 1 ORDER BY `usuarios`.`id` ASC";
+
+
+        $query = $this->db->query($query);
+        $datos = $query->getResult();
+
+        if (!$datos) {
+            custom_error(504, $this->lang, "usuarios");
+        }
+
+        $datos = $datos[0]; // por que estamos seleccionadno desde un identificdor y siempre el resltado es unico 
+
+        $require = [ // datos obligatorios
+            "usuario" => "alias",
+            "email" => "email",
+            "pasw" => "password",
+            "role_id" => "number",
+
+        ];
+
+        foreach ($require as $name => $type) {
+            $value = $this->request->getGetPost($name);
+            if ($value) {
+                $data[$name] = validateValue($value, $type, $this->lang);
+            }
+        }
+
+        $optionals = [ // datos opcionales 
+            "nombre",
+            "apellido",
+        ];
+
+        // json_debug($this->request->getGetPost());
+
+        if (!$this->request->getGetPost("notnull")) {
+            foreach ($optionals as $name) {
+                $data[$name] = $this->request->getGetPost($name);
+            }
+        }
+
+        $data["activo"] = ($this->request->getGetPost("activo")) ? 1 : 0;
+        $data["edit_at"] = $this->currentDate;
+
+        // debug($this->request->getGetPost(), false);
+        // debug($data);
+
+        // data es un parametro y representa el set
+        // luego separado por , tenemos el where
+        $update = $this->db->table("usuarios")->update($data, ["id" => $id]); // ver query de mysql para entender bien cuales son los 2 paremetros q recibimos (set y where)
+        // debug($datos);
+        if (!$update) {
+            custom_error(506, $this->lang, "usuarios");
+        }
+
+        json_debug(array_merge((array)$datos, $data));
+    }
+
+    public function delete_usuarios($id) {
+
+        $this->valToken(); // las unicas que no se pide el token son las consultas publicas,  login y registro
+
+        $query = "SELECT * FROM usuarios WHERE id = '$id'";
+        $query = $this->db->query($query);
+        $datos = $query->getResult();
+
+        if (!$datos) {
+            custom_error(504, $this->lang, "usuarios");
+        }
+
+        $delete = $this->db->table("usuarios")->delete(["id" => $id]);
+        if (!$delete) {
+            custom_error(507, $this->lang, "general");
+        }
+
+        if ($id) {
+            $datos = $datos[0];
+        }
+
+        json_debug($datos);
+    }
+
+    // FIN CRUD USUARIOS
+
+    // CRUD USUARIOS
+
+    public function create_roles() {
+        $this->valToken();
+
+        $require = [ // datos obligatorios
+            "nombre" => "text",
+        ];
+
+        $valRequire = [];
+
+        foreach ($require as $name => $type) {
+            $value = $this->request->getGetPost($name);
+            if ($value) {
+                $data[$name] = validateValue($value, $type, $this->lang);
+            } else {
+                $valRequire[] = $name;
+            }
+        }
+
+        if ($valRequire) {
+            // validar error que te faltan datos
+            custom_error(101, "es", $valRequire);
+        }
+
+        $nombre = $data['nombre'];
+        $query = $this->db->query("SELECT * FROM roles WHERE nombre = '$nombre'"); // estamos chekeando si existe el nombre
+        $checkUser = $query->getResult();
+        if ($checkUser) {
+            custom_error(209, $this->lang);
+        }
+
+        $optionals = [ // datos opcionales 
+            "descripcion",
+            "ver",
+            "crear",
+            "editar",
+            "borrar",
+        ];
+
+        foreach ($optionals as $name) {
+            $data[$name] = $this->request->getGetPost($name);
+
+            if (is_array($data[$name])) {
+                $data[$name] = implode(',', $data[$name]);
+            }
+        }
+
+        $data["activo"] = ($this->request->getGetPost("activo")) ? 1 : 0;
+
+        $insert = $this->db->table("roles")->insert($data);
+        if (!$insert) {
+            custom_error(204, $this->lang);
+        }
+
+        $id = $this->db->insertID(); // ultimo identificador insertado !
+
+        json_debug(array_merge(["id" => $id], $data));
+    }
+
+    public function get_roles($id = null) {
+        $this->variables();
+        // $this->valToken(); // las unicas que no se pide el token son las consultas publicas,  login y registro
+
+        // $query = "SELECT * FROM secciones ";
+        $query = "SELECT * FROM `roles` ";
+        if ($id) { // esto se utilza para consultar 1 especifico
+            $query .= "WHERE id = '$id'";
+        }
+        if ($this->activo) {
+            $query .= ($id) ? " AND" : " WHERE";
+            $query .= " activo = 1";
+        }
+
+        $query .= " ORDER BY `roles`.`id` ASC";
+        $query = $this->db->query($query);
+        $datos = $query->getResult();
+
+        if (!$datos) {
+            custom_error(504, $this->lang, "roles");
+        }
+
+        if ($id) {
+            $datos = $datos[0];
+        }
+
+        json_debug($datos);
+    }
+
+    public function update_roles($id) {
+        $this->valToken();
+
+        $query = "SELECT * FROM roles WHERE id = '$id'";
+        $query = $this->db->query($query);
+        $datos = $query->getResult();
+
+        if (!$datos) {
+            custom_error(504, $this->lang, "roles");
+        }
+
+        $datos = $datos[0]; // por que estamos seleccionadno desde un identificdor y siempre el resltado es unico 
+
+        $require = [ // datos obligatorios
+            "nombre" => "text",
+        ];
+
+
+        foreach ($require as $name => $type) {
+            $value = $this->request->getGetPost($name);
+            if ($value) {
+                $data[$name] = validateValue($value, $type, $this->lang);
+            }
+        }
+
+        $optionals = [ // datos opcionales 
+            "descripcion",
+            "ver",
+            "crear",
+            "editar",
+            "borrar",
+        ];
+
+        // json_debug($this->request->getGetPost());
+
+        if (!$this->request->getGetPost("notnull")) {
+            foreach ($optionals as $name) {
+                $data[$name] = $this->request->getGetPost($name);
+            }
+        }
+
+        $data["activo"] = ($this->request->getGetPost("activo")) ? 1 : 0;
+        // debug($this->request->getGetPost(), false);
+        // debug($data);
+
+        // data es un parametro y representa el set
+        // luego separado por , tenemos el where
+        $update = $this->db->table("roles")->update($data, ["id" => $id]); // ver query de mysql para entender bien cuales son los 2 paremetros q recibimos (set y where)
+        // debug($datos);
+        if (!$update) {
+            custom_error(506, $this->lang, "roles");
+        }
+
+        json_debug(array_merge((array)$datos, $data));
+    }
+
+    public function delete_roles($id) {
+
+        $this->valToken(); // las unicas que no se pide el token son las consultas publicas,  login y registro
+
+        $query = "SELECT * FROM roles WHERE id = '$id'";
+        $query = $this->db->query($query);
+        $datos = $query->getResult();
+
+        if (!$datos) {
+            custom_error(504, $this->lang, "roles");
+        }
+
+        $delete = $this->db->table("roles")->delete(["id" => $id]);
+        if (!$delete) {
+            custom_error(507, $this->lang, "general");
+        }
+
+        if ($id) {
+            $datos = $datos[0];
+        }
+
+        json_debug($datos);
+    }
+
+    // FIN CRUD USUARIOS
 
     public function mailing() {
         $this->valToken();
@@ -3057,7 +3478,6 @@ class Api extends BaseController {
         }
 
         $checkUser = $checkUser[0];
-        // debug($checkUser);
 
         unset($checkUser->pasw);
         $this->user = $checkUser;
@@ -3133,21 +3553,479 @@ class Api extends BaseController {
         }
     }
 
+    // public function test() {
+
+    //     // $P = true;
+    //     // $Q = true;
+    //     // $R = true;
+
+    //     // $var1 = ($P || $Q) && (!$R || $Q);
+    //     // $var2 = (!($P && !$Q) || $R) || (!$P != $Q);
+    //     // $var3 = !$P && ($Q && $R);
+    //     // $var4 = !$P || ($Q && $R);
+    //     // $var5 = ($P && $Q) && $R;
+    //     // $var6 = (!$P || $Q) && !$R;
+    //     // $var7 = ($P != $Q) || ($Q && $R);
+    //     // $var8 = !$P || (!$Q && $R);
+
+    //     // echo $var1 .  '';
+
+    //     // Definir las variables posibles (0 o 1)
+    //     $values = [1, 0];
+
+    //     // Imprimir el encabezado de la tabla
+    //     echo "<style> table {text-align: center;} </style>";
+    //     echo "<table border='1'>";
+    //     echo "<tr><th>P</th><th>Q</th><th>R</th><th>S</th>";
+    //     // echo "<th>(P ∨ Q) ∧ (¬R ∨ Q)</th>";
+    //     // echo "<th>((P ∧ ¬Q) → R) ∨ (¬P ⊕ Q)</th>";
+    //     // echo "<th>¬P ∧ (Q ∧ R)</th>";
+    //     // echo "<th>¬P v (Q ∧ R)</th>";
+    //     // echo "<th>(P ∧ Q) ∧ R</th>";
+    //     // echo "<th>(¬P ∨ Q) ∧ ¬R</th>";
+    //     // echo "<th>(P ⊕ Q) ∨ (Q ∧ R)</th>";
+    //     // echo "<th> P → (¬Q ∧ R)</th>";
+
+    //     //ejer2
+    //     // echo "<th> (¬P ∧ Q) → (P ∨ ¬R) </th>";
+    //     // echo "<th> ((P ∧ R) → Q) ∨ ¬(P ∨ R) </th>";
+    //     // echo "<th>  (P ∧ ¬Q) ∧ (Q ⊕ ¬R) </th>";
+    //     // echo "<th> ¬(P ⊕ Q) ∨ (R ∧ ¬P) </th>";
+    //     // echo "<th> ¬(P ∨ Q) ∧ (Q ∨ R) </th>";
+    //     // echo "<th> (P → Q) ∧ (¬R ∨ P) </th>";
+    //     // echo "<th> ¬(P ∧ ¬Q) ∨ (R ∧ Q) </th>";
+    //     // echo "<th> (P ∨ ¬Q) → (¬R ∨ P) </th>";
+    //     // echo "<th> ((¬P ∧ Q) ∨ R) ∧ (P → ¬R) </th>";
+    //     // echo "<th> (P ∨ Q) ⊕ (¬Q ∧ R) </th>";
+
+    //     //ejer3
+    //     // echo "<th> (P ∨ ¬R) ∧ ¬(Q → R) </th>";
+    //     // echo "<th> ¬(P ∧ ¬R) ∨ (Q ∧ ¬P) </th>";
+    //     // echo "<th> (P ⊕ Q) ∧ (¬R ∨ ¬P) </th>";
+    //     // echo "<th> (P ∨ R) → (¬Q ∧ P) </th>";
+    //     // echo "<th> ¬(P ∨ Q) ∧ (R → ¬Q) </th>";
+    //     // echo "<th> ¬(P ∨ R) ∧ (Q ∨ ¬R) </th>";
+    //     // echo "<th> (P → ¬Q) ∨ (R ∧ ¬P) </th>";
+    //     // echo "<th> (¬P ∧ Q) ∧ (R ∨ ¬Q) </th>";
+    //     // echo "<th> (P ∨ ¬R) ∧ (¬Q → P) </th>";
+    //     // echo "<th> (P ⊕ R) ∧ (¬Q ∨ P) </th>";
+    //     // echo "<th> ¬(P ∨ ¬Q) ∧ (Q ∨ R) </th>";
+    //     // echo "<th> (P ∧ Q) ∨ ¬(R ∨ P) </th>";
+    //     // echo "<th> (P ∧ ¬R) ∨ (¬Q ⊕ R) </th>";
+    //     // echo "<th> (¬P → Q) ∧ (R ∨ ¬P) </th>";
+    //     // echo "<th> ¬(P ∨ ¬Q) → (R ∧ ¬P) </th>";
+    //     // echo "<th> ¬(P ∨ ¬Q) → (R ∧ ¬P) </th>";
+    //     // echo "<th> (P ∨ ¬R) ∧ (¬Q → P) </th>";
+    //     // echo "<th> (P ∨ ¬R) ∧ (¬Q → P) </th>";
+    //     // echo "<th> (¬P → Q) ∧ (R ∨ ¬P) </th>";
+    //     // echo "<th> (¬P → Q) ∧ (R ∨ ¬P) </th>";
+
+
+    //     // echo "<th> (P ∧ ¬Q) ∨ (R ∧ ¬S) </th>";
+    //     // echo "<th> (P → Q) ∧ (¬R ∨ S) </th>";
+    //     // echo "<th>  (¬P ∧ Q) ⊕ (R ∨ ¬S) </th>";
+    //     // echo "<th> (P ∧ Q) → (¬R ∨ S) </th>";
+    //     // echo "<th> (P ∨ ¬Q) ∧ (¬R ∨ S) </th>";
+
+    //     // echo "<th> (¬P ∨ ¬Q) ∧ (R ∧ S) </th>";
+    //     // echo "<th> ¬((P ∧ Q) ∨ (R ∧ S)) </th>";
+    //     // echo "<th> ((P ⊕ Q) ∧ ¬R) ∨ (S → P) </th>";
+    //     // echo "<th> ¬(P → Q) ∧ (R ∨ ¬S) </th>";
+    //     // echo "<th> (P ∧ Q) ∨ (¬R ∧ ¬S) </th>";
+
+
+    //     // echo "<th> (P ∨ Q) ∧ ¬(R ⊕ S) </th>";
+    //     // echo "<th> ((P → Q) ∧ (¬R ∨ S)) ∧ ¬(P ∧ R) </th>";
+    //     // echo "<th> ¬(P ⊕ Q) ∨ (R ∧ S) </th>";
+    //     // echo "<th> (P ∨ ¬Q) ∧ (R ⊕ ¬S) </th>";
+    //     // echo "<th> ((P ∧ S) ∨ (¬Q ∧ R)) ∧ ¬(P → ¬R) </th>";
+
+    //     // echo "<th> (P ⊕ Q) → (R ∨ ¬S) </th>";
+    //     // echo "<th> (¬P → Q) ∧ (R ⊕ S) </th>";
+    //     // echo "<th> ((P ∨ ¬Q) ⊕ (R ∧ S)) → P </th>";
+    //     // echo "<th> ¬((P ⊕ R) → (Q ∧ S)) </th>";
+    //     // echo "<th> (P ∧ ¬Q) ⊕ (R → S) </th>";
+
+    //     // echo "<th> (P → Q) ∧ (R ⊕ ¬S) </th>";
+    //     // echo "<th> ((P ∨ Q) → (¬R ⊕ S)) ∧ ¬P </th>";
+    //     // echo "<th> (¬P ⊕ Q) ∨ (R → S) </th>";
+    //     // echo "<th> (P → ¬Q) ∧ (R ⊕ ¬S) </th>";
+    //     // echo "<th> ((¬P → Q) ∧ (R ⊕ S)) ⊕ ¬R </th>";
+
+    //     // echo "<th> ¬((P ⊕ Q) ∨ (R → ¬S)) </th>";
+    //     // echo "<th> (P → Q) ⊕ (R ∨ ¬S) </th>";
+    //     // echo "<th> ((¬P → R) ⊕ (Q ∨ ¬S)) ∧ P </th>";
+    //     // echo "<th> (P ⊕ Q) → (¬R ∨ S) </th>";
+    //     // echo "<th> ((P → ¬Q) ∨ (R ⊕ S)) </th>";
+
+    //     // echo "<th> ((¬P ∧ Q) → (¬R ⊕ S)) ∨ ((¬P ⊕ Q) ∧ (¬R → S)) ∧ ¬(P ∧ ¬R) </th>";
+    //     // echo "<th> (¬P ∨ (¬Q → ¬R)) ∧ ((¬S ⊕ P) → (¬R ∧ Q)) ∨ ¬((¬P → Q) ⊕ (R ∨ ¬S)) </th>";
+    //     // echo "<th> (¬P → (Q ⊕ ¬R)) ∧ (¬S → (P ∧ ¬Q)) ∨ ((¬R ⊕ S) ∧ (¬P ∨ Q)) </th>";
+    //     // echo "<th> ((¬P ∧ ¬Q) ⊕ (¬R → S)) ∧ ((¬P ∨ R) → (¬Q ⊕ S)) ∧ ¬((P → ¬Q) ∨ ¬R) </th>";
+    //     // echo "<th> (¬P ⊕ (¬Q → ¬R)) ∧ ((¬S ∧ P) → (¬Q ⊕ ¬R)) ∨ ((P → ¬Q) ∧ (¬R ⊕ S)) </th>";
+
+
+
+    //     echo "</tr>";
+
+    //     // Generar todas las combinaciones de P, Q, R
+    //     foreach ($values as $P) {
+    //         foreach ($values as $Q) {
+    //             foreach ($values as $R) {
+    //                 foreach ($values as $S) {
+    //                     //             $result1 = ($P || $Q) && (!$R || $Q) ? "1" : "0";
+    //                     //             $result2 = (!($P && !$Q) || $R) || (!$P != $Q) ? "1" : "0";
+    //                     //             $result3 = !$P && ($Q && $R) ? "1" : "0";
+    //                     //             $result4 = !$P || ($Q && $R) ? "1" : "0";
+    //                     //             $result5 = ($P && $Q) && $R ? "1" : "0";
+    //                     //             $result6 = (!$P || $Q) && !$R ? "1" : "0";
+    //                     //             $result7 = ($P != $Q) || ($Q && $R) ? "1" : "0";
+    //                     //             $result8 = !$P || (!$Q && $R) ? "1" : "0";
+
+
+    //                     //ejer 3 (el ejer 2 esta hecho con for abajo)
+    //                     // $result1 = ($P || !$R) && !(!$Q || $R) ? "1" : "0";
+    //                     // $result2 = !($P && !$R) || ($Q && !$P) ? "1" : "0";
+    //                     // $result3 = ($P != $Q) && (!$R || !$P) ? "1" : "0";
+    //                     // $result4 = !($P || $R) || (!$Q && $P) ? "1" : "0";
+    //                     // $result5 = !($P || $Q) && (!$R || !$Q) ? "1" : "0";
+    //                     // $result6 = !($P||$R) && ($Q|| !$R) ? "1" : "0";
+    //                     // $result7 = (!$P || !$Q) || ($R && !$P) ? "1" : "0";
+    //                     // $result8 = (!$P && $Q) && ($R || !$Q) ? "1" : "0";
+    //                     // $result9 = ($P || !$R) && !(!$Q || $P) ? "1" : "0";
+    //                     // $result10 = ($P != $R) && (!$Q || $P) ? "1" : "0";
+    //                     // $result11 = !($P || !$Q) && ($Q || $R) ? "1" : "0";
+    //                     // $result12 = ($P && $Q) || !($R || $P) ? "1" : "0";
+    //                     // $result13 = ($P && $R) || (!$Q != $R) ? "1" : "0";
+    //                     // $result14 = !(!$P || $Q) && ($R || !$P) ? "1" : "0";
+    //                     // $result15 = !(!($P || !$Q)) || ($R && !$P) ? "1" : "0"; // ES EL MISMO QUE EL DE ABAJO PERO VERSION EXTENDIDA JAJA
+    //                     // $result16 = ($P || !$Q) || ($R && !$P) ? "1" : "0";
+    //                     // $result17 = ($P || !$R) && ($Q || $P) ? "1" : "0"; // la diferencia esta en las negaciones que se cancelan, negacion y negacion se elimina.
+    //                     // $result17segunda = ($P || !$R) && (!(!$Q) || $P) ? "1" : "0";
+    //                     // $result18 = ($P || $Q) && ($R || !$P) ? "1" : "0"; // la diferencia esta en las negaciones que se cancelan, negacion y negacion se elimina.
+    //                     // $result18segunda = (!(!$P) || $Q) && ($R || !$P) ? "1" : "0";
+
+
+    //                     // $result19 = ($P && !$Q) || ($R && !$S) ? "1" : "0";
+    //                     // $result20 = (!$P || $Q) && (!$R || $S) ? "1" : "0";
+    //                     // $result21 = (!$P && $Q) != ($R || !$S) ? "1" : "0";
+    //                     // $result22 = !($P && $Q) || (!$R || $S) ? "1" : "0";
+    //                     // $result23 = ($P || !$Q) && (!$R || $S) ? "1" : "0";
+
+    //                     // $result24 = (!$P || !$Q) &&  ($R && $S) ? "1" : "0";
+    //                     // $result25 = !(($P && $Q) || ($R&&$S)) ? "1" : "0";
+    //                     // $result26 = (($P != $Q) && !$R) || (!$S || $P ) ? "1" : "0";
+    //                     // $result27 = !(!$P || $Q) && ($R || !$S) ? "1" : "0";
+    //                     // $result28 = ($P && $Q) || (!$R && !$S) ? "1" : "0";
+
+    //                     // $result29 = ($P || $Q) && !($R != $S) ? "1" : "0";
+    //                     // $result30 = ((!$P || $Q) && (!$R || $S)) && !($P && $R) ? "1" : "0";
+    //                     // $result31 = !($P != $Q) || ($R && $S) ? "1" : "0";
+    //                     // $result32 = ($P || !$Q) && ($R != !$S) ? "1" : "0";
+    //                     // $result33 = (($P && $S) || (!$Q && $R)) && ($P || !$R) ? "1" : "0";
+
+    //                     // $result34 = !($P != $Q) || ($R || !$S) ? "1" : "0";
+    //                     // $result35 = !(!$P || $Q) && ($R != $S) ? "1" : "0";
+    //                     // $result36 = !(($P || !$Q) != ($R && $S)) || $P  ? "1" : "0";
+    //                     // $result37 = ( $P != $R) || ($Q && $S)  ? "1" : "0";
+    //                     // $result38 = ($P && !$Q) != (!$R || $S) ? "1" : "0";
+
+    //                     // $result39 = (!$P || $Q) && ($R != !$S) ? "1" : "0";
+    //                     // $result40 = (!($P || $Q) || (!$R != $S)) && !$P ? "1" : "0";
+    //                     // $result41 = (!$P != $Q) || (!$R || $S) ? "1" : "0";
+    //                     // $result42 = (!$P || !$Q) && ($R != !$S) ? "1" : "0";
+    //                     // $result43 = (($P || $Q) && ($R != $S)) != !$R ? "1" : "0";
+
+    //                     // $result44 = !($P != $Q) || (!$R || !$S) ? "1" : "0";
+    //                     // $result45 = (!$P || $Q) != ($R || !$S) ? "1" : "0";
+    //                     // $result46 = ($P || $R) != ($Q || !$S) && $P ? "1" : "0";
+    //                     // $result47 = !($P !=$Q )  || (!$R || $S) ? "1" : "0";
+    //                     // $result48 = ((!$P || !$Q) || ($R != $S)) ? "1" : "0";
+
+    //                     // $result49 = (!(!$P && $Q)) || (!$R != $S) || ((!$P != $Q) && ($R || $S)) && !($P && !$R) ? "1" : "0";
+    //                     // $result50 = (!$P || ($Q || !$R)) && ( !(!$S != $P) || (!$R && $Q)) || !(($P || $Q) != ($R || !$S)) ? "1" : "0";
+    //                     // $result51 = ($P || ($Q != !$R)) && ($S || ($P && !$Q)) || ((!$R != $S) && (!$P || $Q)) ? "1" : "0";
+    //                     // $result52 = ((!$P && !$Q) != ($R || $S)) && (!(!$P || $R) || (!$Q != $S)) && !((!$P || !$Q) || !$R) ? "1" : "0";
+    //                     // $result53 = (!$P != ($Q || !$R)) && (( ! (!$S && $P)) || (!$Q != !$R)) || ((!$P || !$Q) && (!$R != $S))  ? "1" : "0";
+
+
+    //                     // Imprimir la fila de la tabla
+    //                     echo "<tr>";
+    //                     echo "<td>$P</td>";
+    //                     echo "<td>$Q</td>";
+    //                     echo "<td>$R</td>";
+    //                     echo "<td>$S</td>";
+    //                     // echo "<td>$result1</td>";
+    //                     // echo "<td>$result2</td>";
+    //                     // echo "<td>$result3</td>";
+    //                     // echo "<td>$result4</td>";
+    //                     // echo "<td>$result5</td>";
+    //                     // echo "<td>$result6</td>";
+    //                     // echo "<td>$result7</td>";
+    //                     // echo "<td>$result8</td>";
+    //                     // echo "<td>$result9</td>";
+    //                     // echo "<td>$result10</td>";
+    //                     // echo "<td>$result11</td>";
+    //                     // echo "<td>$result12</td>";
+    //                     // echo "<td>$result13</td>";
+    //                     // echo "<td>$result14</td>";
+    //                     // echo "<td>$result15</td>";
+    //                     // echo "<td>$result16</td>";
+    //                     // echo "<td>$result17</td>";
+    //                     // echo "<td>$result17segunda</td>";
+    //                     // echo "<td>$result18</td>";
+    //                     // echo "<td>$result18segunda</td>";
+
+    //                     // echo "<td>$result19</td>";
+    //                     // echo "<td>$result20</td>";
+    //                     // echo "<td>$result21</td>";
+    //                     // echo "<td>$result22</td>";
+    //                     // echo "<td>$result23</td>";
+
+    //                     // echo "<td>$result24</td>";
+    //                     // echo "<td>$result25</td>";
+    //                     // echo "<td>$result26</td>";
+    //                     // echo "<td>$result27</td>";
+    //                     // echo "<td>$result28</td>";
+
+    //                     // echo "<td>$result29</td>";
+    //                     // echo "<td>$result30</td>";
+    //                     // echo "<td>$result31</td>";
+    //                     // echo "<td>$result32</td>";
+    //                     // echo "<td>$result33</td>";
+
+    //                     // echo "<td>$result34</td>";
+    //                     // echo "<td>$result35</td>";
+    //                     // echo "<td>$result36</td>";
+    //                     // echo "<td>$result37</td>";
+    //                     // echo "<td>$result38</td>";
+
+    //                     // echo "<td>$result39</td>";
+    //                     // echo "<td>$result40</td>";
+    //                     // echo "<td>$result41</td>";
+    //                     // echo "<td>$result42</td>";
+    //                     // echo "<td>$result43</td>";
+
+    //                     // echo "<td>$result44</td>";
+    //                     // echo "<td>$result45</td>";
+    //                     // echo "<td>$result46</td>";
+    //                     // echo "<td>$result47</td>";
+    //                     // echo "<td>$result48</td>";
+
+    //                     // echo "<td>$result49</td>";
+    //                     // echo "<td>$result50</td>";
+    //                     // echo "<td>$result51</td>";
+    //                     // echo "<td>$result52</td>";
+    //                     // echo "<td>$result53</td>";
+
+
+    //                     echo "</tr>";
+    //                 }
+    //             }
+    //         }
+    //     }
+
+
+    //     // for ($P = 1; $P >= 0; $P--) {
+    //     //     for ($Q = 1; $Q >= 0; $Q--) {
+    //     //         for ($R = 1; $R >= 0; $R--) {
+
+    //     //             // $result1 = !( !$P && $Q )  || ($P || !$R) ? "1" : "0";
+    //     //             // $result2 = (! ( $P && $R) || $Q) || !($P || $R) ? "1" : "0";
+    //     //             // $result3 = ( $P && !$Q) && ( $Q != !$R) ? "1" : "0";
+    //     //             // $result4 = !( $P != $Q) || ( $R && !$P ) ? "1" : "0";
+    //     //             // $result5 = !($P || $Q) && ($Q || $R) ? "1" : "0";
+    //     //             // $result6 = (!$P || $Q ) && (!$R || $P) ? "1" : "0";
+    //     //             // $result7 = !($P && !$Q) ? "1" : "0";
+    //     //             // $result8 = !($P || !$Q) || (!$R || $P) ? "1" : "0";
+    //     //             // $result9 = ((!$P && $Q) || $R) && ( !$P || !$R) ? "1" : "0";
+    //     //             // $result10 = ( $P || $Q ) != ( !$Q &&  $R) ? "1" : "0";
+
+
+    //     //             echo "<tr>";
+    //     //             echo "<td>$P</td>";
+    //     //             echo "<td>$Q</td>";
+    //     //             echo "<td>$R</td>";
+    //     //             echo "<td>$result1</td>";
+    //     //             echo "<td>$result2</td>";
+    //     //             echo "<td>$result3</td>";
+    //     //             echo "<td>$result4</td>";
+    //     //             echo "<td>$result5</td>";
+    //     //             echo "<td>$result6</td>";
+    //     //             echo "<td>$result7</td>";
+    //     //             echo "<td>$result8</td>";
+    //     //             echo "<td>$result9</td>";
+    //     //             echo "<td>$result10</td>";
+    //     //             echo "</tr>";
+    //     //         }
+    //     //     }
+    //     // }
+
+    //     echo "</table>";
+    // }
+
     public function test() {
+        // Suma de Dos Números:
+        // Escribe un programa que tome dos números enteros como entrada y muestre la suma de ambos.
 
-        // debug($this->db);
+        // $n1 = 2;
+        // $n2 = 4;
+        // $resut = $n1 + $n2;
+        // echo $resut;
 
-        $query   = $this->db->query('SELECT * FROM hola');
-        $results = $query->getResult();
+        // Número Par o Impar:
+        // Escribe un programa que determine si un número ingresado por el usuario es par o impar.
 
-        json_debug($results);
-
-        // foreach ($results as $row) {
-        //     echo $row->title;
-        //     echo $row->name;
-        //     echo $row->email;
+        // $n = 1755;
+        // if ($n % 2 == 0) {
+        //     echo "El numero es par";
+        // } else {
+        //     echo "El numero es impar";
         // }
 
-        echo 'Total Results: ' . count($results);
+        // Mayor de Dos Números:
+        // Escribe un programa que reciba dos números y muestre cuál es el mayor de ellos. Si son iguales, muestra un mensaje que indique que ambos son iguales.
+
+        // $n1 = 56890;
+        // $n2 = 56890;
+        // if ($n1 > $n2) {
+        //     echo $n1;
+        // }else if ($n1 < $n2) {
+        //     echo $n2;
+        // }else {
+        //     echo "$n1 y $n2 son iguales";
+        // }
+
+        // Descuento en una Tienda:
+        // Escribe un programa que calcule el precio final de un producto después de aplicar un descuento del 10% si el precio original es mayor a $100.
+
+        // $precio = 115;
+        // $desc = 10;
+        // $preciocondescuento = $precio * $desc / 100;
+        // $ultimoprecio = $precio - $preciocondescuento;
+
+        // if($ultimoprecio >= 100){
+        //     echo "El producto costo: $" . $ultimoprecio . " se incluye un descuento del 10%, por lo cual el precio real del producto era $$precio";
+        // } 
+
+        // Nivel 2: Estructuras de Control y Bucles
+
+        // Tabla de Multiplicar:
+        // Escribe un programa que genere la tabla de multiplicar de un número ingresado por el usuario, desde el 1 hasta el 10.
+
+        // $n = 6;
+        // for ($i=1; $i <= 10; $i++) { 
+        //     echo "<br>" . $i * $n ;
+        // }
+
+        // Suma de Números del 1 al 100:
+        // Escribe un programa que calcule la suma de todos los números enteros del 1 al 100 usando un bucle for.
+        // $suma = 0;
+        // for ($i=1; $i <= 100 ; $i++) { 
+        //     $suma += $i;
+        // }
+        // echo "del 1 al 100 da: " . $suma;
+
+        // Factorial de un Número:
+        // Escribe un programa que calcule el factorial de un número ingresado por el usuario utilizando un bucle while.
+
+        // $n = 17;
+        // $factorial = 1;
+        // $i = 1;
+        // echo "Cálculo del factorial de $n:<br><br>";
+
+        // while ($i <= $n) {
+        //     // Mostramos el estado actual antes del cálculo
+        //     // echo "Paso $i: factorial = $factorial * $i<br><br>";
+
+        //     // Calculamos el nuevo valor del factorial
+        //     $factorial = $factorial * $i;
+
+        //     // Mostramos el resultado después del cálculo
+        //     // echo "Resultado después del paso $i: $factorial<br>";
+
+        //     // Incrementamos la variable del bucle
+        //     $i++;
+        // }
+
+        // // Mostramos el resultado final
+        // echo "El factorial de $n es: " . $factorial;
+
+        // Contar Números Positivos, Negativos y Ceros:
+        // Escribe un programa que permita al usuario ingresar 10 números. El programa debe contar y mostrar cuántos de esos números son positivos, 
+        // cuántos son negativos y cuántos son ceros.
+
+        // $numeros = [-12, 7, 0, -5, 14, -8, 3, -1, 22, -6, 9, -4, 15, 0, -3, 8, -7, 11, -2, 20];
+        // $pos = 0;
+        // $neg = 0;
+        // $cero = 0;
+
+        // for ($i = 0; $i < count($numeros); $i++) {
+        //     $numero = $numeros[$i];
+        //     if ($numero > 0) {
+        //         $pos++;
+        //     } elseif ($numero < 0) {
+        //         $neg++;
+        //     } else {
+        //         $cero++;
+        //     }
+        // }
+
+        // while ($i < count($numeros)) {
+        //     $numero = $numeros[$i];
+        //     if ($numero > 0) {
+        //         $pos ++;
+        //     } elseif ($numero < 0) {
+        //         $neg ++;
+        //     } else {
+        //         $cero++;
+        //     }
+
+        //     $i++;
+        // }
+
+        // foreach ($numeros as $key => $value) {
+        //     if ($value > 0) {
+        //         $pos++;
+        //     } elseif ($value < 0) {
+        //         $neg++;
+        //     } else {
+        //         $cero++;
+        //     }
+        // }
+        // echo "Hay: $pos numeros positivos <br>";
+        // echo "Hay: $neg numeros negativos <br>";
+        // echo "Hay: $cero numeros 0 <br>";
+
+
+        // Nivel 3: Estructuras de Control Anidadas y Arreglos
+
+        // Números Primos en un Rango:
+        // Escribe un programa que encuentre y muestre todos los números primos entre 1 y 100.
+
+        // function esPrimo($numero){
+        //     //arrancamos en 2 por que el 1 es dividendo por el mismo y el anterior a su numero por que es lo mismo.
+        //     for ($i=2; $i < $numero ; $i++) { 
+        //         if($numero % $i == 0){
+        //             return false;
+        //         }
+        //     }
+        //     return true;
+        // }
+
+        // $vari = [];
+        // for ($i=1; $i < 100 ; $i++) { 
+        //     $primo = esPrimo($i);
+        //     if($primo){
+        //         $vari[] = [
+        //             "numero" => $i,
+        //             "esPrimo" => $primo
+        //         ];
+        //     }
+        // }
+
+        // json_debug($vari);
+
+
     }
 }

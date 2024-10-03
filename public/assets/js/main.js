@@ -1045,6 +1045,238 @@ function changeactivoblogComm(id) {
         });
 }
 
+function deleteusuarios(id) {
+    /* $(".todelete").attr("href", "admin/delete/clientes/" + id); */
+    data = [];
+    data["activo"] = $(".ch-usuarios-" + id).is(":checked") ? 1 : 0;
+    data["notnull"] = 1;
+    data["token"] = getCookie("token");
+    activo = $(".ch-usuarios-" + id).is(":checked") ? 1 : 0;
+    msj = activo ? "Activado" : "Desactivado";
+    type = activo ? "success" : "danger";
+
+    console.log("data", data);
+    Swal.fire({
+        title: '¿Estás seguro?',
+        text: '¡No podrás revertir esto!',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Sí, eliminarlo',
+        cancelButtonText: 'Cancelar'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            $.ajax({
+                async: true,
+                type: "POST",
+                dataType: "json",
+                url:
+                    "./api/delete/usuarios/" +
+                    id +
+                    "?token=" +
+                    getCookie("token") +
+                    "&activo=" +
+                    activo +
+                    "&notnull=1",
+                data: data,
+                contentType: "application/json; charset=utf-8",
+                processData: false,
+
+                success: function (response) {
+                    console.log('Respuesta del servidor:', response);
+                    Swal.fire(
+                        '¡Eliminado!',
+                        'Tu archivo ha sido eliminado.',
+                        'success'
+                    ).then(() => {
+                        // window.location.href = "./admin/blogComm";
+                        $(".tr-" + id).html("<td colspan='99' class='bg-success text-center text-white'>Eliminado satisfactoriamente</td>");
+                        setTimeout(() => {
+                            $(".tr-" + id).hide('slide');
+                        }, 2000);
+
+                    });
+                },
+                error: function (xhr, status, error) {
+                    console.error('Error en la solicitud AJAX:', error);
+                    Swal.fire(
+                        'Abortado',
+                        'El servidor no pudo eliminar el archivo',
+                        'error'
+                    );
+                }
+            });
+
+        } else if (result.dismiss === Swal.DismissReason.cancel) {
+            Swal.fire(
+                'Cancelado',
+                'Tu archivo está a salvo :)',
+                'error'
+            );
+        }
+    });
+}
+
+function changeactivousuarios(id) {
+    data = [];
+    data["activo"] = $(".ch-usuarios-" + id).is(":checked") ? 1 : 0;
+    data["notnull"] = 1;
+    data["token"] = getCookie("token");
+    activo = $(".ch-usuarios-" + id).is(":checked") ? 1 : 0;
+    msj = activo ? "Activado" : "Desactivado";
+    type = activo ? "success" : "danger";
+
+    console.log("data", data);
+
+    $.ajax({
+        async: true,
+        type: "POST",
+        dataType: "json",
+        url:
+            "./api/update/usuarios/" +
+            id +
+            "?token=" +
+            getCookie("token") +
+            "&activo=" +
+            activo +
+            "&notnull=1",
+        data: data,
+        contentType: "application/json; charset=utf-8",
+        // contentType: false,
+        processData: false,
+    })
+        .done(function (Response) {
+            //do something when get response
+            showAlert(
+                type,
+                `El usuario ${Response.usuario} se ha ${msj} correctamente`
+            );
+            console.log(Response);
+        })
+        .fail(function (Response) {
+            //do something when any error occurs.
+            showAlert("danger", Response.error);
+            console.error(Response);
+        });
+}
+
+function deleteroles(id) {
+    /* $(".todelete").attr("href", "admin/delete/clientes/" + id); */
+    data = [];
+    data["activo"] = $(".ch-roles-" + id).is(":checked") ? 1 : 0;
+    data["notnull"] = 1;
+    data["token"] = getCookie("token");
+    activo = $(".ch-roles-" + id).is(":checked") ? 1 : 0;
+    msj = activo ? "Activado" : "Desactivado";
+    type = activo ? "success" : "danger";
+
+    console.log("data", data);
+    Swal.fire({
+        title: '¿Estás seguro?',
+        text: '¡No podrás revertir esto!',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Sí, eliminarlo',
+        cancelButtonText: 'Cancelar'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            $.ajax({
+                async: true,
+                type: "POST",
+                dataType: "json",
+                url:
+                    "./api/delete/roles/" +
+                    id +
+                    "?token=" +
+                    getCookie("token") +
+                    "&activo=" +
+                    activo +
+                    "&notnull=1",
+                data: data,
+                contentType: "application/json; charset=utf-8",
+                processData: false,
+
+                success: function (response) {
+                    console.log('Respuesta del servidor:', response);
+                    Swal.fire(
+                        '¡Eliminado!',
+                        'Tu archivo ha sido eliminado.',
+                        'success'
+                    ).then(() => {
+                        // window.location.href = "./admin/blogComm";
+                        $(".tr-" + id).html("<td colspan='99' class='bg-success text-center text-white'>Eliminado satisfactoriamente</td>");
+                        setTimeout(() => {
+                            $(".tr-" + id).hide('slide');
+                        }, 2000);
+
+                    });
+                },
+                error: function (xhr, status, error) {
+                    console.error('Error en la solicitud AJAX:', error);
+                    Swal.fire(
+                        'Abortado',
+                        'El servidor no pudo eliminar el archivo',
+                        'error'
+                    );
+                }
+            });
+
+        } else if (result.dismiss === Swal.DismissReason.cancel) {
+            Swal.fire(
+                'Cancelado',
+                'Tu archivo está a salvo :)',
+                'error'
+            );
+        }
+    });
+}
+
+function changeactivoroles(id) {
+    data = [];
+    data["activo"] = $(".ch-roles-" + id).is(":checked") ? 1 : 0;
+    data["notnull"] = 1;
+    data["token"] = getCookie("token");
+    activo = $(".ch-roles-" + id).is(":checked") ? 1 : 0;
+    msj = activo ? "Activado" : "Desactivado";
+    type = activo ? "success" : "danger";
+
+    console.log("data", data);
+
+    $.ajax({
+        async: true,
+        type: "POST",
+        dataType: "json",
+        url:
+            "./api/update/roles/" +
+            id +
+            "?token=" +
+            getCookie("token") +
+            "&activo=" +
+            activo +
+            "&notnull=1",
+        data: data,
+        contentType: "application/json; charset=utf-8",
+        // contentType: false,
+        processData: false,
+    })
+        .done(function (Response) {
+            //do something when get response
+            showAlert(
+                type,
+                `El rol ${Response.role_name} se ha ${msj} correctamente`
+            );
+            console.log(Response);
+        })
+        .fail(function (Response) {
+            //do something when any error occurs.
+            showAlert("danger", Response.error);
+            console.error(Response);
+        });
+}
+
 //MODAL DE DESCRIPCIONES DE PROYECTOS.
 $(document).on("click", ".showdescrip", function (e) {
     e.preventDefault();
@@ -1167,7 +1399,7 @@ $(document).on("click", ".del-img", function (e) {
     });
 });
 
-    tinymce.init({
+tinymce.init({
         selector: '#content',
         plugins: 'anchor autolink charmap codesample emoticons image link lists media searchreplace table visualblocks wordcount checklist mediaembed casechange export formatpainter pageembed linkchecker a11ychecker tinymcespellchecker permanentpen powerpaste advtable advcode editimage advtemplate ai mentions tinycomments tableofcontents footnotes mergetags autocorrect typography inlinecss markdown',
         toolbar: 'undo redo | blocks fontfamily fontsize | bold italic underline strikethrough | link image media table mergetags | addcomment showcomments | spellcheckdialog a11ycheck typography | align lineheight | checklist numlist bullist indent outdent | emoticons charmap | removeformat',
@@ -1196,5 +1428,6 @@ $(document).on("click", ".del-img", function (e) {
             document.getElementById('content').value = editor.getContent();
         });
         }
-    });
+});
     
+$(".select-multiple").selectize({create:!0,sortField:{field:"text",direction:"asc"},dropdownParent:"body"});

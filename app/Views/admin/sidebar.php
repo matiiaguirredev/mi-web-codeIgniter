@@ -1,3 +1,4 @@
+
 <!-- ========== Left Sidebar ========== -->
 <div class="main-menu">
     <!-- Brand Logo -->
@@ -53,6 +54,50 @@
                     </div>
                 </li> -->
 
+            
+            <li class="menu-item">
+                <a href="#menuRoles" data-bs-toggle="collapse" class="menu-link waves-effect waves-light">
+                    <span class="menu-icon"><i class="fa-solid fa-pen-ruler"></i></span>
+                    <span class="menu-text"> Roles </span>
+                    <span class="menu-arrow"></span>
+                </a>
+                <div class="collapse" id="menuRoles">
+                    <ul class="sub-menu">
+                        <li class="menu-item">
+                            <a class='menu-link' href='/admin/roles'>
+                                <span class="menu-text">Lista de Roles</span>
+                            </a>
+                        </li>
+                        <li class="menu-item">
+                            <a class='menu-link' href='/admin/create/roles'>
+                                <span class="menu-text">Nuevos Roles</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </li>
+
+            <li class="menu-item">
+                <a href="#menuUsuarios" data-bs-toggle="collapse" class="menu-link waves-effect waves-light">
+                    <span class="menu-icon"><i class="fa-duotone fa-solid fa-users"></i></span>
+                    <span class="menu-text"> Usuarios </span>
+                    <span class="menu-arrow"></span>
+                </a>
+                <div class="collapse" id="menuUsuarios">
+                    <ul class="sub-menu">
+                        <li class="menu-item">
+                            <a class='menu-link' href='/admin/usuarios'>
+                                <span class="menu-text">Lista de Usuarios</span>
+                            </a>
+                        </li>
+                        <li class="menu-item">
+                            <a class='menu-link' href='/admin/create/usuarios'>
+                                <span class="menu-text">Nuevos Usuarios</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </li>
 
             <li class="menu-item">
                 <a href="#menuSecciones" data-bs-toggle="collapse" class="menu-link waves-effect waves-light">
@@ -123,7 +168,7 @@
 
             <li class="menu-item">
                 <a href="#menuMultilevelBlog" data-bs-toggle="collapse" class="menu-link waves-effect waves-light">
-                    <span class="menu-icon"><i class="bx bx-share-alt"></i></span>
+                    <span class="menu-icon"><i class="fa-sharp-duotone fa-solid fa-blog"></i></span>
                     <span class="menu-text"> Blog </span>
                     <span class="menu-arrow"></span>
                 </a>
@@ -704,13 +749,13 @@
                     <a class="nav-link dropdown-toggle nav-user me-0 waves-effect waves-light" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="false" aria-expanded="false">
                         <img src="<?= $user->informacion->img ?>" alt="user-image" class="rounded-circle">
                         <span class="ms-1 d-none d-md-inline-block">
-                            <?= $user->usuario ?> <i class="mdi mdi-chevron-down"></i>
+                            <?= $user->nombre ?> <i class="mdi mdi-chevron-down"></i>
                         </span>
                     </a>
                     <div class="dropdown-menu dropdown-menu-end profile-dropdown ">
                         <!-- item-->
                         <div class="dropdown-header noti-title">
-                            <h6 class="text-overflow m-0">Welcome !</h6>
+                            <h6 class="text-overflow m-0">Welcome <?= $user->nombre ?>!</h6>
                         </div>
 
                         <!-- item-->

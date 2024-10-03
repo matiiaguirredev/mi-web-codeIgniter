@@ -60,11 +60,13 @@ class Admin extends BaseController {
 
     private function header() {
         $this->data["user"] = $this->user;
+        // debug($this->data["user"]);
         echo view('admin/header', $this->data);
     }
 
     private function sidebar() {
         echo view('admin/sidebar', $this->data);
+        // debug($this->data);
     }
 
     private function footer() {
@@ -232,6 +234,7 @@ class Admin extends BaseController {
             // debug($create_proyect, false);
             if (isset($create_proyect->error)) {
                 $this->data['error'] = $create_proyect->error;
+                // debug($this->data['error']);
             } else {
                 $this->data['success'] = "Proyecto creado exitosamente";
                 $this->get_proyect();
@@ -248,6 +251,8 @@ class Admin extends BaseController {
             } else {
                 $this->data['categorias'] = $categorias;
             }
+
+
             $this->header();
             $this->sidebar();
             echo view('admin/newproyect', $this->data);
@@ -2117,6 +2122,367 @@ class Admin extends BaseController {
 
     // FIN CRUD BLOG COMENTARIOS
 
+    // CRUD USUARIOS
+
+    public function get_usuarios() {
+        $this->valtoken();
+        $token = $this->request->getCookie("token");
+
+        $this->data['usuarios'] = [];
+        $usuarios = json_decode(send_post($this->urlAPI . "usuarios", ["token" => $token]));
+        // debug($usuarios);
+        if (isset($usuarios->error)) {
+            $this->data['error'] = $usuarios->error;
+        } else {
+            $this->data['usuarios'] = $usuarios;
+        }
+
+        $view = true;
+
+        if ($view) {
+            $this->header();
+            $this->sidebar();
+            echo view('admin/usuarios', $this->data);
+            $this->footer();
+        }
+    }
+
+    public function create_usuarios() {
+
+        $this->valtoken();
+        $view = true;
+        if ($this->request->getGetPost()) {
+            $token = $this->request->getCookie("token");
+            $requestData = array_merge($this->request->getGetPost(), ["token" => $token]); // en una variable tengo que guardar el merge 
+            // debug($this->request->getGetPost());
+
+            $create_usuarios = json_decode(send_post($this->urlAPI . "create/usuarios", $requestData)); // envio directamente la variable que tiene todo ya concatenado
+            // debug($create_usuarios);
+            if (isset($create_usuarios->error)) {
+                $this->data['error'] = $create_usuarios->error;
+            } else {
+                $this->data['success'] = "Informacion de usuarios creada exitosamente";
+                $this->get_usuarios();
+                $view = false;
+            }
+            // debug($create_usuarios);
+        }
+
+        if ($view) {
+            $token = $this->request->getCookie("token");
+
+            $this->data['usuarios'] = [];
+            $usuarios = json_decode(send_post($this->urlAPI . "usuarios", ["token" => $token]));
+            if (isset($usuarios->error)) {
+                $this->data['error'] = $usuarios->error;
+                // debug($this->data['error']);
+            } else {
+                $this->data['usuarios'] = $usuarios;
+            }
+
+            $this->data['roles'] = [];
+            $roles = json_decode(send_post($this->urlAPI . "roles?activo=1", ["token" => $token]));
+            if (isset($roles->error)) {
+                $this->data['error'] = $roles->error;
+            } else {
+                $this->data['roles'] = $roles;
+            }
+
+
+            $this->header();
+            $this->sidebar();
+            echo view('admin/newusuarios', $this->data);
+            $this->footer();
+        }
+    }
+
+    public function update_usuarios($id) {
+
+        $this->valtoken();
+        $view = true;
+        $token = $this->request->getCookie("token");
+
+        if ($this->request->getGetPost()) {
+
+            $requestData = array_merge($this->request->getGetPost(), ["token" => $token]); // en una variable tengo que guardar el merge 
+
+            // debug($requestData);
+            $update_usuarios = json_decode(send_post($this->urlAPI . "update/usuarios/" . $id, $requestData)); // envio directamente la variable que tiene todo ya concatenado
+            // $update_usuarios = send_post($this->urlAPI . "update/usuarios/" . $id, $requestData); // envio directamente la variable que tiene todo ya concatenado
+            // json_debug($update_usuarios);
+            if (isset($update_usuarios->error)) {
+                $this->data['error'] = $update_usuarios->error;
+            } else {
+                $this->data['success'] = "Informacion de usuarios modificada exitosamente";
+                $this->get_usuarios();
+                $view = false;
+            }
+            // debug($update_usuarios, false);
+
+        }
+
+        if ($view) {
+
+            $token = $this->request->getCookie("token");
+
+            $this->data['usuarios'] = [];
+            $usuarios = json_decode(send_post($this->urlAPI . "usuarios/" . $id, ["token" => $token]));
+            // debug($usuarios);
+            if (isset($usuarios->error)) {
+                $this->data['error'] = $usuarios->error;
+            } else {
+                $this->data['usuarios'] = $usuarios;
+            }
+
+            $this->data['roles'] = [];
+            $roles = json_decode(send_post($this->urlAPI . "roles?activo=1", ["token" => $token]));
+            if (isset($roles->error)) {
+                $this->data['error'] = $roles->error;
+            } else {
+                $this->data['roles'] = $roles;
+            }
+
+
+            $this->header();
+            $this->sidebar();
+            echo view('admin/edit-usuarios');
+            $this->footer();
+        }
+    }
+
+    public function delete_usuarios($id) {
+        // $this->valtoken();
+        $token = $this->request->getCookie("token");
+
+        // $this->data = [];
+        if ($id) {
+            $requestData = ["token" => $token]; // Datos para enviar a la API
+            $delete_usuarios = json_decode(send_post($this->urlAPI . "delete/usuarios/" . $id, $requestData));
+
+            if (isset($delete_usuarios->error)) {
+                $this->data['error'] = $delete_usuarios->error;
+            } else {
+                // El proyecto se eliminó exitosamente
+                $this->data['success'] = "Informacion de usuarios eliminada exitosamente";
+            }
+        }
+        $this->get_usuarios();
+    }
+
+    // FIN CRUD USUARIOS
+
+    // CRUD ROLES
+
+    public function get_roles() {
+        $this->valtoken();
+        $token = $this->request->getCookie("token");
+
+        $this->data['roles'] = [];
+        $roles = json_decode(send_post($this->urlAPI . "roles", ["token" => $token]));
+        if (isset($roles->error)) {
+            $this->data['error'] = $roles->error;
+        } else {
+            $this->data['roles'] = $roles;
+        }
+
+        $view = true;
+
+        if ($view) {
+            $this->header();
+            $this->sidebar();
+            echo view('admin/roles', $this->data);
+            $this->footer();
+        }
+    }
+
+    public function create_roles() {
+
+        $this->valtoken();
+        $token = $this->request->getCookie("token");
+        $view = true;
+        if ($this->request->getGetPost()) {
+            
+            // debug($this->request->getGetPost(), false);
+            $requestData = array_merge($this->request->getGetPost(), ["token" => $token]); // en una variable tengo que guardar el merge 
+            // debug($requestData, false);
+            foreach ($requestData as $key => $value) {
+                if (is_array($value)) {
+                    $requestData[$key] = implode(',' , $value);
+                }
+            }
+            // debug($requestData);
+
+
+            $create_roles = json_decode(send_post($this->urlAPI . "create/roles", $requestData)); // envio directamente la variable que tiene todo ya concatenado
+            // debug($create_roles, false);
+            if (isset($create_roles->error)) {
+                $this->data['error'] = $create_roles->error;
+            } else {
+                $this->data['success'] = "Informacion de roles creada exitosamente";
+                $this->get_roles();
+                $view = false;
+            }
+            // debug($create_roles);
+        }
+
+        if ($view) {
+
+            $this->data['secciones'] = [
+                [
+                    'alias' => 'proyect',
+                    'titulo' => 'Proyectos'
+                ],
+                [
+                    'alias' => 'lenguaje',
+                    'titulo' => 'Lenguaje'
+                ],
+                [
+                    'alias' => 'redes',
+                    'titulo' => 'Redes'
+                ],
+                [
+                    'alias' => 'categorias',
+                    'titulo' => 'Categorías'
+                ],
+                [
+                    'alias' => 'servicios',
+                    'titulo' => 'Servicios'
+                ],
+                [
+                    'alias' => 'curriculum',
+                    'titulo' => 'Currículum'
+                ],
+                [
+                    'alias' => 'perfil',
+                    'titulo' => 'Perfil'
+                ],
+                [
+                    'alias' => 'hobies',
+                    'titulo' => 'Hobbies'
+                ],
+                [
+                    'alias' => 'contacto',
+                    'titulo' => 'Contacto'
+                ],
+                [
+                    'alias' => 'secciones',
+                    'titulo' => 'Secciones'
+                ],
+                [
+                    'alias' => 'navbar',
+                    'titulo' => 'Navbar'
+                ],
+                [
+                    'alias' => 'txtbanner',
+                    'titulo' => 'Texto Banner'
+                ],
+                [
+                    'alias' => 'clientes',
+                    'titulo' => 'Clientes'
+                ],
+                [
+                    'alias' => 'testimonios',
+                    'titulo' => 'Testimonios'
+                ],
+                [
+                    'alias' => 'blog',
+                    'titulo' => 'Blog'
+                ],
+                [
+                    'alias' => 'blogCat',
+                    'titulo' => 'Categorías del Blog'
+                ],
+                [
+                    'alias' => 'blogComm',
+                    'titulo' => 'Comentarios del Blog'
+                ],
+                [
+                    'alias' => 'blogComm2',
+                    'titulo' => 'Comentarios del Blog (Versión 2)'
+                ],
+                [
+                    'alias' => 'usuarios',
+                    'titulo' => 'Usuarios'
+                ],
+                [
+                    'alias' => 'roles',
+                    'titulo' => 'Roles'
+                ],
+            ];
+
+            $this->header();
+            $this->sidebar();
+            echo view('admin/newroles', $this->data);
+            $this->footer();
+        }
+    }
+
+    public function update_roles($id) {
+
+        $this->valtoken();
+        $view = true;
+        $token = $this->request->getCookie("token");
+
+        if ($this->request->getGetPost()) {
+
+            $requestData = array_merge($this->request->getGetPost(), ["token" => $token]); // en una variable tengo que guardar el merge 
+
+            // debug($requestData);
+            $update_roles = json_decode(send_post($this->urlAPI . "update/roles/" . $id, $requestData)); // envio directamente la variable que tiene todo ya concatenado
+            // $update_roles = send_post($this->urlAPI . "update/roles/" . $id, $requestData); // envio directamente la variable que tiene todo ya concatenado
+            // json_debug($update_roles);
+            if (isset($update_roles->error)) {
+                $this->data['error'] = $update_roles->error;
+            } else {
+                $this->data['success'] = "Informacion de roles modificada exitosamente";
+                $this->get_roles();
+                $view = false;
+            }
+            // debug($update_roles, false);
+
+        }
+
+        if ($view) {
+
+            $token = $this->request->getCookie("token");
+
+            $this->data['roles'] = [];
+            $roles = json_decode(send_post($this->urlAPI . "roles/" . $id, ["token" => $token]));
+            // debug($roles);
+            if (isset($roles->error)) {
+                $this->data['error'] = $roles->error;
+            } else {
+                $this->data['roles'] = $roles;
+            }
+
+            $this->header();
+            $this->sidebar();
+            echo view('admin/edit-roles');
+            $this->footer();
+        }
+    }
+
+    public function delete_roles($id) {
+        // $this->valtoken();
+        $token = $this->request->getCookie("token");
+
+        // $this->data = [];
+        if ($id) {
+            $requestData = ["token" => $token]; // Datos para enviar a la API
+            $delete_roles = json_decode(send_post($this->urlAPI . "delete/roles/" . $id, $requestData));
+
+            if (isset($delete_roles->error)) {
+                $this->data['error'] = $delete_roles->error;
+            } else {
+                // El proyecto se eliminó exitosamente
+                $this->data['success'] = "Informacion de roles eliminada exitosamente";
+            }
+        }
+        $this->get_roles();
+    }
+
+    // FIN CRUD ROLES
+
     private function valtoken() {
         $this->token = $this->request->getCookie("token");
         if (!$this->token) {
@@ -2131,15 +2497,17 @@ class Admin extends BaseController {
             exit();
         } else {
             $this->user = $checkToken;
-            // debug($this->user['token']);
-
+            // debug($this->user);
             $checkPerfil = json_decode(send_post($this->urlAPI . "perfil", ["token" => $this->token]));
             // debug(send_post($this->urlAPI . "perfil", ["token" => $token]));
             // debug($checkPerfil);
             if (!isset($checkPerfil->error)) {
                 $this->user->informacion = $checkPerfil;
+                // debug($this->user->informacion);
             }
         }
+
+
         // debug($checkToken);
     }
 

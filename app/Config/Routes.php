@@ -11,10 +11,7 @@ $routes->match(['get', 'post'], 'single-blog/(:segment)', 'Web::single_blog/$1')
 $routes->get('pages-404', 'Web::pages_404');
 
 
-
-$routes->get('/test', 'Web::test'); // ruta de pruebas
-
-
+$routes->get('/test', 'Api::test'); // ruta de pruebas
 
 // rutas administrador
 
@@ -56,6 +53,8 @@ $routes->group('admin', function ($routes) {
         'blog',
         'blogCat',
         'blogComm',
+        'usuarios',
+        'roles',
         
     ];
     foreach ($entitySegments as $entitySegment) {
@@ -77,10 +76,12 @@ $routes->group('admin', function ($routes) {
 });
 
 $routes->group('api', function ($routes) {
+
         //metodos que acepta        //ruta(url navegador) //function(controlador)
+    // $routes->match(['get', 'post'], 'index', 'Api::index');
     $routes->match(['get', 'post'], 'register', 'Api::register');
     $routes->match(['get', 'post'], 'login', 'Api::login');
-    $routes->match(['get', 'post'], 'checktoken', 'Api::checkToken');
+    $routes->match(['get', 'post'], 'checktoken', 'Api::checktoken');
     $routes->match(['get', 'post'], 'mailing', 'Api::mailing');
     $routes->match(['get', 'post'], 'delete/img', 'Api::delete_img');
     $routes->match(['get', 'post'], 'bgimg/(:segment)/(:segment)', 'Api::bgimg/$1/$2');
@@ -105,6 +106,8 @@ $routes->group('api', function ($routes) {
         'blogCat',
         'blogComm',
         'blogComm2',
+        'usuarios',
+        'roles',
 
     ];
 

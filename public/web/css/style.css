@@ -658,6 +658,7 @@ Main Banner Area CSS
   border-radius: 50%;
   background: rgba(0, 0, 0, 0.3);
   font-size: 14px;
+  align-content: center;
 }
 
 .main-banner-text ul li a:hover {
