@@ -5,14 +5,14 @@
     <div class="logo-box">
         <!-- Brand Logo Light -->
         <a class='logo-light' href='/admin/'>
-            <img src="assets/images/logo-light.png" alt="logo" class="logo-lg" height="28">
-            <img src="assets/images/logo-sm.png" alt="small logo" class="logo-sm" height="28">
+            <!-- <img src="assets/images/logo-light.png" alt="logo" class="logo-lg" height="28"> -->
+            <!-- <img src="assets/images/logo-sm.png" alt="small logo" class="logo-sm" height="28"> -->
         </a>
 
         <!-- Brand Logo Dark -->
         <a class='logo-dark' href='/admin/'>
-            <img src="assets/images/logo-dark.png" alt="dark logo" class="logo-lg" height="28">
-            <img src="assets/images/logo-sm.png" alt="small logo" class="logo-sm" height="28">
+            <!-- <img src="assets/images/logo-dark.png" alt="dark logo" class="logo-lg" height="28"> -->
+            <!-- <img src="assets/images/logo-sm.png" alt="small logo" class="logo-sm" height="28"> -->
         </a>
     </div>
 
