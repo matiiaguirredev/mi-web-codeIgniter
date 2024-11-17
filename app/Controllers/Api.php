@@ -48,8 +48,10 @@ class Api extends BaseController {
     }
 
     public function index() {
-        $this->valToken();
-        json_debug($this->user);
+        // $this->valToken();
+        // json_debug($this->user);
+        echo view('admin/pages-404');
+
     }
 
     public function register() {
@@ -219,7 +221,7 @@ class Api extends BaseController {
             // custom_error(502, $this->lang); esta comentado por el momento para que no expire el tiempo
         }
 
-        $query = $this->db->query("SELECT usuarios.*, roles.nombre FROM usuarios, roles WHERE usuarios.role_id = roles.id AND usuarios.id = '$valtoken->id'");
+        $query = $this->db->query("SELECT usuarios.*, roles.nombre, roles.ver, roles.crear, roles.editar, roles.borrar FROM usuarios, roles WHERE usuarios.role_id = roles.id AND usuarios.id = '$valtoken->id'");
         $checkUser = $query->getResult(); // los datos del usuario
 
         if (!$checkUser) {
@@ -435,8 +437,6 @@ class Api extends BaseController {
         if (!$insert) {
             custom_error(204, $this->lang);
         }
-
-
 
         $id = $this->db->insertID(); // ultimo identificador insertado !
 
@@ -2907,8 +2907,10 @@ class Api extends BaseController {
 
         $query .= " AND usuarios.role_id = roles.id AND usuarios.id <> 1 ORDER BY `usuarios`.`id` ASC";
 
-        // json_debug($query);
+        // devuelve esto
+        // SELECT usuarios.*, roles.nombre AS role_nombre FROM `usuarios`, roles WHERE 1=1 AND usuarios.role_id = roles.id AND usuarios.id <> 1 ORDER BY `usuarios`.`id` ASC
 
+        // json_debug($query);
 
         // $query = "SELECT usuarios.*, roles.nombre FROM usuarios INNER JOIN roles ON usuarios.role_id = roles.id WHERE usuarios.id <> 1";
         // if ($id) { // Esto se utiliza para consultar un usuario específico
@@ -3864,168 +3866,4 @@ class Api extends BaseController {
     //     echo "</table>";
     // }
 
-    public function test() {
-        // Suma de Dos Números:
-        // Escribe un programa que tome dos números enteros como entrada y muestre la suma de ambos.
-
-        // $n1 = 2;
-        // $n2 = 4;
-        // $resut = $n1 + $n2;
-        // echo $resut;
-
-        // Número Par o Impar:
-        // Escribe un programa que determine si un número ingresado por el usuario es par o impar.
-
-        // $n = 1755;
-        // if ($n % 2 == 0) {
-        //     echo "El numero es par";
-        // } else {
-        //     echo "El numero es impar";
-        // }
-
-        // Mayor de Dos Números:
-        // Escribe un programa que reciba dos números y muestre cuál es el mayor de ellos. Si son iguales, muestra un mensaje que indique que ambos son iguales.
-
-        // $n1 = 56890;
-        // $n2 = 56890;
-        // if ($n1 > $n2) {
-        //     echo $n1;
-        // }else if ($n1 < $n2) {
-        //     echo $n2;
-        // }else {
-        //     echo "$n1 y $n2 son iguales";
-        // }
-
-        // Descuento en una Tienda:
-        // Escribe un programa que calcule el precio final de un producto después de aplicar un descuento del 10% si el precio original es mayor a $100.
-
-        // $precio = 115;
-        // $desc = 10;
-        // $preciocondescuento = $precio * $desc / 100;
-        // $ultimoprecio = $precio - $preciocondescuento;
-
-        // if($ultimoprecio >= 100){
-        //     echo "El producto costo: $" . $ultimoprecio . " se incluye un descuento del 10%, por lo cual el precio real del producto era $$precio";
-        // } 
-
-        // Nivel 2: Estructuras de Control y Bucles
-
-        // Tabla de Multiplicar:
-        // Escribe un programa que genere la tabla de multiplicar de un número ingresado por el usuario, desde el 1 hasta el 10.
-
-        // $n = 6;
-        // for ($i=1; $i <= 10; $i++) { 
-        //     echo "<br>" . $i * $n ;
-        // }
-
-        // Suma de Números del 1 al 100:
-        // Escribe un programa que calcule la suma de todos los números enteros del 1 al 100 usando un bucle for.
-        // $suma = 0;
-        // for ($i=1; $i <= 100 ; $i++) { 
-        //     $suma += $i;
-        // }
-        // echo "del 1 al 100 da: " . $suma;
-
-        // Factorial de un Número:
-        // Escribe un programa que calcule el factorial de un número ingresado por el usuario utilizando un bucle while.
-
-        // $n = 17;
-        // $factorial = 1;
-        // $i = 1;
-        // echo "Cálculo del factorial de $n:<br><br>";
-
-        // while ($i <= $n) {
-        //     // Mostramos el estado actual antes del cálculo
-        //     // echo "Paso $i: factorial = $factorial * $i<br><br>";
-
-        //     // Calculamos el nuevo valor del factorial
-        //     $factorial = $factorial * $i;
-
-        //     // Mostramos el resultado después del cálculo
-        //     // echo "Resultado después del paso $i: $factorial<br>";
-
-        //     // Incrementamos la variable del bucle
-        //     $i++;
-        // }
-
-        // // Mostramos el resultado final
-        // echo "El factorial de $n es: " . $factorial;
-
-        // Contar Números Positivos, Negativos y Ceros:
-        // Escribe un programa que permita al usuario ingresar 10 números. El programa debe contar y mostrar cuántos de esos números son positivos, 
-        // cuántos son negativos y cuántos son ceros.
-
-        // $numeros = [-12, 7, 0, -5, 14, -8, 3, -1, 22, -6, 9, -4, 15, 0, -3, 8, -7, 11, -2, 20];
-        // $pos = 0;
-        // $neg = 0;
-        // $cero = 0;
-
-        // for ($i = 0; $i < count($numeros); $i++) {
-        //     $numero = $numeros[$i];
-        //     if ($numero > 0) {
-        //         $pos++;
-        //     } elseif ($numero < 0) {
-        //         $neg++;
-        //     } else {
-        //         $cero++;
-        //     }
-        // }
-
-        // while ($i < count($numeros)) {
-        //     $numero = $numeros[$i];
-        //     if ($numero > 0) {
-        //         $pos ++;
-        //     } elseif ($numero < 0) {
-        //         $neg ++;
-        //     } else {
-        //         $cero++;
-        //     }
-
-        //     $i++;
-        // }
-
-        // foreach ($numeros as $key => $value) {
-        //     if ($value > 0) {
-        //         $pos++;
-        //     } elseif ($value < 0) {
-        //         $neg++;
-        //     } else {
-        //         $cero++;
-        //     }
-        // }
-        // echo "Hay: $pos numeros positivos <br>";
-        // echo "Hay: $neg numeros negativos <br>";
-        // echo "Hay: $cero numeros 0 <br>";
-
-
-        // Nivel 3: Estructuras de Control Anidadas y Arreglos
-
-        // Números Primos en un Rango:
-        // Escribe un programa que encuentre y muestre todos los números primos entre 1 y 100.
-
-        // function esPrimo($numero){
-        //     //arrancamos en 2 por que el 1 es dividendo por el mismo y el anterior a su numero por que es lo mismo.
-        //     for ($i=2; $i < $numero ; $i++) { 
-        //         if($numero % $i == 0){
-        //             return false;
-        //         }
-        //     }
-        //     return true;
-        // }
-
-        // $vari = [];
-        // for ($i=1; $i < 100 ; $i++) { 
-        //     $primo = esPrimo($i);
-        //     if($primo){
-        //         $vari[] = [
-        //             "numero" => $i,
-        //             "esPrimo" => $primo
-        //         ];
-        //     }
-        // }
-
-        // json_debug($vari);
-
-
-    }
 }

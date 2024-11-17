@@ -1,4 +1,3 @@
-
 <!-- ========== Left Sidebar ========== -->
 <div class="main-menu">
     <!-- Brand Logo -->
@@ -54,7 +53,7 @@
                     </div>
                 </li> -->
 
-            
+
             <li class="menu-item">
                 <a href="#menuRoles" data-bs-toggle="collapse" class="menu-link waves-effect waves-light">
                     <span class="menu-icon"><i class="fa-solid fa-pen-ruler"></i></span>
@@ -134,11 +133,13 @@
                                 <span class="menu-text">Lista de Proyectos</span>
                             </a>
                         </li>
-                        <li class="menu-item">
-                            <a class='menu-link' href='/admin/create/proyect'>
-                                <span class="menu-text">Nuevo Proyecto</span>
-                            </a>
-                        </li>
+                        <?php if (isset($can_manage) && $can_manage): ?>
+                            <li class="menu-item">
+                                <a class='menu-link' href='/admin/create/proyect'>
+                                    <span class="menu-text">Nuevo Proyecto</span>
+                                </a>
+                            </li>
+                        <?php endif; ?>
                     </ul>
                     <!-- <div class="collapse" id="menuProyects"></div> -->
                     <ul class="sub-menu">

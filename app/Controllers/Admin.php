@@ -10,12 +10,40 @@ class Admin extends BaseController {
     private $user = null;
     private $data = null;
     private $token = null;
+    private $rolesAllowed = [];
 
     public function __construct() {
 
         $this->db = \Config\Database::connect();
         $this->key = getenv('KEYENCRIPT');
         $this->data = [];
+
+        $this->rolesAllowed = [
+            'Root' => getenv("ROLE_ID_Root"),
+            'Administrador' => getenv("ROLE_ID_Administrador"),
+            'UsuarioEstandar' => getenv("ROLE_ID_UsuarioEstandar"),
+
+        ];
+
+        // $this->rolesAllowed = [
+        //     'consultar' =>[
+        //         'proyect' => [
+        //             'Root' => '',
+        //             'Administrador' => getenv("ROLE_ID_Administrador"),
+        //             'UsuarioEstandar' => getenv("ROLE_ID_UsuarioEstandar"),
+        //         ]
+
+        //     ],
+        //     'crear' => [
+
+        //     ],
+        //     'editar'=>[
+
+        //     ],
+        //     'eliminar' =>[
+
+        //     ],
+        // ];
     }
 
     public function login($var = true) {
@@ -34,7 +62,6 @@ class Admin extends BaseController {
                 exit();
             }
         }
-
 
         $this->header();
         // echo view('admin/login', $this->data);
@@ -65,6 +92,8 @@ class Admin extends BaseController {
     }
 
     private function sidebar() {
+
+        $this->data['can_manage'] = ($this->user->role_id == $this->rolesAllowed['Root']);
         echo view('admin/sidebar', $this->data);
         // debug($this->data);
     }
@@ -217,6 +246,16 @@ class Admin extends BaseController {
         $this->valtoken();
         $view = true;
 
+        // Roles permitidos para ver esta funcionalidad
+        if ($this->user->role_id != $this->rolesAllowed['Root']) {
+            $this->data['error'] = 'No tienes los permisos necesarios.';
+            $this->header();
+            $this->sidebar();
+            echo view('/admin/index', $this->data);
+            $this->footer();
+            exit;
+        }
+
         // debug($this->request->getGetPost(), false);
 
         if ($this->request->getGetPost()) {
@@ -229,6 +268,7 @@ class Admin extends BaseController {
                     $requestData[$k] = curl_file_create($v['tmp_name'], $v['type'], basename($v['name']));
                 }
             }
+
 
             $create_proyect = json_decode(send_post($this->urlAPI . "create/proyect", $requestData)); // envio directamente la variable que tiene todo ya concatenado
             // debug($create_proyect, false);
@@ -2301,13 +2341,13 @@ class Admin extends BaseController {
         $token = $this->request->getCookie("token");
         $view = true;
         if ($this->request->getGetPost()) {
-            
+
             // debug($this->request->getGetPost(), false);
             $requestData = array_merge($this->request->getGetPost(), ["token" => $token]); // en una variable tengo que guardar el merge 
             // debug($requestData, false);
             foreach ($requestData as $key => $value) {
                 if (is_array($value)) {
-                    $requestData[$key] = implode(',' , $value);
+                    $requestData[$key] = implode(',', $value);
                 }
             }
             // debug($requestData);
@@ -2506,7 +2546,6 @@ class Admin extends BaseController {
                 // debug($this->user->informacion);
             }
         }
-
 
         // debug($checkToken);
     }

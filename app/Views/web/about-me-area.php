@@ -47,6 +47,7 @@
                     <?php if (count($hobies) > 0) { ?>
                         <div class="col-lg-12 col-md-12 prueba">
                             <div class="hobbies-interest">
+
                                 <h3 class="title"><?= $titulos ?></h3>
                                 <div class="row">
                                     <?php foreach ($hobies as $key => $hobie) { ?>

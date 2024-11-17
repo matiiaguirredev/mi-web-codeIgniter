@@ -5,7 +5,7 @@
     <?php /* debug($perfil, false); */ ?> 
     <style>
         .main-banner {
-            background-image: url(<?= $perfil->img_fondo ?>);
+            background-image: url(<?= $perfil->img_fondo; ?>);
         }
     </style>
     <div class="parallax-home"></div>

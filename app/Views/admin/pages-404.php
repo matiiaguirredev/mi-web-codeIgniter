@@ -22,11 +22,11 @@
                     <div class="card-body p-4">
 
                         <div class="text-center w-75 mx-auto auth-logo mb-4">
-                            <a class="logo-dark" href="/dashtrap/">
+                            <a class="logo-dark" href="/admin/">
                                 <span><img src="assets/images/logo-dark.png" alt="" height="22"></span>
                             </a>
 
-                            <a class="logo-light" href="/dashtrap/">
+                            <a class="logo-light" href="/admin/">
                                 <span><img src="assets/images/logo-light.png" alt="" height="22"></span>
                             </a>
                         </div>
@@ -39,7 +39,7 @@
 
                         <p class="text-muted text-center mt-3"> It's looking like you may have taken a wrong turn. Don't worry... it happens to the best of us. You might want to check your internet connection. </p>
                         <div class="mt-4 text-center">
-                            <a class="btn btn-primary w-100" href="/dashtrap/">Back to Home</a>
+                            <a class="btn btn-primary w-100" href="/admin/">Back to Home</a>
                         </div>
 
                     </div> <!-- end card-body -->
