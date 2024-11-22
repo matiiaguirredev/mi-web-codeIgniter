@@ -1283,20 +1283,20 @@ $(document).on("click", ".showdescrip", function (e) {
     Swal.fire({ title: $(this).data("description") });
 });
 
+
 // VERIFICACIONES DE CLASE IMG PARA AGREGADO DE BTN
 // console.log("cantidad", $(".input-group-text").length );
 if ($(".input-group-text").length > 0) {
-
-    $(".input-group-text").each(function () { // recorremos cada una de la que exista con la correspondiente url
-        var img = $(this).attr("href"); // con el atributo href obtnemos la url de la clase
-        // console.log("imagen", img);
-        if (img) {
+    $(".input-group-text").each(function () { // Recorremos cada una de las que existen con la correspondiente URL
+        var img = $(this).attr("href"); // Obtenemos la URL del atributo href
+        // Verificamos si el elemento tiene la clase "delete"
+        if (img && !$(this).hasClass("delete")) {
             var html = `
             <button class="btn btn-outline-secondary del-img" type="button" data-img="${img}">
                 <i class="fa fa-trash"></i>
             </button>
             `;
-            $(this).parent().append(html);
+            $(this).parent().append(html); // Añadimos el botón solo si no tiene la clase "delete"
         }
     });
 }
@@ -1398,6 +1398,81 @@ $(document).on("click", ".del-img", function (e) {
         }
     });
 });
+
+
+if ($(".delete").length > 0) {
+    $(".delete").each(function () { // Recorremos cada uno de los elementos con la clase delete
+        var img = $(this).attr("href"); // Obtenemos la URL del atributo href
+        // Verificamos si el enlace tiene la clase "delete" (que es nuestra clase de referencia)
+        if (img) {
+            var html = `
+            <button class="btn btn-outline-secondary del-perfil-img" type="button" data-img="${img}">
+                <i class="fa fa-trash"></i>
+            </button>
+            `;
+            $(this).parent().append(html); // Añadimos el botón con la clase del-perfil-img
+        }
+    });
+}
+
+$(document).on("click", ".del-perfil-img", function (e) {
+    e.preventDefault(); // Evitar la acción por defecto
+
+    var ruta = $(this).data("img"); // Obtener la URL de la imagen del botón
+    console.log("Ruta de la imagen:", ruta);
+
+    Swal.fire({
+        title: '¿Estás seguro?',
+        text: '¡No podrás revertir esto!',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Sí, eliminarlo',
+        cancelButtonText: 'Cancelar'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            // Enviar datos al API mediante AJAX
+            $.ajax({
+                url: "http://mi-web/api/delete/img/perfil", // Ruta del API
+                type: "POST",
+                data: {
+                    ruta: ruta, // URL de la imagen
+                },
+                success: function (response) {
+                    console.log('Respuesta del servidor:', response);
+                    Swal.fire(
+                        '¡Eliminado!',
+                        'Tu archivo ha sido eliminado.',
+                        'success'
+                    );
+                },
+                error: function (xhr, status, error) {
+                    console.error('Error en la solicitud AJAX:', error);
+                    Swal.fire(
+                        'Abortado',
+                        'El servidor no pudo eliminar el archivo',
+                        'error'
+                    );
+                }
+            });
+
+        } else if (result.dismiss === Swal.DismissReason.cancel) {
+            Swal.fire(
+                'Cancelado',
+                'Tu archivo está a salvo :)',
+                'error'
+            );
+        }
+    });
+});
+
+
+
+
+
+
+
 
 tinymce.init({
         selector: '#content',

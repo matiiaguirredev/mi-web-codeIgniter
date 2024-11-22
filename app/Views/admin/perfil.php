@@ -94,7 +94,7 @@
                             <div class="col-6 mb-2">
                                 <label class="mb-2" for="example-fileinput">Foto de perfil</label>
                                 <div class="col input-group">
-                                    <a href="<?= $user->informacion->img; ?>" target="_blank" class="input-group-text" id="basic-addon1"><i class="fa-sharp fa-solid fa-image"></i></a>
+                                    <a href="<?= $user->informacion->img; ?>" target="_blank" class="input-group-text delete" id="basic-addon1"><i class="fa-sharp fa-solid fa-image"></i></a>
                                     <input multiple type="file" name="img" class="form-control" id="example-fileinput" value="<?= $user->informacion->img; ?>">
                                 </div>
                             </div>
@@ -102,7 +102,7 @@
                             <div class="col-6 mb-2">
                                 <label class="mb-2" for="example-fileinput">Fondo del perfil</label>
                                 <div class="col input-group">
-                                    <a href="<?= $user->informacion->img_fondo; ?>" target="_blank" class="input-group-text" id="basic-addon1"><i class="fa-sharp fa-solid fa-image"></i></a>
+                                    <a href="<?= $user->informacion->img_fondo; ?>" target="_blank" class="input-group-text delete" id="basic-addon1"><i class="fa-sharp fa-solid fa-image"></i></a>
                                     <input multiple type="file" name="img_fondo" class="form-control" id="example-fileinput" value="<?= $user->informacion->img_fondo; ?>">
                                 </div>
                             </div>

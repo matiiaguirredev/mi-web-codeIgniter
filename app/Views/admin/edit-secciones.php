@@ -95,7 +95,7 @@
 
                                         
 
-                                        <div class="mb-2 row">
+                                        <?php /*<div class="mb-2 row">
                                             <label class="col-md-2 col-form-label" for="simpleinput">Orden</label>
                                             <div class="col-md-10">
                                                 <select class="form-control" name="orden" id="" require>
@@ -103,6 +103,19 @@
                                                         <option value="<?= $key + 1 ?>" <?= ($seccion->orden == ($key + 1)) ? 'selected' : ''; ?>> <?= $key + 1 ?> </option>
                                                     <?php }  ?>
                                                     <option value="<?= count($secciones) + 1 ?>"><?= count($secciones) + 1 ?></option>
+                                                </select>
+                                            </div>
+                                        </div> aca tienen todos ese +1 cuando en realidad si vas a editar no puede existir una seccion no creada. 
+                                        */ ?>
+
+                                        <div class="mb-2 row">
+                                            <label class="col-md-2 col-form-label" for="simpleinput">Orden</label>
+                                            <div class="col-md-10">
+                                                <select class="form-control" name="orden" id="" require>
+                                                    <?php foreach ($secciones as $key => $value) { ?>
+                                                        <option value="<?= $key ?>" <?= ($seccion->orden == ($key)) ? 'selected' : ''; ?>> <?= $key ?> </option>
+                                                    <?php }  ?>
+                                                    <option value="<?= count($secciones) ?>"><?= count($secciones) ?></option>
                                                 </select>
                                             </div>
                                         </div>

@@ -51,7 +51,6 @@ class Api extends BaseController {
         // $this->valToken();
         // json_debug($this->user);
         echo view('admin/pages-404');
-
     }
 
     public function register() {
@@ -3294,25 +3293,11 @@ class Api extends BaseController {
     }
 
     public function delete_img() {
-        // $postData = $_POST;
-        // $getData = $_GET;
-        // $requestData = $_REQUEST;
-        // $fileData = $_FILES;
-
-        // // Para debuggear los datos recibidos
-        // json_debug([
-        //     "post" => $postData,
-        //     "get" => $getData,
-        //     "request" => $requestData,
-        //     "file" => $fileData
-        // ]);
 
         // Procesar los datos según sea necesario
-
         $require = [
             "seccion" => "text",
             "id" => "number",
-
         ];
 
         $valRequire = [];
@@ -3333,7 +3318,6 @@ class Api extends BaseController {
         // $funcion = $this->request->getGetPost("funcion");
         $seccion = $req["seccion"];
         $id = $req["id"];
-        // $ruta = $this->request->getGetPost("ruta"); ya no lo usamos
 
         $query = "SELECT * FROM $seccion WHERE id = '$id'";
         // debug($query);
@@ -3389,6 +3373,74 @@ class Api extends BaseController {
         }
 
         json_debug(array_merge((array)$datos, $data));
+    }
+
+    public function delete_img_perfil() {
+        // Obtener la ruta completa de la imagen enviada por el cliente
+        $rutaCompleta = $this->request->getPost('ruta');
+        
+        // Validación sencilla para asegurar que la ruta esté presente
+        if (!$rutaCompleta) {
+            return json_debug(['error' => 'La ruta de la imagen es requerida.'], 400);
+        }
+    
+        // Extraer el nombre del archivo desde la ruta completa (obtenemos solo el nombre de la imagen)
+        $nombreArchivo = basename($rutaCompleta);
+    
+        // Tabla de perfil y columnas a procesar (solo las imágenes relacionadas con el perfil)
+        $tabla = 'perfil';
+        $columnas = ['img', 'img_fondo'];
+    
+        // Buscar en la base de datos si alguna de las columnas tiene este nombre de archivo
+        $query = $this->db->table($tabla)
+            ->groupStart()
+            ->whereIn($columnas[0], [$nombreArchivo]) // Verifica si el nombre coincide con 'img'
+            ->orWhereIn($columnas[1], [$nombreArchivo]) // Verifica si el nombre coincide con 'img_fondo'
+            ->groupEnd()
+            ->get();
+    
+        // Comprobamos si se encontró algún registro
+        $registro = $query->getRow();
+    
+        if (!$registro) {
+            return json_debug(['error' => 'La imagen no está registrada en la base de datos.'], 404);
+        }
+    
+        // Determinar qué columna corresponde al archivo a eliminar
+        $columnaAActualizar = null;
+        if ($registro->{$columnas[0]} === $nombreArchivo) {
+            $columnaAActualizar = $columnas[0]; // La imagen corresponde a 'img'
+        } elseif ($registro->{$columnas[1]} === $nombreArchivo) {
+            $columnaAActualizar = $columnas[1]; // La imagen corresponde a 'img_fondo'
+        }
+    
+        if (!$columnaAActualizar) {
+            return json_debug(['error' => 'No se pudo determinar la columna de la imagen.'], 500);
+        }
+    
+        // Eliminar la referencia en la base de datos (actualizamos la columna con NULL)
+        $actualizacion = $this->db->table($tabla)
+            ->where('id', $registro->id)
+            ->update([$columnaAActualizar => null]);
+    
+        if (!$actualizacion) {
+            return json_debug(['error' => 'No se pudo actualizar la base de datos.'], 500);
+        }
+    
+        // Construir la ruta completa del archivo en el servidor
+        $rutaServidor = FCPATH . 'assets/images/perfil/' . $nombreArchivo;
+    
+        // Verificar que el archivo exista en el servidor
+        if (!file_exists($rutaServidor)) {
+            return json_debug(['warning' => 'El archivo no existe en el servidor, pero la base de datos fue actualizada.'], 200);
+        }
+    
+        // Intentar eliminar el archivo del servidor
+        if (unlink($rutaServidor)) {
+            return json_debug(['success' => 'Imagen eliminada correctamente.'], 200);
+        } else {
+            return json_debug(['error' => 'La base de datos se actualizó, pero no se pudo eliminar el archivo.'], 500);
+        }
     }
 
     public function bgimg($width, $height, $color = '808080') {

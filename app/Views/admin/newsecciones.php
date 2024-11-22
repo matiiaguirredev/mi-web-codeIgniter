@@ -87,22 +87,6 @@
                                                 </div>
                                             </div>
 
-                                            <!-- <div class="mb-2 row">
-                                            <label class="col-md-2 col-form-label" for="simpleinput">Categoria</label>
-                                            <div class="col-md-10">
-                                                <select class="form-control" name="alias" id="" require>
-                                                    <option value="">Selecciona una seccion</option>
-                                                    <option value="acerca">Acerca de mi (1)</option>
-                                                    <option value="servicios">Servicios (2)</option>
-                                                    <option value="clientes">Clientes felices (3)</option>
-                                                    <option value="exp">Expiencia (4)</option>
-                                                    <option value="proyectos">Proyectos (5)</option>
-                                                    <option value="contratame">Contrátame (6)</option>
-                                                    <option value="contactame">Contáctame (7)</option>
-                                                </select>
-                                            </div>
-                                        </div> -->
-
                                             <div class="mb-2 row">
                                                 <label class="col-md-2 col-form-label" for="simpleinput">Orden</label>
                                                 <div class="col-md-10">

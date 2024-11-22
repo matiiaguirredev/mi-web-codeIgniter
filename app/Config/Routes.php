@@ -84,6 +84,7 @@ $routes->group('api', function ($routes) {
     $routes->match(['get', 'post'], 'checktoken', 'Api::checktoken');
     $routes->match(['get', 'post'], 'mailing', 'Api::mailing');
     $routes->match(['get', 'post'], 'delete/img', 'Api::delete_img');
+    $routes->match(['get', 'post'], 'delete/img/perfil', 'Api::delete_img_perfil');
     $routes->match(['get', 'post'], 'bgimg/(:segment)/(:segment)', 'Api::bgimg/$1/$2');
     $routes->get('/', 'Api::index');
 

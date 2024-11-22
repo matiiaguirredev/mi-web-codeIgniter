@@ -2194,10 +2194,8 @@ class Admin extends BaseController {
         if ($this->request->getGetPost()) {
             $token = $this->request->getCookie("token");
             $requestData = array_merge($this->request->getGetPost(), ["token" => $token]); // en una variable tengo que guardar el merge 
-            // debug($this->request->getGetPost());
 
             $create_usuarios = json_decode(send_post($this->urlAPI . "create/usuarios", $requestData)); // envio directamente la variable que tiene todo ya concatenado
-            // debug($create_usuarios);
             if (isset($create_usuarios->error)) {
                 $this->data['error'] = $create_usuarios->error;
             } else {
@@ -2205,7 +2203,6 @@ class Admin extends BaseController {
                 $this->get_usuarios();
                 $view = false;
             }
-            // debug($create_usuarios);
         }
 
         if ($view) {
@@ -2246,10 +2243,7 @@ class Admin extends BaseController {
 
             $requestData = array_merge($this->request->getGetPost(), ["token" => $token]); // en una variable tengo que guardar el merge 
 
-            // debug($requestData);
             $update_usuarios = json_decode(send_post($this->urlAPI . "update/usuarios/" . $id, $requestData)); // envio directamente la variable que tiene todo ya concatenado
-            // $update_usuarios = send_post($this->urlAPI . "update/usuarios/" . $id, $requestData); // envio directamente la variable que tiene todo ya concatenado
-            // json_debug($update_usuarios);
             if (isset($update_usuarios->error)) {
                 $this->data['error'] = $update_usuarios->error;
             } else {
@@ -2257,8 +2251,6 @@ class Admin extends BaseController {
                 $this->get_usuarios();
                 $view = false;
             }
-            // debug($update_usuarios, false);
-
         }
 
         if ($view) {
@@ -2342,19 +2334,18 @@ class Admin extends BaseController {
         $view = true;
         if ($this->request->getGetPost()) {
 
-            // debug($this->request->getGetPost(), false);
             $requestData = array_merge($this->request->getGetPost(), ["token" => $token]); // en una variable tengo que guardar el merge 
-            // debug($requestData, false);
-            foreach ($requestData as $key => $value) {
-                if (is_array($value)) {
-                    $requestData[$key] = implode(',', $value);
+
+            // Procesar todas las acciones (ver, crear, editar, borrar)
+            $actions = ['ver', 'crear', 'editar', 'borrar'];
+            foreach ($actions as $action) {
+                if (isset($requestData[$action]) && is_array($requestData[$action])) {
+                    // Convierte arrays en cadenas separadas por comas
+                    $requestData[$action] = implode(',', $requestData[$action]);
                 }
             }
-            // debug($requestData);
-
 
             $create_roles = json_decode(send_post($this->urlAPI . "create/roles", $requestData)); // envio directamente la variable que tiene todo ya concatenado
-            // debug($create_roles, false);
             if (isset($create_roles->error)) {
                 $this->data['error'] = $create_roles->error;
             } else {
@@ -2362,7 +2353,6 @@ class Admin extends BaseController {
                 $this->get_roles();
                 $view = false;
             }
-            // debug($create_roles);
         }
 
         if ($view) {
@@ -2458,49 +2448,155 @@ class Admin extends BaseController {
     }
 
     public function update_roles($id) {
-
         $this->valtoken();
         $view = true;
         $token = $this->request->getCookie("token");
 
+        // Proceso de actualización
         if ($this->request->getGetPost()) {
+            $requestData = array_merge($this->request->getGetPost(), ["token" => $token]);
 
-            $requestData = array_merge($this->request->getGetPost(), ["token" => $token]); // en una variable tengo que guardar el merge 
+            // Procesar todas las acciones (ver, crear, editar, borrar)
+            $actions = ['ver', 'crear', 'editar', 'borrar'];
+            foreach ($actions as $action) {
+                if (isset($requestData[$action]) && is_array($requestData[$action])) {
+                    $requestData[$action] = implode(',', $requestData[$action]);
+                }
+            }
 
-            // debug($requestData);
-            $update_roles = json_decode(send_post($this->urlAPI . "update/roles/" . $id, $requestData)); // envio directamente la variable que tiene todo ya concatenado
-            // $update_roles = send_post($this->urlAPI . "update/roles/" . $id, $requestData); // envio directamente la variable que tiene todo ya concatenado
-            // json_debug($update_roles);
+            $update_roles = json_decode(send_post($this->urlAPI . "update/roles/" . $id, $requestData));
             if (isset($update_roles->error)) {
                 $this->data['error'] = $update_roles->error;
             } else {
-                $this->data['success'] = "Informacion de roles modificada exitosamente";
+                $this->data['success'] = "Información de roles modificada exitosamente";
                 $this->get_roles();
                 $view = false;
             }
-            // debug($update_roles, false);
-
         }
 
+        // Renderizar vista de edición
         if ($view) {
-
-            $token = $this->request->getCookie("token");
-
             $this->data['roles'] = [];
             $roles = json_decode(send_post($this->urlAPI . "roles/" . $id, ["token" => $token]));
-            // debug($roles);
+
             if (isset($roles->error)) {
                 $this->data['error'] = $roles->error;
             } else {
-                $this->data['roles'] = $roles;
+                $this->data['roles'] = $roles; // Datos recuperados del rol
+
+                // Convertir las cadenas separadas por comas en arrays para cada acción
+                $actions = ['ver', 'crear', 'editar', 'borrar'];
+                foreach ($actions as $action) {
+                    if (isset($roles->$action)) {
+                        $this->data[$action] = explode(',', $roles->$action);
+                    } else {
+                        $this->data[$action] = []; // Si no está definido, asigna un array vacío
+                    }
+                }
             }
 
+            // Opciones disponibles para el select
+            $this->data['secciones'] = [
+                [
+                    'alias' => 'proyect',
+                    'titulo' => 'Proyectos'
+                ],
+                [
+                    'alias' => 'lenguaje',
+                    'titulo' => 'Lenguaje'
+                ],
+                [
+                    'alias' => 'redes',
+                    'titulo' => 'Redes'
+                ],
+                [
+                    'alias' => 'categorias',
+                    'titulo' => 'Categorías'
+                ],
+                [
+                    'alias' => 'servicios',
+                    'titulo' => 'Servicios'
+                ],
+                [
+                    'alias' => 'curriculum',
+                    'titulo' => 'Currículum'
+                ],
+                [
+                    'alias' => 'perfil',
+                    'titulo' => 'Perfil'
+                ],
+                [
+                    'alias' => 'hobies',
+                    'titulo' => 'Hobbies'
+                ],
+                [
+                    'alias' => 'contacto',
+                    'titulo' => 'Contacto'
+                ],
+                [
+                    'alias' => 'secciones',
+                    'titulo' => 'Secciones'
+                ],
+                [
+                    'alias' => 'navbar',
+                    'titulo' => 'Navbar'
+                ],
+                [
+                    'alias' => 'txtbanner',
+                    'titulo' => 'Texto Banner'
+                ],
+                [
+                    'alias' => 'clientes',
+                    'titulo' => 'Clientes'
+                ],
+                [
+                    'alias' => 'testimonios',
+                    'titulo' => 'Testimonios'
+                ],
+                [
+                    'alias' => 'blog',
+                    'titulo' => 'Blog'
+                ],
+                [
+                    'alias' => 'blogCat',
+                    'titulo' => 'Categorías del Blog'
+                ],
+                [
+                    'alias' => 'blogComm',
+                    'titulo' => 'Comentarios del Blog'
+                ],
+                [
+                    'alias' => 'blogComm2',
+                    'titulo' => 'Comentarios del Blog (Versión 2)'
+                ],
+                [
+                    'alias' => 'usuarios',
+                    'titulo' => 'Usuarios'
+                ],
+                [
+                    'alias' => 'roles',
+                    'titulo' => 'Roles'
+                ],
+            ];
+
+            // Extraer las secciones seleccionadas previamente para cada acción
+            // Estas secciones se asignan a variables correspondientes a cada acción
+            foreach ($actions as $action) {
+                if (isset($roles->$action)) {
+                    $this->data['selected' . $action] = explode(',', $roles->$action);
+                } else {
+                    $this->data['selected' . $action] = [];
+                }
+            }
+
+            // Renderizar la vista
             $this->header();
             $this->sidebar();
-            echo view('admin/edit-roles');
+            echo view('admin/edit-roles', $this->data);
             $this->footer();
         }
     }
+
 
     public function delete_roles($id) {
         // $this->valtoken();

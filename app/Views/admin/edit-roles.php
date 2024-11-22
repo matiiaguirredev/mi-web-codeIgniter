@@ -35,16 +35,81 @@
                                         <div class="mb-2 row">
                                             <label class="col-md-2 col-form-label" for="nombre">Nombre del Rol</label>
                                             <div class="col-md-10">
-                                                <input type="text" name="nombre" id="nombre" class="form-control" value="<?= $roles->role_name ?>">
+                                                <input type="text" name="nombre" id="nombre" class="form-control" value="<?= $roles->nombre ?>">
                                             </div>
                                         </div>
 
                                         <div class="mb-2 row">
                                             <label class="col-md-2 col-form-label" for="descripcion">Descripcion del rol</label>
                                             <div class="col-md-10">
-                                                <textarea class="form-control" name="descripcion" id="descripcion" rows="5"><?= $roles->role_descr ?></textarea>
+                                                <textarea class="form-control" name="descripcion" id="descripcion" rows="5"><?= $roles->descripcion ?></textarea>
                                             </div>
                                         </div>
+
+
+                                        <h6>PERMISOS DE ROLES</h6>
+
+                                        <div class="mb-2 row">
+                                            <label class="form-label col-md-2 col-form-label">Ver</label> <br />
+                                            <div class="col-md-10">
+                                                <select class="no-shadow select-multiple" name="ver[]" id="select-ver" multiple>
+                                                    <option value="" data-display="Select">Seleccione las secciones:</option>
+                                                    <?php foreach ($secciones as $value) { ?>
+                                                        <option value="<?= $value['alias'] ?>"
+                                                            <?= in_array($value['alias'], $selectedVer) ? 'selected' : '' ?>>
+                                                            <?= $value['titulo'] ?>
+                                                        </option>
+                                                    <?php } ?>
+                                                </select>
+                                            </div>
+                                        </div>
+
+                                        <div class="mb-2 row">
+                                            <label class="form-label col-md-2 col-form-label">Crear</label> <br />
+                                            <div class="col-md-10">
+                                                <select class="no-shadow select-multiple" name="crear[]" id="select-crear" multiple>
+                                                    <option value="" data-display="Select">Seleccione las secciones:</option>
+                                                    <?php foreach ($secciones as $value) { ?>
+                                                        <option value="<?= $value['alias'] ?>"
+                                                            <?= in_array($value['alias'], $selectedCrear) ? 'selected' : '' ?>>
+                                                            <?= $value['titulo'] ?>
+                                                        </option>
+                                                    <?php } ?>
+                                                </select>
+                                            </div>
+                                        </div>
+
+                                        <div class="mb-2 row">
+                                            <label class="form-label col-md-2 col-form-label">Editar</label> <br />
+                                            <div class="col-md-10">
+                                                <select class="no-shadow select-multiple" name="editar[]" id="select-editar" multiple>
+                                                    <option value="" data-display="Select">Seleccione las secciones:</option>
+                                                    <?php foreach ($secciones as $value) { ?>
+                                                        <option value="<?= $value['alias'] ?>"
+                                                            <?= in_array($value['alias'], $selectedEditar) ? 'selected' : '' ?>>
+                                                            <?= $value['titulo'] ?>
+                                                        </option>
+                                                    <?php } ?>
+                                                </select>
+                                            </div>
+                                        </div>
+
+                                        <div class="mb-2 row">
+                                            <label class="form-label col-md-2 col-form-label">Borrar</label> <br />
+                                            <div class="col-md-10">
+                                                <select class="no-shadow select-multiple" name="borrar[]" id="select-borrar" multiple>
+                                                    <option value="" data-display="Select">Seleccione las secciones:</option>
+                                                    <?php foreach ($secciones as $value) { ?>
+                                                        <option value="<?= $value['alias'] ?>"
+                                                            <?= in_array($value['alias'], $selectedBorrar) ? 'selected' : '' ?>>
+                                                            <?= $value['titulo'] ?>
+                                                        </option>
+                                                    <?php } ?>
+                                                </select>
+                                            </div>
+                                        </div>
+
+
 
                                         <div class="mb-2 row">
                                             <label class="col-md-2 col-form-label" for="example-fileinput">Activo</label>
