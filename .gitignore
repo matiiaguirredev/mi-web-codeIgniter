@@ -45,6 +45,7 @@ $RECYCLE.BIN/
 .vagrant
 Vagrantfile
 app/Config/Email.php
+app/Config/Database.php
 
 
 #-------------------------
