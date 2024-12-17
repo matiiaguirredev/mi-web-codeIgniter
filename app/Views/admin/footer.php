@@ -130,6 +130,13 @@
                </script>
            <?php endif; ?>
 
+           <?php if (session()->getFlashdata('error') !== null) : ?>
+               <script>
+                   let $error = '<?= session()->getFlashdata('error') ?>';
+                   showAlert("danger", $error);
+               </script>
+           <?php endif; ?>
+
 
            </body>
 

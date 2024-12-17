@@ -31,72 +31,57 @@
 
             <li class="menu-title">Custom</li>
 
-            <!-- <li class="menu-item">
-                    <a href="#menuProyects" data-bs-toggle="collapse" class="menu-link waves-effect waves-light">
-                        <span class="menu-icon"><i class="fa-duotone fa-book"></i></span>
-                        <span class="menu-text"> Proyectos </span>
+            <?php if (in_array('roles', array_merge($user->ver, $user->crear, $user->editar, $user->borrar))): ?>
+                <li class="menu-item">
+                    <a href="#menuRoles" data-bs-toggle="collapse" class="menu-link waves-effect waves-light">
+                        <span class="menu-icon"><i class="fa-solid fa-pen-ruler"></i></span>
+                        <span class="menu-text"> Roles </span>
                         <span class="menu-arrow"></span>
                     </a>
-                    <div class="collapse" id="menuProyects">
+                    <div class="collapse" id="menuRoles">
                         <ul class="sub-menu">
                             <li class="menu-item">
-                                <a class='menu-link' href='/admin/proyect'>
-                                    <span class="menu-text">Lista de Proyectos</span>
+                                <a class='menu-link' href='/admin/roles'>
+                                    <span class="menu-text">Lista de Roles</span>
                                 </a>
                             </li>
-                            <li class="menu-item">
-                                <a class='menu-link' href='/admin/create/proyect'>
-                                    <span class="menu-text">Nuevo Proyecto</span>
-                                </a>
-                            </li>
+                            <?php if (in_array('roles', $user->crear)): ?>
+                                <li class="menu-item">
+                                    <a class='menu-link' href='/admin/create/roles'>
+                                        <span class="menu-text">Nuevos Roles</span>
+                                    </a>
+                                </li>
+                            <?php endif; ?>
                         </ul>
                     </div>
-                </li> -->
+                </li>
+            <?php endif; ?>
 
-
-            <li class="menu-item">
-                <a href="#menuRoles" data-bs-toggle="collapse" class="menu-link waves-effect waves-light">
-                    <span class="menu-icon"><i class="fa-solid fa-pen-ruler"></i></span>
-                    <span class="menu-text"> Roles </span>
-                    <span class="menu-arrow"></span>
-                </a>
-                <div class="collapse" id="menuRoles">
-                    <ul class="sub-menu">
-                        <li class="menu-item">
-                            <a class='menu-link' href='/admin/roles'>
-                                <span class="menu-text">Lista de Roles</span>
-                            </a>
-                        </li>
-                        <li class="menu-item">
-                            <a class='menu-link' href='/admin/create/roles'>
-                                <span class="menu-text">Nuevos Roles</span>
-                            </a>
-                        </li>
-                    </ul>
-                </div>
-            </li>
-
-            <li class="menu-item">
-                <a href="#menuUsuarios" data-bs-toggle="collapse" class="menu-link waves-effect waves-light">
-                    <span class="menu-icon"><i class="fa-duotone fa-solid fa-users"></i></span>
-                    <span class="menu-text"> Usuarios </span>
-                    <span class="menu-arrow"></span>
-                </a>
-                <div class="collapse" id="menuUsuarios">
-                    <ul class="sub-menu">
-                        <li class="menu-item">
-                            <a class='menu-link' href='/admin/usuarios'>
-                                <span class="menu-text">Lista de Usuarios</span>
-                            </a>
-                        </li>
-                        <li class="menu-item">
-                            <a class='menu-link' href='/admin/create/usuarios'>
-                                <span class="menu-text">Nuevos Usuarios</span>
-                            </a>
-                        </li>
-                    </ul>
-                </div>
-            </li>
+            <?php if (in_array('usuarios', array_merge($user->ver, $user->crear, $user->editar, $user->borrar))): ?>
+                <li class="menu-item">
+                    <a href="#menuUsuarios" data-bs-toggle="collapse" class="menu-link waves-effect waves-light">
+                        <span class="menu-icon"><i class="fa-duotone fa-solid fa-users"></i></span>
+                        <span class="menu-text"> Usuarios </span>
+                        <span class="menu-arrow"></span>
+                    </a>
+                    <div class="collapse" id="menuUsuarios">
+                        <ul class="sub-menu">
+                            <li class="menu-item">
+                                <a class='menu-link' href='/admin/usuarios'>
+                                    <span class="menu-text">Lista de Usuarios</span>
+                                </a>
+                            </li>
+                            <?php if (in_array('usuarios', $user->crear)): ?>
+                                <li class="menu-item">
+                                    <a class='menu-link' href='/admin/create/usuarios'>
+                                        <span class="menu-text">Nuevos Usuarios</span>
+                                    </a>
+                                </li>
+                            <?php endif; ?>
+                        </ul>
+                    </div>
+                </li>
+            <?php endif; ?>
 
             <li class="menu-item">
                 <a href="#menuSecciones" data-bs-toggle="collapse" class="menu-link waves-effect waves-light">
@@ -133,7 +118,7 @@
                                 <span class="menu-text">Lista de Proyectos</span>
                             </a>
                         </li>
-                        <?php if (isset($can_manage) && $can_manage): ?>
+                        <?php if (in_array('proyect', $user->crear)): ?>
                             <li class="menu-item">
                                 <a class='menu-link' href='/admin/create/proyect'>
                                     <span class="menu-text">Nuevo Proyecto</span>
@@ -155,11 +140,13 @@
                                             <span class="menu-text">Lista de categorias</span>
                                         </a>
                                     </li>
-                                    <li class="menu-item">
-                                        <a href="/admin/create/categorias" class="menu-link">
-                                            <span class="menu-text">Crear categorias</span>
-                                        </a>
-                                    </li>
+                                    <?php if (in_array('proyect', $user->crear)): ?>
+                                        <li class="menu-item">
+                                            <a href="/admin/create/categorias" class="menu-link">
+                                                <span class="menu-text">Crear categorias</span>
+                                            </a>
+                                        </li>
+                                    <?php endif; ?>
                                 </ul>
                             </div>
                         </li>
@@ -454,78 +441,80 @@
                 </div>
             </li>
 
-            <li class="menu-item">
-                <a href="#menuExpages" data-bs-toggle="collapse" class="menu-link waves-effect waves-light">
-                    <span class="menu-icon"><i class="bx bx-file"></i></span>
-                    <span class="menu-text"> Extra Pages </span>
-                    <span class="menu-arrow"></span>
-                </a>
-                <div class="collapse" id="menuExpages">
-                    <ul class="sub-menu">
+            <?php if (in_array('usuarios', array_merge($user->ver, $user->crear, $user->editar, $user->borrar))): ?>
+                <li class="menu-item">
+                    <a href="#menuExpages" data-bs-toggle="collapse" class="menu-link waves-effect waves-light">
+                        <span class="menu-icon"><i class="bx bx-file"></i></span>
+                        <span class="menu-text"> Extra Pages </span>
+                        <span class="menu-arrow"></span>
+                    </a>
+                    <div class="collapse" id="menuExpages">
+                        <ul class="sub-menu">
 
-                        <li class="menu-item">
-                            <a class='menu-link' href='/admin/login'>
-                                <span class="menu-text">Log In</span>
-                            </a>
-                        </li>
-                        <li class="menu-item">
-                            <a class='menu-link' href='/admin/register'>
-                                <span class="menu-text">Register</span>
-                            </a>
-                        </li>
-                        <li class="menu-item">
-                            <a class='menu-link' href='/admin/recover'>
-                                <span class="menu-text">Recover Password</span>
-                            </a>
-                        </li>
-                        <li class="menu-item">
-                            <a class='menu-link' href='/admin/pages-404'>
-                                <span class="menu-text">Error 404</span>
-                            </a>
-                        </li>
-                        <li class="menu-item">
-                            <a class='menu-link' href='/admin/pages-500'>
-                                <span class="menu-text">Error 500</span>
-                            </a>
-                        </li>
-                        <li class="menu-item">
-                            <a class='menu-link' href='/admin/forms-advanced'>
-                                <span class="menu-text">Forms-advanced</span>
-                            </a>
-                        </li>
-                        <li class="menu-item">
-                            <a class='menu-link' href='/admin/forms-elements'>
-                                <span class="menu-text">Forms-elements</span>
-                            </a>
-                        </li>
-                        <li class="menu-item">
-                            <a class='menu-link' href='/admin/forms-file-uploads'>
-                                <span class="menu-text">Forms-file-uploads</span>
-                            </a>
-                        </li>
-                        <li class="menu-item">
-                            <a class='menu-link' href='/admin/forms-quilljs'>
-                                <span class="menu-text">Forms-quilljs</span>
-                            </a>
-                        </li>
-                        <li class="menu-item">
-                            <a class='menu-link' href='/admin/tables-basic'>
-                                <span class="menu-text">Tables basic</span>
-                            </a>
-                        </li>
-                        <li class="menu-item">
-                            <a class='menu-link' href='/admin/tables-datatables'>
-                                <span class="menu-text">Tables-DataBase</span>
-                            </a>
-                        </li>
-                        <li class="menu-item">
-                            <a class='menu-link' href='/admin/components-sweet-alert'>
-                                <span class="menu-text">Sweet Alerts</span>
-                            </a>
-                        </li>
-                    </ul>
-                </div>
-            </li>
+                            <li class="menu-item">
+                                <a class='menu-link' href='/admin/login'>
+                                    <span class="menu-text">Log In</span>
+                                </a>
+                            </li>
+                            <li class="menu-item">
+                                <a class='menu-link' href='/admin/register'>
+                                    <span class="menu-text">Register</span>
+                                </a>
+                            </li>
+                            <li class="menu-item">
+                                <a class='menu-link' href='/admin/recover'>
+                                    <span class="menu-text">Recover Password</span>
+                                </a>
+                            </li>
+                            <li class="menu-item">
+                                <a class='menu-link' href='/admin/pages-404'>
+                                    <span class="menu-text">Error 404</span>
+                                </a>
+                            </li>
+                            <li class="menu-item">
+                                <a class='menu-link' href='/admin/pages-500'>
+                                    <span class="menu-text">Error 500</span>
+                                </a>
+                            </li>
+                            <li class="menu-item">
+                                <a class='menu-link' href='/admin/forms-advanced'>
+                                    <span class="menu-text">Forms-advanced</span>
+                                </a>
+                            </li>
+                            <li class="menu-item">
+                                <a class='menu-link' href='/admin/forms-elements'>
+                                    <span class="menu-text">Forms-elements</span>
+                                </a>
+                            </li>
+                            <li class="menu-item">
+                                <a class='menu-link' href='/admin/forms-file-uploads'>
+                                    <span class="menu-text">Forms-file-uploads</span>
+                                </a>
+                            </li>
+                            <li class="menu-item">
+                                <a class='menu-link' href='/admin/forms-quilljs'>
+                                    <span class="menu-text">Forms-quilljs</span>
+                                </a>
+                            </li>
+                            <li class="menu-item">
+                                <a class='menu-link' href='/admin/tables-basic'>
+                                    <span class="menu-text">Tables basic</span>
+                                </a>
+                            </li>
+                            <li class="menu-item">
+                                <a class='menu-link' href='/admin/tables-datatables'>
+                                    <span class="menu-text">Tables-DataBase</span>
+                                </a>
+                            </li>
+                            <li class="menu-item">
+                                <a class='menu-link' href='/admin/components-sweet-alert'>
+                                    <span class="menu-text">Sweet Alerts</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </li>
+            <?php endif; ?>
 
         </ul>
     </div>

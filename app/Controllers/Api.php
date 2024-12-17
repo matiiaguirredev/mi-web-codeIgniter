@@ -16,12 +16,6 @@ class Api extends BaseController {
     private $activo = 0;
     private $captchaUrl = 'https://www.google.com/recaptcha/api/siteverify';
 
-    private $perm = [
-        "Root" => null,
-        "Administrador" => null,
-        "UsuarioEstandar" => null,
-    ];
-
     public function __construct() {
 
         $this->db = \Config\Database::connect();
@@ -34,12 +28,6 @@ class Api extends BaseController {
             "register" => filter_var(getenv('GENERAL_REGISTER'), FILTER_VALIDATE_BOOLEAN), // esto conviente el valor de env en booleano
         ];
 
-        // debug($this->perm, false);
-        foreach ($this->perm as $key => $value) {
-            $this->perm[$key] = getenv("ROLE_ID_$key");
-        }
-        // debug($this->perm);
-
         // $this->currentDate = Time::now(); // funcion de codeige
 
         $hoy = getdate();
@@ -50,7 +38,7 @@ class Api extends BaseController {
     public function index() {
         // $this->valToken();
         // json_debug($this->user);
-        echo view('admin/pages-404');
+        custom_error(404, $this->lang);
     }
 
     public function register() {
@@ -58,7 +46,7 @@ class Api extends BaseController {
         // debug($this->system->register);
         if (!$this->system->register) {
             // el error es de registro desactiv
-            custom_error(207, $this->lang);
+            // custom_error(207, $this->lang);
         }
 
         // $data = $this->request->getGetPost(); no sirve porque usamos base d datos estructurada mysql y no mongo.
@@ -122,8 +110,6 @@ class Api extends BaseController {
 
         unset($data['pasw']);
 
-        $this->create_perfil($id);
-
         json_debug(array_merge(["id" => $id], $data));
     }
 
@@ -168,6 +154,7 @@ class Api extends BaseController {
             custom_error(202, $this->lang);
         }
 
+
         $checkUser->token = encode(json_encode([
             'id' => $checkUser->id,
             'date' => $this->currentDate
@@ -175,6 +162,7 @@ class Api extends BaseController {
 
         unset($checkUser->pasw); // la borramos por que no necesitamos enviarle a nadie la pasw / no se hace publica
 
+        // devuelve los datos del usuario
         json_debug($checkUser);
     }
 
@@ -202,6 +190,7 @@ class Api extends BaseController {
         $valtoken = json_decode(decode($data['token'], $this->key));
 
         if (!$valtoken) {
+            // verifica que se haya desencriptado el token
             custom_error(103, $this->lang, 'token');
         }
 
@@ -214,10 +203,10 @@ class Api extends BaseController {
         // Calcular la diferencia en segundos
         $difference = $currentTimestamp - $tokenTimestamp;
 
-        $maxTime = getenv('SESION_TIME') * 60; // 60 minutos
+        $maxTime = getenv('SESION_TIME') * 60; 
 
         if ($difference > $maxTime) {
-            // custom_error(502, $this->lang); esta comentado por el momento para que no expire el tiempo
+            custom_error(502, $this->lang); // esta comentado por el momento para que no expire el tiempo
         }
 
         $query = $this->db->query("SELECT usuarios.*, roles.nombre, roles.ver, roles.crear, roles.editar, roles.borrar FROM usuarios, roles WHERE usuarios.role_id = roles.id AND usuarios.id = '$valtoken->id'");
@@ -231,6 +220,13 @@ class Api extends BaseController {
         // debug($checkUser);
 
         unset($checkUser->pasw);
+
+        $checkUser->ver = explode(',', $checkUser->ver);
+        $checkUser->crear = explode(',', $checkUser->crear);
+        $checkUser->editar = explode(',', $checkUser->editar);
+        $checkUser->borrar = explode(',', $checkUser->borrar);
+
+
         json_debug($checkUser);
         // $this->user = $checkUser;
     }
@@ -239,14 +235,11 @@ class Api extends BaseController {
     public function create_proyect() {
         $this->valToken();
 
-        // intentado poner los permisos
-        $rolesAllowed = [
-            $this->perm['Root'],
-        ];
+        // json_debug($this->user);
 
-        if (!in_array($this->user->role_id, $rolesAllowed)) {
+        if (!in_array('proyect', $this->user->crear)) {
             // Sin permisos
-            custom_error(403, "es", "create/proyect");
+            custom_error(403, "es", "crear proyectos");
         }
 
         $require = [
@@ -295,18 +288,28 @@ class Api extends BaseController {
     }
 
     public function get_proyect($id = null) {
+
         $this->variables();
+        $this->valToken();
 
-        // $this->valToken(); // las unicas que no se pide el token son las consultas publicas,  login y registro
-
+        // debug($this->user);
         $query = "SELECT * FROM proyect ";
         if ($id) { // esto se utilza para consultar 1 especifico
             $query .= "WHERE id = '$id'";
         }
+
         if ($this->activo) {
             $query .= ($id) ? " AND" : " WHERE";
             $query .= " activo = 1";
         }
+
+        if (!in_array('proyect', $this->user->ver)) {
+            $query .= ($id || $this->activo) ? " AND" : " WHERE";
+            $query .= " user_id = " . $this->user->id;
+        }
+
+        // debug($query);
+
         $query = $this->db->query($query);
         $datos = $query->getResult();
 
@@ -330,6 +333,11 @@ class Api extends BaseController {
 
     public function update_proyect($id) {
         $this->valToken();
+
+        if (!in_array('proyect', $this->user->editar)) {
+            // Sin permisos
+            custom_error(403, "es", "actualizar proyectos");
+        }
 
         $query = "SELECT * FROM proyect WHERE id = '$id'";
         $query = $this->db->query($query);
@@ -378,7 +386,12 @@ class Api extends BaseController {
 
     public function delete_proyect($id) {
 
-        $this->valToken(); // las unicas que no se pide el token son las consultas publicas,  login y registro
+        $this->valToken();
+
+        if (!in_array('proyect', $this->user->borrar)) {
+            // Sin permisos
+            custom_error(403, "es", "eliminar proyectos");
+        }
 
         $query = "SELECT * FROM proyect WHERE id = '$id'";
         $query = $this->db->query($query);
@@ -719,6 +732,11 @@ class Api extends BaseController {
     public function create_categorias() {
         $this->valToken();
 
+        if (!in_array('categorias', $this->user->crear)) {
+            // Sin permisos
+            custom_error(403, "es", "crear categorias");
+        }
+
         $require = [
             "nombre" => "text",
 
@@ -764,7 +782,7 @@ class Api extends BaseController {
 
     public function get_categorias($id = null) {
         $this->variables();
-        // $this->valToken(); // las unicas que no se pide el token son las consultas publicas,  login y registro
+        $this->valToken();
 
         $query = "SELECT * FROM categorias ";
         if ($id) { // esto se utilza para consultar 1 especifico
@@ -774,6 +792,14 @@ class Api extends BaseController {
             $query .= ($id) ? " AND" : " WHERE";
             $query .= " activo = 1";
         }
+
+        // if (!in_array('categorias', $this->user->ver)) {
+        //     // Sin permisos
+        //     // custom_error(403, "es", "update/categorias");
+        //     $query .= ($id || $this->activo) ? " AND" : " WHERE";
+        //     $query .= " user_id = " . $this->user->id;
+        // } conflicto con que la categoria y el proyecto tienen que estar creados por el mismo usuario.
+
         $query = $this->db->query($query);
         $datos = $query->getResult();
 
@@ -790,6 +816,11 @@ class Api extends BaseController {
 
     public function update_categorias($id) {
         $this->valToken();
+
+        if (!in_array('categorias', $this->user->editar)) {
+            // Sin permisos
+            custom_error(403, "es", "editar categorias");
+        }
 
         $query = "SELECT * FROM categorias WHERE id = '$id'";
         $query = $this->db->query($query);
@@ -838,6 +869,12 @@ class Api extends BaseController {
     public function delete_categorias($id) {
 
         $this->valToken(); // las unicas que no se pide el token son las consultas publicas,  login y registro
+
+        if (!in_array('categorias', $this->user->borrar)) {
+            // Sin permisos
+            custom_error(403, "es", "borrar categorias");
+        }
+
 
         $query = "SELECT * FROM categorias WHERE id = '$id'";
         $query = $this->db->query($query);
@@ -2813,6 +2850,11 @@ class Api extends BaseController {
     public function create_usuarios() {
         $this->valToken();
 
+        if (!in_array('usuarios', $this->user->crear)) {
+            // Sin permisos
+            custom_error(403, "es", "crear usuarios");
+        }
+
         $require = [ // datos obligatorios
             "usuario" => "alias",
             "email" => "email",
@@ -2836,15 +2878,6 @@ class Api extends BaseController {
             // validar error que te faltan datos
             custom_error(101, "es", $valRequire);
         }
-
-        // $usuario = $data['usuario'];
-        // $email = $data['email'];
-
-        // $query = $this->db->query("SELECT * FROM usuarios WHERE usuario = '$usuario' OR email = '$email'"); // estamos chekeando si existe el usuario o emial
-        // $checkUser = $query->getResult();
-        // if ($checkUser) {
-        //     custom_error(208, $this->lang);
-        // }
 
         $usuario = $data['usuario'];
         $email = $data['email'];
@@ -2872,6 +2905,7 @@ class Api extends BaseController {
 
         $data['pasw'] = encode($data['pasw'], $this->key);
 
+        $data["user_id"] = $this->user->id;
         $data["activo"] = ($this->request->getGetPost("activo")) ? 1 : 0;
 
         $insert = $this->db->table("usuarios")->insert($data);
@@ -2892,36 +2926,36 @@ class Api extends BaseController {
     }
 
     public function get_usuarios($id = null) {
-        $this->variables();
 
-        // esta hicimos con alberto, la de abajo es chatgpt
-        $query = "SELECT usuarios.*, roles.nombre AS role_nombre FROM `usuarios`, roles WHERE 1=1";
-        if ($id) { // esto se utilza para consultar 1 especifico
+        $this->variables();
+        $this->valToken();
+
+        // Validar permisos
+        if (isset($this->user->ver) && is_array($this->user->ver)) {
+            if (!in_array('usuarios', $this->user->ver)) {
+                custom_error(403, $this->lang, 'ver usuarios');
+                return; // Detener el flujo
+            } // hablar con alberto a la hora del get y otros problemas con los usuarios y la ruta
+        }
+
+        // Consulta principal
+        $query = "SELECT usuarios.*, roles.nombre, roles.ver, roles.crear, roles.editar, roles.borrar 
+            FROM usuarios 
+            INNER JOIN roles ON usuarios.role_id = roles.id 
+            WHERE usuarios.id <> 1"; // Excluye usuario con id 1
+
+        // Si se proporciona un ID específico
+        if ($id) {
             $query .= " AND usuarios.id = '$id'";
         }
+
+        // Filtrar solo usuarios activos
         if ($this->activo) {
-            $query .= ($id) ? " AND" : "";
-            $query .= " activo = 1";
+            $query .= " AND usuarios.activo = 1";
         }
 
-        $query .= " AND usuarios.role_id = roles.id AND usuarios.id <> 1 ORDER BY `usuarios`.`id` ASC";
-
-        // devuelve esto
-        // SELECT usuarios.*, roles.nombre AS role_nombre FROM `usuarios`, roles WHERE 1=1 AND usuarios.role_id = roles.id AND usuarios.id <> 1 ORDER BY `usuarios`.`id` ASC
-
-        // json_debug($query);
-
-        // $query = "SELECT usuarios.*, roles.nombre FROM usuarios INNER JOIN roles ON usuarios.role_id = roles.id WHERE usuarios.id <> 1";
-        // if ($id) { // Esto se utiliza para consultar un usuario específico
-        //     $query .= " AND usuarios.id = '$id'";
-        // }
-
-        // if ($this->activo) {
-        //     $query .= " AND usuarios.activo = 1";
-        // }
-
-        // $query .= " ORDER BY usuarios.id ASC";
-
+        // Ordenar resultados
+        $query .= " ORDER BY usuarios.id ASC";
 
         // Ejecutar la consulta
         $query = $this->db->query($query);
@@ -2930,6 +2964,7 @@ class Api extends BaseController {
         // Manejo de error si no hay datos
         if (!$datos) {
             custom_error(504, $this->lang, "usuarios");
+            return;
         }
 
         // Si se proporciona un id específico, devolver solo el primer resultado
@@ -2944,17 +2979,32 @@ class Api extends BaseController {
     public function update_usuarios($id) {
         $this->valToken();
 
-        $query = "SELECT usuarios.*, roles.nombre AS role_nombre FROM `usuarios`, roles WHERE 1=1";
-        if ($id) { // esto se utilza para consultar 1 especifico
+        // Validar permisos
+        if (isset($this->user->editar) && is_array($this->user->editar)) {
+            if (!in_array('usuarios', $this->user->editar)) {
+                custom_error(403, $this->lang, 'editar usuarios');
+                return; // Detener el flujo
+            }
+        }
+
+        // Consulta principal
+        $query = "SELECT usuarios.*, roles.nombre, roles.ver, roles.crear, roles.editar, roles.borrar 
+            FROM usuarios 
+            INNER JOIN roles ON usuarios.role_id = roles.id 
+            WHERE usuarios.id <> 1"; // Excluye usuario con id 1
+
+        // Si se proporciona un ID específico
+        if ($id) {
             $query .= " AND usuarios.id = '$id'";
         }
+
+        // Filtrar solo usuarios activos
         if ($this->activo) {
-            $query .= ($id) ? " AND" : "";
-            $query .= " activo = 1";
+            $query .= " AND usuarios.activo = 1";
         }
 
-        $query .= " AND usuarios.role_id = roles.id AND usuarios.id <> 1 ORDER BY `usuarios`.`id` ASC";
-
+        // Ordenar resultados
+        $query .= " ORDER BY usuarios.id ASC";
 
         $query = $this->db->query($query);
         $datos = $query->getResult();
@@ -2993,6 +3043,7 @@ class Api extends BaseController {
             }
         }
 
+        $data["user_id"] = $this->user->id;
         $data["activo"] = ($this->request->getGetPost("activo")) ? 1 : 0;
         $data["edit_at"] = $this->currentDate;
 
@@ -3013,6 +3064,11 @@ class Api extends BaseController {
     public function delete_usuarios($id) {
 
         $this->valToken(); // las unicas que no se pide el token son las consultas publicas,  login y registro
+
+        if (!in_array('usuarios', $this->user->borrar)) {
+            // Sin permisos
+            custom_error(403, "es", "eliminar usuarios");
+        }
 
         $query = "SELECT * FROM usuarios WHERE id = '$id'";
         $query = $this->db->query($query);
@@ -3036,10 +3092,44 @@ class Api extends BaseController {
 
     // FIN CRUD USUARIOS
 
-    // CRUD USUARIOS
+    // CRUD ROLES
 
     public function create_roles() {
         $this->valToken();
+
+        // Validar que el usuario no intente crear roles restringidos
+        $rolesProhibidos = ['roles', 'usuarios']; // Los roles que no se pueden crear
+
+        $ver = $this->request->getGetPost('ver');
+        $crear = $this->request->getGetPost('crear');
+        $editar = $this->request->getGetPost('editar');
+        $borrar = $this->request->getGetPost('borrar');
+
+        // Dividir los valores de 'ver', 'crear', 'editar' y 'borrar' si son cadenas separadas por comas
+        $ver = explode(',', $ver);
+        $crear = explode(',', $crear);
+        $editar = explode(',', $editar);
+        $borrar = explode(',', $borrar);
+
+        // Si estos campos son arrays, vamos a combinarlos en uno solo
+        $unidos = array_merge($ver, $crear, $editar, $borrar);
+
+        // Verificar si alguno de los valores está en los roles prohibidos
+        foreach ($unidos as $role) {
+            if (in_array(strtolower(trim($role)), $rolesProhibidos)) {
+                if ($this->user->id != 1) {
+                    // Solo el admin con id 1 puede crear estos roles
+                    custom_error(403, "es", "No puedes crear el rol '$role'. Este rol está restringido.");
+                    return; // Detener el flujo
+                }
+            }
+        }
+
+
+        if (!in_array('roles', $this->user->crear)) {
+            // Sin permisos
+            custom_error(403, "es", "crear roles");
+        }
 
         $require = [ // datos obligatorios
             "nombre" => "text",
@@ -3084,6 +3174,7 @@ class Api extends BaseController {
             }
         }
 
+        $data["user_id"] = $this->user->id;
         $data["activo"] = ($this->request->getGetPost("activo")) ? 1 : 0;
 
         $insert = $this->db->table("roles")->insert($data);
@@ -3098,19 +3189,26 @@ class Api extends BaseController {
 
     public function get_roles($id = null) {
         $this->variables();
-        // $this->valToken(); // las unicas que no se pide el token son las consultas publicas,  login y registro
+        $this->valToken();
 
-        // $query = "SELECT * FROM secciones ";
-        $query = "SELECT * FROM `roles` ";
-        if ($id) { // esto se utilza para consultar 1 especifico
-            $query .= "WHERE id = '$id'";
-        }
-        if ($this->activo) {
-            $query .= ($id) ? " AND" : " WHERE";
-            $query .= " activo = 1";
+        // Validar permisos
+        if (isset($this->user->ver) && is_array($this->user->ver)) {
+            if (!in_array('roles', $this->user->ver)) {
+                custom_error(403, $this->lang, 'ver roles');
+                return; // Detener el flujo
+            }
         }
 
-        $query .= " ORDER BY `roles`.`id` ASC";
+        $query = "SELECT * FROM `roles` WHERE roles.id <> 1"; // Asegurando que id 1 no se incluya
+        if ($id) { // Si hay un ID específico
+            $query .= " AND id = '$id'"; // Agrega el filtro por id
+        }
+        if ($this->activo) { // Si se requiere filtrar por activo
+            $query .= " AND activo = 1"; // Filtra solo los activos
+        }
+
+        $query .= " ORDER BY `roles`.`id` ASC"; // Ordena por id
+
         $query = $this->db->query($query);
         $datos = $query->getResult();
 
@@ -3127,6 +3225,14 @@ class Api extends BaseController {
 
     public function update_roles($id) {
         $this->valToken();
+
+        // Validar permisos
+        if (isset($this->user->editar) && is_array($this->user->editar)) {
+            if (!in_array('roles', $this->user->editar)) {
+                custom_error(403, $this->lang, 'editar roles');
+                return; // Detener el flujo
+            }
+        }
 
         $query = "SELECT * FROM roles WHERE id = '$id'";
         $query = $this->db->query($query);
@@ -3166,6 +3272,7 @@ class Api extends BaseController {
             }
         }
 
+        $data["user_id"] = $this->user->id;
         $data["activo"] = ($this->request->getGetPost("activo")) ? 1 : 0;
         // debug($this->request->getGetPost(), false);
         // debug($data);
@@ -3184,6 +3291,11 @@ class Api extends BaseController {
     public function delete_roles($id) {
 
         $this->valToken(); // las unicas que no se pide el token son las consultas publicas,  login y registro
+
+        if (!in_array('roles', $this->user->borrar)) {
+            // Sin permisos
+            custom_error(403, "es", "eliminar roles");
+        }
 
         $query = "SELECT * FROM roles WHERE id = '$id'";
         $query = $this->db->query($query);
@@ -3205,7 +3317,7 @@ class Api extends BaseController {
         json_debug($datos);
     }
 
-    // FIN CRUD USUARIOS
+    // FIN CRUD ROLES
 
     public function mailing() {
         $this->valToken();
@@ -3378,19 +3490,19 @@ class Api extends BaseController {
     public function delete_img_perfil() {
         // Obtener la ruta completa de la imagen enviada por el cliente
         $rutaCompleta = $this->request->getPost('ruta');
-        
+
         // Validación sencilla para asegurar que la ruta esté presente
         if (!$rutaCompleta) {
             return json_debug(['error' => 'La ruta de la imagen es requerida.'], 400);
         }
-    
+
         // Extraer el nombre del archivo desde la ruta completa (obtenemos solo el nombre de la imagen)
         $nombreArchivo = basename($rutaCompleta);
-    
+
         // Tabla de perfil y columnas a procesar (solo las imágenes relacionadas con el perfil)
         $tabla = 'perfil';
         $columnas = ['img', 'img_fondo'];
-    
+
         // Buscar en la base de datos si alguna de las columnas tiene este nombre de archivo
         $query = $this->db->table($tabla)
             ->groupStart()
@@ -3398,14 +3510,14 @@ class Api extends BaseController {
             ->orWhereIn($columnas[1], [$nombreArchivo]) // Verifica si el nombre coincide con 'img_fondo'
             ->groupEnd()
             ->get();
-    
+
         // Comprobamos si se encontró algún registro
         $registro = $query->getRow();
-    
+
         if (!$registro) {
             return json_debug(['error' => 'La imagen no está registrada en la base de datos.'], 404);
         }
-    
+
         // Determinar qué columna corresponde al archivo a eliminar
         $columnaAActualizar = null;
         if ($registro->{$columnas[0]} === $nombreArchivo) {
@@ -3413,28 +3525,28 @@ class Api extends BaseController {
         } elseif ($registro->{$columnas[1]} === $nombreArchivo) {
             $columnaAActualizar = $columnas[1]; // La imagen corresponde a 'img_fondo'
         }
-    
+
         if (!$columnaAActualizar) {
             return json_debug(['error' => 'No se pudo determinar la columna de la imagen.'], 500);
         }
-    
+
         // Eliminar la referencia en la base de datos (actualizamos la columna con NULL)
         $actualizacion = $this->db->table($tabla)
             ->where('id', $registro->id)
             ->update([$columnaAActualizar => null]);
-    
+
         if (!$actualizacion) {
             return json_debug(['error' => 'No se pudo actualizar la base de datos.'], 500);
         }
-    
+
         // Construir la ruta completa del archivo en el servidor
         $rutaServidor = FCPATH . 'assets/images/perfil/' . $nombreArchivo;
-    
+
         // Verificar que el archivo exista en el servidor
         if (!file_exists($rutaServidor)) {
             return json_debug(['warning' => 'El archivo no existe en el servidor, pero la base de datos fue actualizada.'], 200);
         }
-    
+
         // Intentar eliminar el archivo del servidor
         if (unlink($rutaServidor)) {
             return json_debug(['success' => 'Imagen eliminada correctamente.'], 200);
@@ -3519,13 +3631,13 @@ class Api extends BaseController {
         // Calcular la diferencia en segundos
         $difference = $currentTimestamp - $tokenTimestamp;
 
-        $maxTime = getenv('SESION_TIME') * 60; // 60 minutos // esta funcion es para traer valores del arch env
+        $maxTime = getenv('SESION_TIME') * 60; // esta funcion es para traer valores del arch env
 
         if ($difference > $maxTime) {
-            // custom_error(502, $this->lang); esta comentado por el momento para que no expire el tiempo
+            custom_error(502, $this->lang); // esta comentado por el momento para que no expire el tiempo
         }
 
-        $query = $this->db->query("SELECT * FROM usuarios WHERE id = '$valtoken->id'");
+        $query = $this->db->query("SELECT usuarios.*, roles.nombre, roles.ver, roles.crear, roles.editar, roles.borrar FROM usuarios, roles WHERE usuarios.role_id = roles.id AND usuarios.id = '$valtoken->id'");
         $checkUser = $query->getResult();
         if (!$checkUser) {
             custom_error(501, $this->lang); // si el usuario no existe
@@ -3534,6 +3646,12 @@ class Api extends BaseController {
         $checkUser = $checkUser[0];
 
         unset($checkUser->pasw);
+
+        $checkUser->ver = explode(',', $checkUser->ver);
+        $checkUser->crear = explode(',', $checkUser->crear);
+        $checkUser->editar = explode(',', $checkUser->editar);
+        $checkUser->borrar = explode(',', $checkUser->borrar);
+
         $this->user = $checkUser;
     }
 
@@ -3606,316 +3724,4 @@ class Api extends BaseController {
             $this->activo = 1;
         }
     }
-
-    // public function test() {
-
-    //     // $P = true;
-    //     // $Q = true;
-    //     // $R = true;
-
-    //     // $var1 = ($P || $Q) && (!$R || $Q);
-    //     // $var2 = (!($P && !$Q) || $R) || (!$P != $Q);
-    //     // $var3 = !$P && ($Q && $R);
-    //     // $var4 = !$P || ($Q && $R);
-    //     // $var5 = ($P && $Q) && $R;
-    //     // $var6 = (!$P || $Q) && !$R;
-    //     // $var7 = ($P != $Q) || ($Q && $R);
-    //     // $var8 = !$P || (!$Q && $R);
-
-    //     // echo $var1 .  '';
-
-    //     // Definir las variables posibles (0 o 1)
-    //     $values = [1, 0];
-
-    //     // Imprimir el encabezado de la tabla
-    //     echo "<style> table {text-align: center;} </style>";
-    //     echo "<table border='1'>";
-    //     echo "<tr><th>P</th><th>Q</th><th>R</th><th>S</th>";
-    //     // echo "<th>(P ∨ Q) ∧ (¬R ∨ Q)</th>";
-    //     // echo "<th>((P ∧ ¬Q) → R) ∨ (¬P ⊕ Q)</th>";
-    //     // echo "<th>¬P ∧ (Q ∧ R)</th>";
-    //     // echo "<th>¬P v (Q ∧ R)</th>";
-    //     // echo "<th>(P ∧ Q) ∧ R</th>";
-    //     // echo "<th>(¬P ∨ Q) ∧ ¬R</th>";
-    //     // echo "<th>(P ⊕ Q) ∨ (Q ∧ R)</th>";
-    //     // echo "<th> P → (¬Q ∧ R)</th>";
-
-    //     //ejer2
-    //     // echo "<th> (¬P ∧ Q) → (P ∨ ¬R) </th>";
-    //     // echo "<th> ((P ∧ R) → Q) ∨ ¬(P ∨ R) </th>";
-    //     // echo "<th>  (P ∧ ¬Q) ∧ (Q ⊕ ¬R) </th>";
-    //     // echo "<th> ¬(P ⊕ Q) ∨ (R ∧ ¬P) </th>";
-    //     // echo "<th> ¬(P ∨ Q) ∧ (Q ∨ R) </th>";
-    //     // echo "<th> (P → Q) ∧ (¬R ∨ P) </th>";
-    //     // echo "<th> ¬(P ∧ ¬Q) ∨ (R ∧ Q) </th>";
-    //     // echo "<th> (P ∨ ¬Q) → (¬R ∨ P) </th>";
-    //     // echo "<th> ((¬P ∧ Q) ∨ R) ∧ (P → ¬R) </th>";
-    //     // echo "<th> (P ∨ Q) ⊕ (¬Q ∧ R) </th>";
-
-    //     //ejer3
-    //     // echo "<th> (P ∨ ¬R) ∧ ¬(Q → R) </th>";
-    //     // echo "<th> ¬(P ∧ ¬R) ∨ (Q ∧ ¬P) </th>";
-    //     // echo "<th> (P ⊕ Q) ∧ (¬R ∨ ¬P) </th>";
-    //     // echo "<th> (P ∨ R) → (¬Q ∧ P) </th>";
-    //     // echo "<th> ¬(P ∨ Q) ∧ (R → ¬Q) </th>";
-    //     // echo "<th> ¬(P ∨ R) ∧ (Q ∨ ¬R) </th>";
-    //     // echo "<th> (P → ¬Q) ∨ (R ∧ ¬P) </th>";
-    //     // echo "<th> (¬P ∧ Q) ∧ (R ∨ ¬Q) </th>";
-    //     // echo "<th> (P ∨ ¬R) ∧ (¬Q → P) </th>";
-    //     // echo "<th> (P ⊕ R) ∧ (¬Q ∨ P) </th>";
-    //     // echo "<th> ¬(P ∨ ¬Q) ∧ (Q ∨ R) </th>";
-    //     // echo "<th> (P ∧ Q) ∨ ¬(R ∨ P) </th>";
-    //     // echo "<th> (P ∧ ¬R) ∨ (¬Q ⊕ R) </th>";
-    //     // echo "<th> (¬P → Q) ∧ (R ∨ ¬P) </th>";
-    //     // echo "<th> ¬(P ∨ ¬Q) → (R ∧ ¬P) </th>";
-    //     // echo "<th> ¬(P ∨ ¬Q) → (R ∧ ¬P) </th>";
-    //     // echo "<th> (P ∨ ¬R) ∧ (¬Q → P) </th>";
-    //     // echo "<th> (P ∨ ¬R) ∧ (¬Q → P) </th>";
-    //     // echo "<th> (¬P → Q) ∧ (R ∨ ¬P) </th>";
-    //     // echo "<th> (¬P → Q) ∧ (R ∨ ¬P) </th>";
-
-
-    //     // echo "<th> (P ∧ ¬Q) ∨ (R ∧ ¬S) </th>";
-    //     // echo "<th> (P → Q) ∧ (¬R ∨ S) </th>";
-    //     // echo "<th>  (¬P ∧ Q) ⊕ (R ∨ ¬S) </th>";
-    //     // echo "<th> (P ∧ Q) → (¬R ∨ S) </th>";
-    //     // echo "<th> (P ∨ ¬Q) ∧ (¬R ∨ S) </th>";
-
-    //     // echo "<th> (¬P ∨ ¬Q) ∧ (R ∧ S) </th>";
-    //     // echo "<th> ¬((P ∧ Q) ∨ (R ∧ S)) </th>";
-    //     // echo "<th> ((P ⊕ Q) ∧ ¬R) ∨ (S → P) </th>";
-    //     // echo "<th> ¬(P → Q) ∧ (R ∨ ¬S) </th>";
-    //     // echo "<th> (P ∧ Q) ∨ (¬R ∧ ¬S) </th>";
-
-
-    //     // echo "<th> (P ∨ Q) ∧ ¬(R ⊕ S) </th>";
-    //     // echo "<th> ((P → Q) ∧ (¬R ∨ S)) ∧ ¬(P ∧ R) </th>";
-    //     // echo "<th> ¬(P ⊕ Q) ∨ (R ∧ S) </th>";
-    //     // echo "<th> (P ∨ ¬Q) ∧ (R ⊕ ¬S) </th>";
-    //     // echo "<th> ((P ∧ S) ∨ (¬Q ∧ R)) ∧ ¬(P → ¬R) </th>";
-
-    //     // echo "<th> (P ⊕ Q) → (R ∨ ¬S) </th>";
-    //     // echo "<th> (¬P → Q) ∧ (R ⊕ S) </th>";
-    //     // echo "<th> ((P ∨ ¬Q) ⊕ (R ∧ S)) → P </th>";
-    //     // echo "<th> ¬((P ⊕ R) → (Q ∧ S)) </th>";
-    //     // echo "<th> (P ∧ ¬Q) ⊕ (R → S) </th>";
-
-    //     // echo "<th> (P → Q) ∧ (R ⊕ ¬S) </th>";
-    //     // echo "<th> ((P ∨ Q) → (¬R ⊕ S)) ∧ ¬P </th>";
-    //     // echo "<th> (¬P ⊕ Q) ∨ (R → S) </th>";
-    //     // echo "<th> (P → ¬Q) ∧ (R ⊕ ¬S) </th>";
-    //     // echo "<th> ((¬P → Q) ∧ (R ⊕ S)) ⊕ ¬R </th>";
-
-    //     // echo "<th> ¬((P ⊕ Q) ∨ (R → ¬S)) </th>";
-    //     // echo "<th> (P → Q) ⊕ (R ∨ ¬S) </th>";
-    //     // echo "<th> ((¬P → R) ⊕ (Q ∨ ¬S)) ∧ P </th>";
-    //     // echo "<th> (P ⊕ Q) → (¬R ∨ S) </th>";
-    //     // echo "<th> ((P → ¬Q) ∨ (R ⊕ S)) </th>";
-
-    //     // echo "<th> ((¬P ∧ Q) → (¬R ⊕ S)) ∨ ((¬P ⊕ Q) ∧ (¬R → S)) ∧ ¬(P ∧ ¬R) </th>";
-    //     // echo "<th> (¬P ∨ (¬Q → ¬R)) ∧ ((¬S ⊕ P) → (¬R ∧ Q)) ∨ ¬((¬P → Q) ⊕ (R ∨ ¬S)) </th>";
-    //     // echo "<th> (¬P → (Q ⊕ ¬R)) ∧ (¬S → (P ∧ ¬Q)) ∨ ((¬R ⊕ S) ∧ (¬P ∨ Q)) </th>";
-    //     // echo "<th> ((¬P ∧ ¬Q) ⊕ (¬R → S)) ∧ ((¬P ∨ R) → (¬Q ⊕ S)) ∧ ¬((P → ¬Q) ∨ ¬R) </th>";
-    //     // echo "<th> (¬P ⊕ (¬Q → ¬R)) ∧ ((¬S ∧ P) → (¬Q ⊕ ¬R)) ∨ ((P → ¬Q) ∧ (¬R ⊕ S)) </th>";
-
-
-
-    //     echo "</tr>";
-
-    //     // Generar todas las combinaciones de P, Q, R
-    //     foreach ($values as $P) {
-    //         foreach ($values as $Q) {
-    //             foreach ($values as $R) {
-    //                 foreach ($values as $S) {
-    //                     //             $result1 = ($P || $Q) && (!$R || $Q) ? "1" : "0";
-    //                     //             $result2 = (!($P && !$Q) || $R) || (!$P != $Q) ? "1" : "0";
-    //                     //             $result3 = !$P && ($Q && $R) ? "1" : "0";
-    //                     //             $result4 = !$P || ($Q && $R) ? "1" : "0";
-    //                     //             $result5 = ($P && $Q) && $R ? "1" : "0";
-    //                     //             $result6 = (!$P || $Q) && !$R ? "1" : "0";
-    //                     //             $result7 = ($P != $Q) || ($Q && $R) ? "1" : "0";
-    //                     //             $result8 = !$P || (!$Q && $R) ? "1" : "0";
-
-
-    //                     //ejer 3 (el ejer 2 esta hecho con for abajo)
-    //                     // $result1 = ($P || !$R) && !(!$Q || $R) ? "1" : "0";
-    //                     // $result2 = !($P && !$R) || ($Q && !$P) ? "1" : "0";
-    //                     // $result3 = ($P != $Q) && (!$R || !$P) ? "1" : "0";
-    //                     // $result4 = !($P || $R) || (!$Q && $P) ? "1" : "0";
-    //                     // $result5 = !($P || $Q) && (!$R || !$Q) ? "1" : "0";
-    //                     // $result6 = !($P||$R) && ($Q|| !$R) ? "1" : "0";
-    //                     // $result7 = (!$P || !$Q) || ($R && !$P) ? "1" : "0";
-    //                     // $result8 = (!$P && $Q) && ($R || !$Q) ? "1" : "0";
-    //                     // $result9 = ($P || !$R) && !(!$Q || $P) ? "1" : "0";
-    //                     // $result10 = ($P != $R) && (!$Q || $P) ? "1" : "0";
-    //                     // $result11 = !($P || !$Q) && ($Q || $R) ? "1" : "0";
-    //                     // $result12 = ($P && $Q) || !($R || $P) ? "1" : "0";
-    //                     // $result13 = ($P && $R) || (!$Q != $R) ? "1" : "0";
-    //                     // $result14 = !(!$P || $Q) && ($R || !$P) ? "1" : "0";
-    //                     // $result15 = !(!($P || !$Q)) || ($R && !$P) ? "1" : "0"; // ES EL MISMO QUE EL DE ABAJO PERO VERSION EXTENDIDA JAJA
-    //                     // $result16 = ($P || !$Q) || ($R && !$P) ? "1" : "0";
-    //                     // $result17 = ($P || !$R) && ($Q || $P) ? "1" : "0"; // la diferencia esta en las negaciones que se cancelan, negacion y negacion se elimina.
-    //                     // $result17segunda = ($P || !$R) && (!(!$Q) || $P) ? "1" : "0";
-    //                     // $result18 = ($P || $Q) && ($R || !$P) ? "1" : "0"; // la diferencia esta en las negaciones que se cancelan, negacion y negacion se elimina.
-    //                     // $result18segunda = (!(!$P) || $Q) && ($R || !$P) ? "1" : "0";
-
-
-    //                     // $result19 = ($P && !$Q) || ($R && !$S) ? "1" : "0";
-    //                     // $result20 = (!$P || $Q) && (!$R || $S) ? "1" : "0";
-    //                     // $result21 = (!$P && $Q) != ($R || !$S) ? "1" : "0";
-    //                     // $result22 = !($P && $Q) || (!$R || $S) ? "1" : "0";
-    //                     // $result23 = ($P || !$Q) && (!$R || $S) ? "1" : "0";
-
-    //                     // $result24 = (!$P || !$Q) &&  ($R && $S) ? "1" : "0";
-    //                     // $result25 = !(($P && $Q) || ($R&&$S)) ? "1" : "0";
-    //                     // $result26 = (($P != $Q) && !$R) || (!$S || $P ) ? "1" : "0";
-    //                     // $result27 = !(!$P || $Q) && ($R || !$S) ? "1" : "0";
-    //                     // $result28 = ($P && $Q) || (!$R && !$S) ? "1" : "0";
-
-    //                     // $result29 = ($P || $Q) && !($R != $S) ? "1" : "0";
-    //                     // $result30 = ((!$P || $Q) && (!$R || $S)) && !($P && $R) ? "1" : "0";
-    //                     // $result31 = !($P != $Q) || ($R && $S) ? "1" : "0";
-    //                     // $result32 = ($P || !$Q) && ($R != !$S) ? "1" : "0";
-    //                     // $result33 = (($P && $S) || (!$Q && $R)) && ($P || !$R) ? "1" : "0";
-
-    //                     // $result34 = !($P != $Q) || ($R || !$S) ? "1" : "0";
-    //                     // $result35 = !(!$P || $Q) && ($R != $S) ? "1" : "0";
-    //                     // $result36 = !(($P || !$Q) != ($R && $S)) || $P  ? "1" : "0";
-    //                     // $result37 = ( $P != $R) || ($Q && $S)  ? "1" : "0";
-    //                     // $result38 = ($P && !$Q) != (!$R || $S) ? "1" : "0";
-
-    //                     // $result39 = (!$P || $Q) && ($R != !$S) ? "1" : "0";
-    //                     // $result40 = (!($P || $Q) || (!$R != $S)) && !$P ? "1" : "0";
-    //                     // $result41 = (!$P != $Q) || (!$R || $S) ? "1" : "0";
-    //                     // $result42 = (!$P || !$Q) && ($R != !$S) ? "1" : "0";
-    //                     // $result43 = (($P || $Q) && ($R != $S)) != !$R ? "1" : "0";
-
-    //                     // $result44 = !($P != $Q) || (!$R || !$S) ? "1" : "0";
-    //                     // $result45 = (!$P || $Q) != ($R || !$S) ? "1" : "0";
-    //                     // $result46 = ($P || $R) != ($Q || !$S) && $P ? "1" : "0";
-    //                     // $result47 = !($P !=$Q )  || (!$R || $S) ? "1" : "0";
-    //                     // $result48 = ((!$P || !$Q) || ($R != $S)) ? "1" : "0";
-
-    //                     // $result49 = (!(!$P && $Q)) || (!$R != $S) || ((!$P != $Q) && ($R || $S)) && !($P && !$R) ? "1" : "0";
-    //                     // $result50 = (!$P || ($Q || !$R)) && ( !(!$S != $P) || (!$R && $Q)) || !(($P || $Q) != ($R || !$S)) ? "1" : "0";
-    //                     // $result51 = ($P || ($Q != !$R)) && ($S || ($P && !$Q)) || ((!$R != $S) && (!$P || $Q)) ? "1" : "0";
-    //                     // $result52 = ((!$P && !$Q) != ($R || $S)) && (!(!$P || $R) || (!$Q != $S)) && !((!$P || !$Q) || !$R) ? "1" : "0";
-    //                     // $result53 = (!$P != ($Q || !$R)) && (( ! (!$S && $P)) || (!$Q != !$R)) || ((!$P || !$Q) && (!$R != $S))  ? "1" : "0";
-
-
-    //                     // Imprimir la fila de la tabla
-    //                     echo "<tr>";
-    //                     echo "<td>$P</td>";
-    //                     echo "<td>$Q</td>";
-    //                     echo "<td>$R</td>";
-    //                     echo "<td>$S</td>";
-    //                     // echo "<td>$result1</td>";
-    //                     // echo "<td>$result2</td>";
-    //                     // echo "<td>$result3</td>";
-    //                     // echo "<td>$result4</td>";
-    //                     // echo "<td>$result5</td>";
-    //                     // echo "<td>$result6</td>";
-    //                     // echo "<td>$result7</td>";
-    //                     // echo "<td>$result8</td>";
-    //                     // echo "<td>$result9</td>";
-    //                     // echo "<td>$result10</td>";
-    //                     // echo "<td>$result11</td>";
-    //                     // echo "<td>$result12</td>";
-    //                     // echo "<td>$result13</td>";
-    //                     // echo "<td>$result14</td>";
-    //                     // echo "<td>$result15</td>";
-    //                     // echo "<td>$result16</td>";
-    //                     // echo "<td>$result17</td>";
-    //                     // echo "<td>$result17segunda</td>";
-    //                     // echo "<td>$result18</td>";
-    //                     // echo "<td>$result18segunda</td>";
-
-    //                     // echo "<td>$result19</td>";
-    //                     // echo "<td>$result20</td>";
-    //                     // echo "<td>$result21</td>";
-    //                     // echo "<td>$result22</td>";
-    //                     // echo "<td>$result23</td>";
-
-    //                     // echo "<td>$result24</td>";
-    //                     // echo "<td>$result25</td>";
-    //                     // echo "<td>$result26</td>";
-    //                     // echo "<td>$result27</td>";
-    //                     // echo "<td>$result28</td>";
-
-    //                     // echo "<td>$result29</td>";
-    //                     // echo "<td>$result30</td>";
-    //                     // echo "<td>$result31</td>";
-    //                     // echo "<td>$result32</td>";
-    //                     // echo "<td>$result33</td>";
-
-    //                     // echo "<td>$result34</td>";
-    //                     // echo "<td>$result35</td>";
-    //                     // echo "<td>$result36</td>";
-    //                     // echo "<td>$result37</td>";
-    //                     // echo "<td>$result38</td>";
-
-    //                     // echo "<td>$result39</td>";
-    //                     // echo "<td>$result40</td>";
-    //                     // echo "<td>$result41</td>";
-    //                     // echo "<td>$result42</td>";
-    //                     // echo "<td>$result43</td>";
-
-    //                     // echo "<td>$result44</td>";
-    //                     // echo "<td>$result45</td>";
-    //                     // echo "<td>$result46</td>";
-    //                     // echo "<td>$result47</td>";
-    //                     // echo "<td>$result48</td>";
-
-    //                     // echo "<td>$result49</td>";
-    //                     // echo "<td>$result50</td>";
-    //                     // echo "<td>$result51</td>";
-    //                     // echo "<td>$result52</td>";
-    //                     // echo "<td>$result53</td>";
-
-
-    //                     echo "</tr>";
-    //                 }
-    //             }
-    //         }
-    //     }
-
-
-    //     // for ($P = 1; $P >= 0; $P--) {
-    //     //     for ($Q = 1; $Q >= 0; $Q--) {
-    //     //         for ($R = 1; $R >= 0; $R--) {
-
-    //     //             // $result1 = !( !$P && $Q )  || ($P || !$R) ? "1" : "0";
-    //     //             // $result2 = (! ( $P && $R) || $Q) || !($P || $R) ? "1" : "0";
-    //     //             // $result3 = ( $P && !$Q) && ( $Q != !$R) ? "1" : "0";
-    //     //             // $result4 = !( $P != $Q) || ( $R && !$P ) ? "1" : "0";
-    //     //             // $result5 = !($P || $Q) && ($Q || $R) ? "1" : "0";
-    //     //             // $result6 = (!$P || $Q ) && (!$R || $P) ? "1" : "0";
-    //     //             // $result7 = !($P && !$Q) ? "1" : "0";
-    //     //             // $result8 = !($P || !$Q) || (!$R || $P) ? "1" : "0";
-    //     //             // $result9 = ((!$P && $Q) || $R) && ( !$P || !$R) ? "1" : "0";
-    //     //             // $result10 = ( $P || $Q ) != ( !$Q &&  $R) ? "1" : "0";
-
-
-    //     //             echo "<tr>";
-    //     //             echo "<td>$P</td>";
-    //     //             echo "<td>$Q</td>";
-    //     //             echo "<td>$R</td>";
-    //     //             echo "<td>$result1</td>";
-    //     //             echo "<td>$result2</td>";
-    //     //             echo "<td>$result3</td>";
-    //     //             echo "<td>$result4</td>";
-    //     //             echo "<td>$result5</td>";
-    //     //             echo "<td>$result6</td>";
-    //     //             echo "<td>$result7</td>";
-    //     //             echo "<td>$result8</td>";
-    //     //             echo "<td>$result9</td>";
-    //     //             echo "<td>$result10</td>";
-    //     //             echo "</tr>";
-    //     //         }
-    //     //     }
-    //     // }
-
-    //     echo "</table>";
-    // }
-
 }
