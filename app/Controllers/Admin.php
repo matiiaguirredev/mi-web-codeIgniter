@@ -224,10 +224,10 @@ class Admin extends BaseController {
             exit;
         }
 
-        // debug($this->request->getGetPost(), false);
-
         if ($this->request->getGetPost()) {
+            // debug($this->request->getGetPost());
             $token = $this->request->getCookie("token");
+            // debug($token);
             $requestData = array_merge($this->request->getGetPost(), ["token" => $token]); // en una variable tengo que guardar el merge 
             // debug($requestData);
             // debug($_FILES);
@@ -244,16 +244,18 @@ class Admin extends BaseController {
                 $this->data['error'] = $create_proyect->error;
                 // debug($this->data['error']);
             } else {
-                $this->data['success'] = "Proyecto creado exitosamente";
-                $this->get_proyect();
+                return redirect()->to(base_url('/admin/proyect'))->with('success', 'Proyecto creado exitosamente');
+                // $this->data['success'] = "Proyecto creado exitosamente";
+                // $this->get_proyect();
                 $view = false;
             }
         }
 
         if ($view) {
+            $token = $this->request->getCookie("token");
 
             $this->data['categorias'] = [];
-            $categorias = json_decode(send_post($this->urlAPI . "categorias?activo=1"));
+            $categorias = json_decode(send_post($this->urlAPI . "categorias?activo=1", ["token" => $token]));
             if (isset($categorias->error)) {
                 $this->data['error'] = $categorias->error;
             } else {
@@ -295,8 +297,9 @@ class Admin extends BaseController {
             if (isset($update_proyect->error)) {
                 $this->data['error'] = $update_proyect->error;
             } else {
-                $this->data['success'] = "Proyecto modificado exitosamente";
-                $this->get_proyect();
+                return redirect()->to(base_url('/admin/proyect'))->with('success', "Proyecto modificado exitosamente");
+                // $this->data['success'] = "Proyecto modificado exitosamente";
+                // $this->get_proyect();
                 $view = false;
             }
         }
@@ -332,16 +335,18 @@ class Admin extends BaseController {
             $requestData = ["token" => $token]; // Datos para enviar a la API
             $delete_proyect = json_decode(send_post($this->urlAPI . "delete/proyect/" . $id, $requestData));
 
+            // Validar si ocurrió un error en la API
             if (isset($delete_proyect->error)) {
-                $this->data['error'] = $delete_proyect->error;
-            } else {
-                // El proyecto se eliminó exitosamente
-                $this->data['success'] = "Proyecto eliminado exitosamente";
+                // Pasar el error usando flashdata
+                return redirect()->to('admin/proyect')->with('error', $delete_proyect->error);
             }
+
+            // Si no hay error, pasar mensaje de éxito usando flashdata
+            return redirect()->to('admin/proyect')->with('success', "Proyecto eliminado exitosamente");
         }
-        $this->get_proyect();
-        // header("Location: /admin/proyects");
-        // exit();
+
+        // Si no se proporciona un ID válido
+        return redirect()->to('admin/proyect')->with('error', "No se proporcionó un ID válido para eliminar.");
     }
 
     // FIN FUNCIONES PROYECTOS
@@ -370,6 +375,12 @@ class Admin extends BaseController {
         $this->valtoken();
         $view = true;
 
+        // Roles permitidos para ver esta funcionalidad
+        if (!in_array('lenguaje', $this->user->crear)) {
+            return redirect()->back()->with('error', 'No tienes los permisos necesarios.');
+            exit;
+        }
+
         if ($this->request->getGetPost()) {
             $token = $this->request->getCookie("token");
             $requestData = array_merge($this->request->getGetPost(), ["token" => $token]); // en una variable tengo que guardar el merge 
@@ -386,8 +397,9 @@ class Admin extends BaseController {
             if (isset($create_lenguaje->error)) {
                 $this->data['error'] = $create_lenguaje->error;
             } else {
-                $this->data['success'] = "Lenguaje creado exitosamente";
-                $this->get_lenguaje();
+                return redirect()->to(base_url('/admin/lenguaje'))->with('success', 'Lenguaje creado exitosamente');
+                // $this->data['success'] = "Lenguaje creado exitosamente";
+                // $this->get_lenguaje();
                 $view = false;
             }
             // debug($create_lenguaje, false);
@@ -404,9 +416,12 @@ class Admin extends BaseController {
 
     public function update_lenguaje($id) {
 
-        // debug('aqui', false);
-
         $this->valtoken();
+
+        if (!in_array('lenguaje', $this->user->editar)) {
+            return redirect()->back()->with('error', 'No tienes los permisos necesarios.');
+            exit;
+        }
 
         $view = true;
         $token = $this->request->getCookie("token");
@@ -426,16 +441,14 @@ class Admin extends BaseController {
             if (isset($update_lenguaje->error)) {
                 $this->data['error'] = $update_lenguaje->error;
             } else {
-                $this->data['success'] = "Lenguaje modificado exitosamente";
-                $this->get_lenguaje();
+                return redirect()->to(base_url('/admin/lenguaje'))->with('success', 'Lenguaje modificado exitosamente');
+                // $this->data['success'] = "Lenguaje modificado exitosamente";
+                // $this->get_lenguaje();
                 $view = false;
             }
         }
-        // debug('aqui FUERA DEL  if', false);
 
         if ($view) {
-            // debug('viewwww', false);
-            // debug($view,false );
             $this->data['lenguajes'] = [];
             $lenguaje = json_decode(send_post($this->urlAPI . "lenguaje/" . $id, ["token" => $token]));
             // debug('lenguaje', false);
@@ -469,13 +482,12 @@ class Admin extends BaseController {
             }
         }
         $this->get_lenguaje();
-        // header("Location: /admin/proyects");
-        // exit();
     }
 
     // FIN FUNCIONES LENGUAJES
 
     // FUNCIONES REDES
+
     public function get_redes() {
         $this->valtoken();
         $token = $this->request->getCookie("token");
@@ -499,6 +511,12 @@ class Admin extends BaseController {
         $this->valtoken();
         $view = true;
 
+        // Roles permitidos para ver esta funcionalidad
+        if (!in_array('redes', $this->user->crear)) {
+            return redirect()->back()->with('error', 'No tienes los permisos necesarios.');
+            exit;
+        }
+
         if ($this->request->getGetPost()) {
             $token = $this->request->getCookie("token");
             $requestData = array_merge($this->request->getGetPost(), ["token" => $token]); // en una variable tengo que guardar el merge 
@@ -513,8 +531,9 @@ class Admin extends BaseController {
             if (isset($create_redes->error)) {
                 $this->data['error'] = $create_redes->error;
             } else {
-                $this->data['success'] = "Social media creada exitosamente";
-                $this->get_redes();
+                return redirect()->to(base_url('/admin/redes'))->with('success', 'Social media creada exitosamente');
+                // $this->data['success'] = "Social media creada exitosamente";
+                // $this->get_redes();
                 $view = false;
             }
             // debug($create_lenguaje, false);
@@ -532,6 +551,12 @@ class Admin extends BaseController {
     public function update_redes($id) {
 
         $this->valtoken();
+
+        if (!in_array('redes', $this->user->editar)) {
+            return redirect()->back()->with('error', 'No tienes los permisos necesarios.');
+            exit;
+        }
+
         $view = true;
         $token = $this->request->getCookie("token");
 
@@ -549,8 +574,9 @@ class Admin extends BaseController {
             if (isset($update_redes->error)) {
                 $this->data['error'] = $update_redes->error;
             } else {
-                $this->data['success'] = "Social media modificada exitosamente";
-                $this->get_redes();
+                return redirect()->to(base_url('/admin/redes'))->with('success', 'Social media modificada exitosamente');
+                // $this->data['success'] = "Social media modificada exitosamente";
+                // $this->get_redes();
                 $view = false;
             }
             // debug($update_redes, false);
@@ -589,8 +615,7 @@ class Admin extends BaseController {
             }
         }
         $this->get_redes();
-        // header("Location: /admin/proyects");
-        // exit();
+
     }
 
     // FIN FUNCIONES LENGUAJES
@@ -639,8 +664,9 @@ class Admin extends BaseController {
             if (isset($create_categorias->error)) {
                 $this->data['error'] = $create_categorias->error;
             } else {
-                $this->data['success'] = "Categoria creada exitosamente";
-                $this->get_categorias();
+                return redirect()->to(base_url('/admin/categorias'))->with('success', "Categoria creada exitosamente");
+                // $this->data['success'] = "Categoria creada exitosamente";
+                // $this->get_categorias();
                 $view = false;
             }
             // debug($create_categorias, false);
@@ -682,8 +708,9 @@ class Admin extends BaseController {
             if (isset($update_categorias->error)) {
                 $this->data['error'] = $update_categorias->error;
             } else {
-                $this->data['success'] = "Categoria modificada exitosamente";
-                $this->get_categorias();
+                return redirect()->to('admin/categorias')->with('success', "Categoria modificada exitosamente");
+                // $this->data['success'] = "Categoria modificada exitosamente";
+                // $this->get_categorias();
                 $view = false;
             }
             // debug($update_redes, false);
@@ -721,9 +748,9 @@ class Admin extends BaseController {
                 $this->data['success'] = "Categoria eliminada exitosamente";
             }
         }
+
         $this->get_categorias();
-        // header("Location: /admin/proyects");
-        // exit();
+
     }
 
     // FIN FUNCIONES CATEGORIAS
@@ -752,6 +779,12 @@ class Admin extends BaseController {
         $this->valtoken();
         $view = true;
 
+        // Roles permitidos para ver esta funcionalidad
+        if (!in_array('servicios', $this->user->crear)) {
+            return redirect()->back()->with('error', 'No tienes los permisos necesarios.');
+            exit;
+        }
+
         if ($this->request->getGetPost()) {
             $token = $this->request->getCookie("token");
             $requestData = array_merge($this->request->getGetPost(), ["token" => $token]); // en una variable tengo que guardar el merge 
@@ -770,8 +803,6 @@ class Admin extends BaseController {
                 $this->get_servicios();
                 $view = false;
             }
-            // debug($create_servicios, false);
-
         }
 
         if ($view) {
@@ -785,6 +816,13 @@ class Admin extends BaseController {
     public function update_servicios($id) {
 
         $this->valtoken();
+
+        // Roles permitidos para ver esta funcionalidad
+        if (!in_array('servicios', $this->user->editar)) {
+            return redirect()->back()->with('error', 'No tienes los permisos necesarios.');
+            exit;
+        }
+
         $view = true;
         $token = $this->request->getCookie("token");
 
@@ -2156,10 +2194,10 @@ class Admin extends BaseController {
         $this->valtoken();
         $token = $this->request->getCookie("token");
 
-        if (!in_array('usuarios', $this->user->ver)) {
-            return redirect()->to(base_url('/admin'))->with('error', 'Pagina no encontrada');
-            exit;
-        }
+        // if (!in_array('usuarios', $this->user->ver)) {
+        //     return redirect()->to(base_url('/admin'))->with('error', 'Pagina no encontrada');
+        //     exit;
+        // }
 
         $this->data['usuarios'] = [];
         $usuarios = json_decode(send_post($this->urlAPI . "usuarios", ["token" => $token]));
@@ -2199,8 +2237,9 @@ class Admin extends BaseController {
             if (isset($create_usuarios->error)) {
                 $this->data['error'] = $create_usuarios->error;
             } else {
-                $this->data['success'] = "Informacion de usuarios creada exitosamente";
-                $this->get_usuarios();
+                return redirect()->to(base_url('/admin/usuarios'))->with('success', "Informacion de usuarios creada exitosamente");
+                // $this->data['success'] = "Informacion de usuarios creada exitosamente";
+                // $this->get_usuarios();
                 $view = false;
             }
         }
@@ -2253,8 +2292,9 @@ class Admin extends BaseController {
             if (isset($update_usuarios->error)) {
                 $this->data['error'] = $update_usuarios->error;
             } else {
-                $this->data['success'] = "Informacion de usuarios modificada exitosamente";
-                $this->get_usuarios();
+                return redirect()->to(base_url('/admin/usuarios'))->with('success', "Informacion de usuarios modificada exitosamente");
+                // $this->data['success'] = "Informacion de usuarios modificada exitosamente";
+                // $this->get_usuarios();
                 $view = false;
             }
         }
@@ -2304,6 +2344,7 @@ class Admin extends BaseController {
                 $this->data['success'] = "Informacion de usuarios eliminada exitosamente";
             }
         }
+
         $this->get_usuarios();
     }
 
@@ -2315,10 +2356,10 @@ class Admin extends BaseController {
         $this->valtoken();
         $token = $this->request->getCookie("token");
 
-        if (!in_array('roles', $this->user->ver)) {
-            return redirect()->to(base_url('/admin'))->with('error', 'Pagina no encontrada');
-            exit;
-        }
+        // if (!in_array('roles', $this->user->ver)) {
+        //     return redirect()->to(base_url('/admin'))->with('error', 'Pagina no encontrada');
+        //     exit;
+        // }
 
         $this->data['roles'] = [];
         $roles = json_decode(send_post($this->urlAPI . "roles", ["token" => $token]));
@@ -2366,14 +2407,15 @@ class Admin extends BaseController {
             if (isset($create_roles->error)) {
                 $this->data['error'] = $create_roles->error;
             } else {
-                $this->data['success'] = "Informacion de roles creada exitosamente";
-                $this->get_roles();
+                return redirect()->to('admin/roles')->with('success', "Informacion de roles creada exitosamente");
+                // $this->data['success'] = "Informacion de roles creada exitosamente";
+                // $this->get_roles();
                 $view = false;
             }
         }
 
         if ($view) {
-            if ($this->user->id != 1) {  
+            if ($this->user->id != 1) {
                 $this->data['secciones'] = [
                     [
                         'alias' => 'proyect',
@@ -2400,10 +2442,6 @@ class Admin extends BaseController {
                         'titulo' => 'Currículum'
                     ],
                     [
-                        'alias' => 'perfil',
-                        'titulo' => 'Perfil'
-                    ],
-                    [
                         'alias' => 'hobies',
                         'titulo' => 'Hobbies'
                     ],
@@ -2414,10 +2452,6 @@ class Admin extends BaseController {
                     [
                         'alias' => 'secciones',
                         'titulo' => 'Secciones'
-                    ],
-                    [
-                        'alias' => 'navbar',
-                        'titulo' => 'Navbar'
                     ],
                     [
                         'alias' => 'txtbanner',
@@ -2447,6 +2481,10 @@ class Admin extends BaseController {
                         'alias' => 'blogComm2',
                         'titulo' => 'Comentarios del Blog (Versión 2)'
                     ],
+                    [
+                        'alias' => 'extrapage',
+                        'titulo' => 'Extras Pages'
+                    ],
                 ];
             } else {
                 $this->data['secciones'] = [
@@ -2475,10 +2513,6 @@ class Admin extends BaseController {
                         'titulo' => 'Currículum'
                     ],
                     [
-                        'alias' => 'perfil',
-                        'titulo' => 'Perfil'
-                    ],
-                    [
                         'alias' => 'hobies',
                         'titulo' => 'Hobbies'
                     ],
@@ -2489,10 +2523,6 @@ class Admin extends BaseController {
                     [
                         'alias' => 'secciones',
                         'titulo' => 'Secciones'
-                    ],
-                    [
-                        'alias' => 'navbar',
-                        'titulo' => 'Navbar'
                     ],
                     [
                         'alias' => 'txtbanner',
@@ -2529,6 +2559,10 @@ class Admin extends BaseController {
                     [
                         'alias' => 'roles',
                         'titulo' => 'Roles'
+                    ],
+                    [
+                        'alias' => 'extrapage',
+                        'titulo' => 'Extras Pages'
                     ],
                 ];
             }
@@ -2581,8 +2615,9 @@ class Admin extends BaseController {
             if (isset($update_roles->error)) {
                 $this->data['error'] = $update_roles->error;
             } else {
-                $this->data['success'] = "Información de roles modificada exitosamente";
-                $this->get_roles();
+                // $this->data['success'] = "Información de roles modificada exitosamente";
+                return redirect()->to('admin/roles')->with('success', "Información de roles modificada exitosamente");
+                // $this->get_roles();
                 $view = false;
             }
         }
@@ -2609,7 +2644,7 @@ class Admin extends BaseController {
             }
 
             // Opciones disponibles para el select
-            if ($this->user->id != 1) {  
+            if ($this->user->id != 1) {
                 $this->data['secciones'] = [
                     [
                         'alias' => 'proyect',
@@ -2636,10 +2671,6 @@ class Admin extends BaseController {
                         'titulo' => 'Currículum'
                     ],
                     [
-                        'alias' => 'perfil',
-                        'titulo' => 'Perfil'
-                    ],
-                    [
                         'alias' => 'hobies',
                         'titulo' => 'Hobbies'
                     ],
@@ -2650,10 +2681,6 @@ class Admin extends BaseController {
                     [
                         'alias' => 'secciones',
                         'titulo' => 'Secciones'
-                    ],
-                    [
-                        'alias' => 'navbar',
-                        'titulo' => 'Navbar'
                     ],
                     [
                         'alias' => 'txtbanner',
@@ -2683,6 +2710,10 @@ class Admin extends BaseController {
                         'alias' => 'blogComm2',
                         'titulo' => 'Comentarios del Blog (Versión 2)'
                     ],
+                    [
+                        'alias' => 'extrapage',
+                        'titulo' => 'Extras Pages'
+                    ],
                 ];
             } else {
                 $this->data['secciones'] = [
@@ -2711,10 +2742,6 @@ class Admin extends BaseController {
                         'titulo' => 'Currículum'
                     ],
                     [
-                        'alias' => 'perfil',
-                        'titulo' => 'Perfil'
-                    ],
-                    [
                         'alias' => 'hobies',
                         'titulo' => 'Hobbies'
                     ],
@@ -2725,10 +2752,6 @@ class Admin extends BaseController {
                     [
                         'alias' => 'secciones',
                         'titulo' => 'Secciones'
-                    ],
-                    [
-                        'alias' => 'navbar',
-                        'titulo' => 'Navbar'
                     ],
                     [
                         'alias' => 'txtbanner',
@@ -2765,6 +2788,10 @@ class Admin extends BaseController {
                     [
                         'alias' => 'roles',
                         'titulo' => 'Roles'
+                    ],
+                    [
+                        'alias' => 'extrapage',
+                        'titulo' => 'Extras Pages'
                     ],
                 ];
             }
@@ -2803,12 +2830,14 @@ class Admin extends BaseController {
                 $this->data['success'] = "Informacion de roles eliminada exitosamente";
             }
         }
+
         $this->get_roles();
     }
 
     // FIN CRUD ROLES
     private function valtoken() {
         $this->token = $this->request->getCookie("token");
+        // debug($this->token);
         if (!$this->token) {
             header("Location: /admin/login");
             exit();

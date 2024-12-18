@@ -203,7 +203,7 @@ class Api extends BaseController {
         // Calcular la diferencia en segundos
         $difference = $currentTimestamp - $tokenTimestamp;
 
-        $maxTime = getenv('SESION_TIME') * 60; 
+        $maxTime = getenv('SESION_TIME') * 60;
 
         if ($difference > $maxTime) {
             custom_error(502, $this->lang); // esta comentado por el momento para que no expire el tiempo
@@ -236,11 +236,11 @@ class Api extends BaseController {
         $this->valToken();
 
         // json_debug($this->user);
-
         if (!in_array('proyect', $this->user->crear)) {
             // Sin permisos
             custom_error(403, "es", "crear proyectos");
         }
+
 
         $require = [
             "nombre" => "text",
@@ -392,10 +392,17 @@ class Api extends BaseController {
             // Sin permisos
             custom_error(403, "es", "eliminar proyectos");
         }
-
+        
+        // Verificar si el proyecto existe
         $query = "SELECT * FROM proyect WHERE id = '$id'";
-        $query = $this->db->query($query);
-        $datos = $query->getResult();
+        
+        // Si el usuario no tiene permiso para ver, solo puede eliminar sus propios proyectos
+        if (!in_array('proyect', $this->user->ver)) {
+            $query .= " AND user_id = " . $this->user->id;
+        }
+        
+        $result = $this->db->query($query);
+        $datos = $result->getResult();
 
         if (!$datos) {
             custom_error(504, $this->lang, "proyect");
@@ -418,6 +425,11 @@ class Api extends BaseController {
     public function create_lenguaje() {
         $this->valToken();
 
+        if (!in_array('lenguaje', $this->user->crear)) {
+            // Sin permisos
+            custom_error(403, "es", "crear lenguajes");
+        }
+
         $require = [
             "nombre" => "text",
             // "descripcion" => "text",
@@ -434,8 +446,6 @@ class Api extends BaseController {
                 $valRequire[] = $name;
             }
         }
-
-
 
         if ($valRequire) {
             // validar error que te faltan datos
@@ -457,8 +467,7 @@ class Api extends BaseController {
 
     public function get_lenguaje($id = null) {
         $this->variables();
-
-        // $this->valToken(); // las unicas que no se pide el token son las consultas publicas,  login y registro
+        $this->valToken();
 
         $query = "SELECT * FROM lenguajes ";
         if ($id) { // esto se utilza para consultar 1 especifico
@@ -468,6 +477,12 @@ class Api extends BaseController {
             $query .= ($id) ? " AND" : " WHERE";
             $query .= " activo = 1";
         }
+
+        if (!in_array('lenguaje', $this->user->ver)) {
+            $query .= ($id || $this->activo) ? " AND" : " WHERE";
+            $query .= " user_id = " . $this->user->id;
+        }
+
         $query = $this->db->query($query);
         $datos = $query->getResult();
 
@@ -491,6 +506,12 @@ class Api extends BaseController {
 
     public function update_lenguaje($id) {
         $this->valToken();
+
+
+        if (!in_array('lenguaje', $this->user->editar)) {
+            // Sin permisos
+            custom_error(403, "es", "actualizar lenguajes");
+        }
 
         $query = "SELECT * FROM lenguajes WHERE id = '$id'";
         $query = $this->db->query($query);
@@ -532,11 +553,21 @@ class Api extends BaseController {
 
     public function delete_lenguaje($id) {
 
-        $this->valToken(); // las unicas que no se pide el token son las consultas publicas,  login y registro
+        $this->valToken(); 
+
+        if (!in_array('lenguaje', $this->user->borrar)) {
+            // Sin permisos
+            custom_error(403, "es", "eliminar lenguajes");
+        }
 
         $query = "SELECT * FROM lenguajes WHERE id = '$id'";
-        $query = $this->db->query($query);
-        $datos = $query->getResult();
+        // Si el usuario no tiene permiso para ver, solo puede eliminar sus propios proyectos
+        if (!in_array('lenguaje', $this->user->ver)) {
+            $query .= " AND user_id = " . $this->user->id;
+        }
+        
+        $result = $this->db->query($query);
+        $datos = $result->getResult();
 
         if (!$datos) {
             custom_error(504, $this->lang, "lenguajes");
@@ -553,12 +584,18 @@ class Api extends BaseController {
 
         json_debug($datos);
     }
+
     // FIN CRUD LENGUAJES
 
     // CRUD REDES
 
     public function create_redes() {
         $this->valToken();
+
+        if (!in_array('redes', $this->user->crear)) {
+            // Sin permisos
+            custom_error(403, "es", "crear redes");
+        }
 
         $require = [
             "nombre" => "text",
@@ -589,7 +626,7 @@ class Api extends BaseController {
             custom_error(101, "es", $valRequire);
         }
 
-        // $data["user_id"] = $this->user->id;
+        $data["user_id"] = $this->user->id;
         $data["activo"] = ($this->request->getGetPost("activo")) ? 1 : 0;
 
         $nombre = $data['nombre'];
@@ -615,7 +652,7 @@ class Api extends BaseController {
 
     public function get_redes($id = null) {
         $this->variables();
-        // $this->valToken(); // las unicas que no se pide el token son las consultas publicas,  login y registro
+        $this->valToken();
 
         $query = "SELECT * FROM redes ";
         if ($id) { // esto se utilza para consultar 1 especifico
@@ -625,6 +662,12 @@ class Api extends BaseController {
             $query .= ($id) ? " AND" : " WHERE";
             $query .= " activo = 1";
         }
+
+        if (!in_array('redes', $this->user->ver)) {
+            $query .= ($id || $this->activo) ? " AND" : " WHERE";
+            $query .= " user_id = " . $this->user->id;
+        }
+
         $query = $this->db->query($query);
         $datos = $query->getResult();
 
@@ -648,6 +691,11 @@ class Api extends BaseController {
 
     public function update_redes($id) {
         $this->valToken();
+
+        if (!in_array('redes', $this->user->editar)) {
+            // Sin permisos
+            custom_error(403, "es", "actualizar redes");
+        }
 
         $query = "SELECT * FROM redes WHERE id = '$id'";
         $query = $this->db->query($query);
@@ -705,10 +753,20 @@ class Api extends BaseController {
     public function delete_redes($id) {
 
         $this->valToken(); // las unicas que no se pide el token son las consultas publicas,  login y registro
+        
+        if (!in_array('redes', $this->user->borrar)) {
+            // Sin permisos
+            custom_error(403, "es", "eliminar redes");
+        }
 
         $query = "SELECT * FROM redes WHERE id = '$id'";
-        $query = $this->db->query($query);
-        $datos = $query->getResult();
+        // Si el usuario no tiene permiso para ver, solo puede eliminar sus propios proyectos
+        if (!in_array('redes', $this->user->ver)) {
+            $query .= " AND user_id = " . $this->user->id;
+        }
+        
+        $result = $this->db->query($query);
+        $datos = $result->getResult();
 
         if (!$datos) {
             custom_error(504, $this->lang, "redes");
@@ -877,8 +935,13 @@ class Api extends BaseController {
 
 
         $query = "SELECT * FROM categorias WHERE id = '$id'";
-        $query = $this->db->query($query);
-        $datos = $query->getResult();
+        // Si el usuario no tiene permiso para ver, solo puede eliminar sus propios proyectos
+        if (!in_array('categorias', $this->user->ver)) {
+            $query .= " AND user_id = " . $this->user->id;
+        }
+        
+        $result = $this->db->query($query);
+        $datos = $result->getResult();
 
         if (!$datos) {
             custom_error(504, $this->lang, "categorias");
@@ -900,6 +963,11 @@ class Api extends BaseController {
     // CRUD SERVICIOS
     public function create_servicios() {
         $this->valToken();
+
+        if (!in_array('servicios', $this->user->crear)) {
+            // Sin permisos
+            custom_error(403, "es", "crear servicios");
+        }
 
         $require = [
             "titulo" => "text",
@@ -925,7 +993,7 @@ class Api extends BaseController {
             custom_error(101, "es", $valRequire);
         }
 
-        // $data["user_id"] = $this->user->id;
+        $data["user_id"] = $this->user->id;
         $data["activo"] = ($this->request->getGetPost("activo")) ? 1 : 0;
 
         $titulo = $data['titulo'];
@@ -948,7 +1016,7 @@ class Api extends BaseController {
 
     public function get_servicios($id = null) {
         $this->variables();
-        // $this->valToken(); // las unicas que no se pide el token son las consultas publicas,  login y registro
+        $this->valToken();
 
         $query = "SELECT * FROM servicios ";
         if ($id) { // esto se utilza para consultar 1 especifico
@@ -958,6 +1026,12 @@ class Api extends BaseController {
             $query .= ($id) ? " AND" : " WHERE";
             $query .= " activo = 1";
         }
+
+        if (!in_array('servicios', $this->user->ver)) {
+            $query .= ($id || $this->activo) ? " AND" : " WHERE";
+            $query .= " user_id = " . $this->user->id;
+        }
+
         $query = $this->db->query($query);
         $datos = $query->getResult();
 
@@ -974,6 +1048,11 @@ class Api extends BaseController {
 
     public function update_servicios($id) {
         $this->valToken();
+        
+        if (!in_array('servicios', $this->user->editar)) {
+            // Sin permisos
+            custom_error(403, "es", "actualizar servicios");
+        }
 
         $query = "SELECT * FROM servicios WHERE id = '$id'";
         $query = $this->db->query($query);
@@ -999,7 +1078,7 @@ class Api extends BaseController {
             }
         }
 
-        // $data["user_id"] = $this->user->id;
+        $data["user_id"] = $this->user->id;
         $data["activo"] = ($this->request->getGetPost("activo")) ? 1 : 0;
 
         if ($this->request->getGetPost("titulo")) {
@@ -1017,7 +1096,6 @@ class Api extends BaseController {
             custom_error(506, $this->lang, "servicios");
         }
 
-
         json_debug(array_merge((array)$datos, $data));
     }
 
@@ -1025,9 +1103,20 @@ class Api extends BaseController {
 
         $this->valToken(); // las unicas que no se pide el token son las consultas publicas,  login y registro
 
+        if (!in_array('servicios', $this->user->borrar)) {
+            // Sin permisos
+            custom_error(403, "es", "eliminar servicios");
+        }
+
+
         $query = "SELECT * FROM servicios WHERE id = '$id'";
-        $query = $this->db->query($query);
-        $datos = $query->getResult();
+        // Si el usuario no tiene permiso para ver, solo puede eliminar sus propios proyectos
+        if (!in_array('servicios', $this->user->ver)) {
+            $query .= " AND user_id = " . $this->user->id;
+        }
+        
+        $result = $this->db->query($query);
+        $datos = $result->getResult();
 
         if (!$datos) {
             custom_error(504, $this->lang, "servicios");
@@ -1183,8 +1272,13 @@ class Api extends BaseController {
         $this->valToken(); // las unicas que no se pide el token son las consultas publicas,  login y registro
 
         $query = "SELECT * FROM resume WHERE id = '$id'";
-        $query = $this->db->query($query);
-        $datos = $query->getResult();
+        // Si el usuario no tiene permiso para ver, solo puede eliminar sus propios proyectos
+        if (!in_array('curriculum', $this->user->ver)) {
+            $query .= " AND user_id = " . $this->user->id;
+        }
+        
+        $result = $this->db->query($query);
+        $datos = $result->getResult();
 
         if (!$datos) {
             custom_error(504, $this->lang, "resume");
@@ -1504,8 +1598,13 @@ class Api extends BaseController {
         $this->valToken(); // las unicas que no se pide el token son las consultas publicas,  login y registro
 
         $query = "SELECT * FROM hobies WHERE id = '$id'";
-        $query = $this->db->query($query);
-        $datos = $query->getResult();
+        // Si el usuario no tiene permiso para ver, solo puede eliminar sus propios proyectos
+        if (!in_array('hobies', $this->user->ver)) {
+            $query .= " AND user_id = " . $this->user->id;
+        }
+        
+        $result = $this->db->query($query);
+        $datos = $result->getResult();
 
         if (!$datos) {
             custom_error(504, $this->lang, "hobies");
@@ -1662,8 +1761,13 @@ class Api extends BaseController {
         $this->valToken(); // las unicas que no se pide el token son las consultas publicas,  login y registro
 
         $query = "SELECT * FROM contacto WHERE id = '$id'";
-        $query = $this->db->query($query);
-        $datos = $query->getResult();
+        // Si el usuario no tiene permiso para ver, solo puede eliminar sus propios proyectos
+        if (!in_array('contacto', $this->user->ver)) {
+            $query .= " AND user_id = " . $this->user->id;
+        }
+        
+        $result = $this->db->query($query);
+        $datos = $result->getResult();
 
         if (!$datos) {
             custom_error(504, $this->lang, "contacto");
@@ -1832,8 +1936,13 @@ class Api extends BaseController {
         $this->valToken(); // las unicas que no se pide el token son las consultas publicas,  login y registro
 
         $query = "SELECT * FROM secciones WHERE id = '$id'";
-        $query = $this->db->query($query);
-        $datos = $query->getResult();
+        // Si el usuario no tiene permiso para ver, solo puede eliminar sus propios proyectos
+        if (!in_array('secciones', $this->user->ver)) {
+            $query .= " AND user_id = " . $this->user->id;
+        }
+        
+        $result = $this->db->query($query);
+        $datos = $result->getResult();
 
         if (!$datos) {
             custom_error(504, $this->lang, "secciones");
@@ -1985,8 +2094,13 @@ class Api extends BaseController {
         $this->valToken(); // las unicas que no se pide el token son las consultas publicas,  login y registro
 
         $query = "SELECT * FROM txtbanner WHERE id = '$id'";
-        $query = $this->db->query($query);
-        $datos = $query->getResult();
+        // Si el usuario no tiene permiso para ver, solo puede eliminar sus propios proyectos
+        if (!in_array('txtbanner', $this->user->ver)) {
+            $query .= " AND user_id = " . $this->user->id;
+        }
+        
+        $result = $this->db->query($query);
+        $datos = $result->getResult();
 
         if (!$datos) {
             custom_error(504, $this->lang, "txtbanner");
@@ -2137,8 +2251,13 @@ class Api extends BaseController {
         $this->valToken(); // las unicas que no se pide el token son las consultas publicas,  login y registro
 
         $query = "SELECT * FROM clientes WHERE id = '$id'";
-        $query = $this->db->query($query);
-        $datos = $query->getResult();
+        // Si el usuario no tiene permiso para ver, solo puede eliminar sus propios proyectos
+        if (!in_array('clientes', $this->user->ver)) {
+            $query .= " AND user_id = " . $this->user->id;
+        }
+        
+        $result = $this->db->query($query);
+        $datos = $result->getResult();
 
         if (!$datos) {
             custom_error(504, $this->lang, "clientes");
@@ -2299,8 +2418,13 @@ class Api extends BaseController {
         $this->valToken(); // las unicas que no se pide el token son las consultas publicas,  login y registro
 
         $query = "SELECT * FROM testimonios WHERE id = '$id'";
-        $query = $this->db->query($query);
-        $datos = $query->getResult();
+        // Si el usuario no tiene permiso para ver, solo puede eliminar sus propios proyectos
+        if (!in_array('testimonios', $this->user->ver)) {
+            $query .= " AND user_id = " . $this->user->id;
+        }
+        
+        $result = $this->db->query($query);
+        $datos = $result->getResult();
 
         if (!$datos) {
             custom_error(504, $this->lang, "testimonios");
@@ -2493,8 +2617,13 @@ class Api extends BaseController {
         $this->valToken(); // las unicas que no se pide el token son las consultas publicas,  login y registro
 
         $query = "SELECT * FROM blog WHERE id = '$id'";
-        $query = $this->db->query($query);
-        $datos = $query->getResult();
+        // Si el usuario no tiene permiso para ver, solo puede eliminar sus propios proyectos
+        if (!in_array('blog', $this->user->ver)) {
+            $query .= " AND user_id = " . $this->user->id;
+        }
+        
+        $result = $this->db->query($query);
+        $datos = $result->getResult();
 
         if (!$datos) {
             custom_error(504, $this->lang, "blog");
@@ -2619,8 +2748,13 @@ class Api extends BaseController {
         $this->valToken(); // las unicas que no se pide el token son las consultas publicas,  login y registro
 
         $query = "SELECT * FROM `blogCat` WHERE id = '$id'";
-        $query = $this->db->query($query);
-        $datos = $query->getResult();
+        // Si el usuario no tiene permiso para ver, solo puede eliminar sus propios proyectos
+        if (!in_array('blogCat', $this->user->ver)) {
+            $query .= " AND user_id = " . $this->user->id;
+        }
+        
+        $result = $this->db->query($query);
+        $datos = $result->getResult();
 
         if (!$datos) {
             custom_error(504, $this->lang, "blogCat");
@@ -2748,8 +2882,13 @@ class Api extends BaseController {
         $this->valToken(); // las unicas que no se pide el token son las consultas publicas,  login y registro
 
         $query = "SELECT * FROM blogComm WHERE id = '$id'";
-        $query = $this->db->query($query);
-        $datos = $query->getResult();
+        // Si el usuario no tiene permiso para ver, solo puede eliminar sus propios proyectos
+        if (!in_array('blogComm', $this->user->ver)) {
+            $query .= " AND user_id = " . $this->user->id;
+        }
+        
+        $result = $this->db->query($query);
+        $datos = $result->getResult();
 
         if (!$datos) {
             custom_error(504, $this->lang, "blogComm");
@@ -2931,12 +3070,12 @@ class Api extends BaseController {
         $this->valToken();
 
         // Validar permisos
-        if (isset($this->user->ver) && is_array($this->user->ver)) {
-            if (!in_array('usuarios', $this->user->ver)) {
-                custom_error(403, $this->lang, 'ver usuarios');
-                return; // Detener el flujo
-            } // hablar con alberto a la hora del get y otros problemas con los usuarios y la ruta
-        }
+        // if (isset($this->user->ver) && is_array($this->user->ver)) {
+        //     if (!in_array('usuarios', $this->user->ver)) {
+        //         custom_error(403, $this->lang, 'ver usuarios');
+        //         return; // Detener el flujo
+        //     } // hablar con alberto a la hora del get y otros problemas con los usuarios y la ruta
+        // }
 
         // Consulta principal
         $query = "SELECT usuarios.*, roles.nombre, roles.ver, roles.crear, roles.editar, roles.borrar 
@@ -3192,12 +3331,12 @@ class Api extends BaseController {
         $this->valToken();
 
         // Validar permisos
-        if (isset($this->user->ver) && is_array($this->user->ver)) {
-            if (!in_array('roles', $this->user->ver)) {
-                custom_error(403, $this->lang, 'ver roles');
-                return; // Detener el flujo
-            }
-        }
+        // if (isset($this->user->ver) && is_array($this->user->ver)) {
+        //     if (!in_array('roles', $this->user->ver)) {
+        //         custom_error(403, $this->lang, 'ver roles');
+        //         return; // Detener el flujo
+        //     }
+        // }
 
         $query = "SELECT * FROM `roles` WHERE roles.id <> 1"; // Asegurando que id 1 no se incluya
         if ($id) { // Si hay un ID específico
@@ -3298,8 +3437,13 @@ class Api extends BaseController {
         }
 
         $query = "SELECT * FROM roles WHERE id = '$id'";
-        $query = $this->db->query($query);
-        $datos = $query->getResult();
+        // Si el usuario no tiene permiso para ver, solo puede eliminar sus propios proyectos
+        if (!in_array('roles', $this->user->ver)) {
+            $query .= " AND user_id = " . $this->user->id;
+        }
+        
+        $result = $this->db->query($query);
+        $datos = $result->getResult();
 
         if (!$datos) {
             custom_error(504, $this->lang, "roles");

@@ -137,6 +137,13 @@
                </script>
            <?php endif; ?>
 
+           <?php if (session()->getFlashdata('success') !== null) : ?>
+               <script>
+                   let $success = '<?= session()->getFlashdata('success') ?>';
+                   showAlert("success", $success);
+               </script>
+           <?php endif; ?>
+
 
            </body>
 

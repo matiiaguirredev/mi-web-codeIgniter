@@ -24,7 +24,10 @@
                                             <th class="text-center">#</th>
                                             <th class="text-center">Nombre del lenguaje</th>
                                             <th class="text-center">Porcentaje del lenguaje %</th>
-                                            <th class="text-center">Opciones</th>
+                                            <?php if (in_array('lenguaje', $user->editar)): ?>
+                                                <th class="text-center">Opciones</th>
+                                            <?php endif; ?>
+
                                         </tr>
                                     </thead>
 
@@ -39,13 +42,15 @@
                                                 <td><?= $lenguaje->nombre; ?></td>
                                                 <td> <input class="form-range" name="<?= $lenguaje->porcentaje; ?>" type="range" id="form-range" disabled name="range" min="0" max="100" value="<?= $lenguaje->porcentaje; ?>">
                                                 </td>
-                                                <td class="text-center d-flex justify-content-center gap-1" colspan="">
-                                                    <a href="admin/update/lenguaje/<?= $lenguaje->id; ?>"><i class="fa-sharp fa-solid fa-pen-to-square "></i></a>
-                                                    <a href="" onclick="deletelenguaje(<?= $lenguaje->id; ?>)" data-bs-toggle="modal" data-bs-target="#exampleModal"><i class="fa-sharp fa-solid fa-trash"></i></a>
-                                                    <div class="form-check form-switch">
-                                                        <input class="form-check-input ch-lenguaje-<?= $lenguaje->id; ?>" onchange="changeactivolenguaje(<?= $lenguaje->id; ?>)" type="checkbox" role="switch" id="flexSwitchCheckChecked" <?= ($lenguaje->activo) ? 'checked' : ''; ?>>
-                                                    </div>
-                                                </td>
+                                                <?php if (in_array('lenguaje', $user->editar)): ?>
+                                                    <td class="text-center d-flex justify-content-center gap-1" colspan="">
+                                                        <a href="admin/update/lenguaje/<?= $lenguaje->id; ?>"><i class="fa-sharp fa-solid fa-pen-to-square "></i></a>
+                                                        <a href="" onclick="deletelenguaje(<?= $lenguaje->id; ?>)" data-bs-toggle="modal" data-bs-target="#exampleModal"><i class="fa-sharp fa-solid fa-trash"></i></a>
+                                                        <div class="form-check form-switch">
+                                                            <input class="form-check-input ch-lenguaje-<?= $lenguaje->id; ?>" onchange="changeactivolenguaje(<?= $lenguaje->id; ?>)" type="checkbox" role="switch" id="flexSwitchCheckChecked" <?= ($lenguaje->activo) ? 'checked' : ''; ?>>
+                                                        </div>
+                                                    </td>
+                                                <?php endif; ?>
                                             </tr>
                                         <?php
                                         }

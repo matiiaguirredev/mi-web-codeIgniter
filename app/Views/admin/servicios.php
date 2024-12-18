@@ -6,7 +6,7 @@
                 <p class="sub-header">
                     <!-- Add <code>.table-bordered</code> for borders on all sides of the table and cells. -->
                 </p>
-                
+
                 <div class="row">
                     <div class="col-12">
                         <div class="card">
@@ -25,7 +25,10 @@
                                             <th class="text-center">Nombre del servicio</th>
                                             <th class="text-center">Descripcion del servicio</th>
                                             <th class="text-center">Icon del servicio</th>
-                                            <th class="text-center">Opciones</th>
+                                            <?php if (in_array('servicios', $user->editar)): ?>
+                                                <th class="text-center">Opciones</th>
+                                            <?php endif; ?>
+
                                         </tr>
                                     </thead>
 
@@ -39,15 +42,17 @@
                                                 <th class="text-center" scope="row"><?= $key + 1; ?></th>
                                                 <td><?= $servicio->titulo; ?></td>
                                                 <!-- <td><?= $servicio->descripcion; ?></td> -->
-                                                <td class="text-center " ><a class="showdescrip"  data-description="<?= $servicio->descripcion; ?>">Ver descripcion</a></td>
+                                                <td class="text-center "><a class="showdescrip" data-description="<?= $servicio->descripcion; ?>">Ver descripcion</a></td>
                                                 <td><?= $servicio->iconHTML; ?></td>
-                                                <td class="text-center d-flex justify-content-center gap-1" colspan="">
-                                                    <a href="admin/update/servicios/<?= $servicio->id; ?>"><i class="fa-sharp fa-solid fa-pen-to-square "></i></a>
-                                                    <a href="" onclick="deleteservicios(<?= $servicio->id; ?>)" data-bs-toggle="modal" data-bs-target="#exampleModal"><i class="fa-sharp fa-solid fa-trash"></i></a>
-                                                    <div class="form-check form-switch">
-                                                        <input class="form-check-input ch-servicios-<?= $servicio->id; ?>" onchange="changeactivoservicios(<?= $servicio->id; ?>)" type="checkbox" role="switch" id="flexSwitchCheckChecked" <?= ($servicio->activo) ? 'checked' : ''; ?>>
-                                                    </div>
-                                                </td>
+                                                <?php if (in_array('servicios', $user->editar)): ?>
+                                                    <td class="text-center d-flex justify-content-center gap-1" colspan="">
+                                                        <a href="admin/update/servicios/<?= $servicio->id; ?>"><i class="fa-sharp fa-solid fa-pen-to-square "></i></a>
+                                                        <a href="" onclick="deleteservicios(<?= $servicio->id; ?>)" data-bs-toggle="modal" data-bs-target="#exampleModal"><i class="fa-sharp fa-solid fa-trash"></i></a>
+                                                        <div class="form-check form-switch">
+                                                            <input class="form-check-input ch-servicios-<?= $servicio->id; ?>" onchange="changeactivoservicios(<?= $servicio->id; ?>)" type="checkbox" role="switch" id="flexSwitchCheckChecked" <?= ($servicio->activo) ? 'checked' : ''; ?>>
+                                                        </div>
+                                                    </td>
+                                                <?php endif; ?>
                                                 <!-- NO FUNCIONA EL SWITCH EN PANTALLA MAS CHICA !!! -->
                                             </tr>
                                         <?php

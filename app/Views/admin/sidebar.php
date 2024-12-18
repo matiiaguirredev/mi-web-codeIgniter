@@ -140,7 +140,7 @@
                                             <span class="menu-text">Lista de categorias</span>
                                         </a>
                                     </li>
-                                    <?php if (in_array('proyect', $user->crear)): ?>
+                                    <?php if (in_array('categorias', $user->crear)): ?>
                                         <li class="menu-item">
                                             <a href="/admin/create/categorias" class="menu-link">
                                                 <span class="menu-text">Crear categorias</span>
@@ -224,7 +224,6 @@
                 </div>
             </li>
 
-
             <li class="menu-item">
                 <a href="#menuTestimonios" data-bs-toggle="collapse" class="menu-link waves-effect waves-light">
                     <span class="menu-icon"><i class="fa-solid fa-binary-circle-check"></i></span>
@@ -287,12 +286,13 @@
                                 <span class="menu-text">Lista de Lenguajes</span>
                             </a>
                         </li>
-                        <li class="menu-item">
-                            <a class='menu-link' href='/admin/create/lenguaje'>
-                                <span class="menu-text">Nuevo Lenguajes</span>
-                            </a>
-                        </li>
-
+                        <?php if (in_array('lenguaje', $user->crear)): ?>
+                            <li class="menu-item">
+                                <a class='menu-link' href='/admin/create/lenguaje'>
+                                    <span class="menu-text">Nuevo Lenguajes</span>
+                                </a>
+                            </li>
+                        <?php endif; ?>
                     </ul>
                 </div>
             </li>
@@ -311,12 +311,13 @@
                                 <span class="menu-text">Lista de Redes</span>
                             </a>
                         </li>
-                        <li class="menu-item">
-                            <a class='menu-link' href='/admin/create/redes'>
-                                <span class="menu-text">Nueva Red</span>
-                            </a>
-                        </li>
-
+                        <?php if (in_array('redes', $user->crear)): ?>
+                            <li class="menu-item">
+                                <a class='menu-link' href='/admin/create/redes'>
+                                    <span class="menu-text">Nueva Red</span>
+                                </a>
+                            </li>
+                        <?php endif; ?>
                     </ul>
                 </div>
             </li>
@@ -329,18 +330,18 @@
                 </a>
                 <div class="collapse" id="menuServicios">
                     <ul class="sub-menu">
-
                         <li class="menu-item">
                             <a class='menu-link' href='/admin/servicios'>
                                 <span class="menu-text">Lista de servicios</span>
                             </a>
                         </li>
-                        <li class="menu-item">
-                            <a class='menu-link' href='/admin/create/servicios'>
-                                <span class="menu-text">Nuevo servicio</span>
-                            </a>
-                        </li>
-
+                        <?php if (in_array('servicios', $user->crear)): ?>
+                            <li class="menu-item">
+                                <a class='menu-link' href='/admin/create/servicios'>
+                                    <span class="menu-text">Nuevo servicio</span>
+                                </a>
+                            </li>
+                        <?php endif; ?>
                     </ul>
                 </div>
             </li>
@@ -441,7 +442,7 @@
                 </div>
             </li>
 
-            <?php if (in_array('usuarios', array_merge($user->ver, $user->crear, $user->editar, $user->borrar))): ?>
+            <?php if (in_array('extrapage', array_merge($user->ver, $user->crear, $user->editar, $user->borrar))): ?>
                 <li class="menu-item">
                     <a href="#menuExpages" data-bs-toggle="collapse" class="menu-link waves-effect waves-light">
                         <span class="menu-icon"><i class="bx bx-file"></i></span>

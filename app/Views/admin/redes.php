@@ -6,7 +6,7 @@
                 <p class="sub-header">
                     <!-- Add <code>.table-bordered</code> for borders on all sides of the table and cells. -->
                 </p>
-                
+
                 <div class="row">
                     <div class="col-12">
                         <div class="card">
@@ -26,7 +26,10 @@
                                             <th class="text-center">HTML del icon directamente</th>
                                             <th class="text-center">Img del icon</th>
                                             <th class="text-center">URL</th>
-                                            <th class="text-center">Opciones</th>
+                                            <?php if (in_array('redes', $user->editar)): ?>
+                                                <th class="text-center">Opciones</th>
+                                            <?php endif; ?>
+
                                         </tr>
                                     </thead>
 
@@ -42,16 +45,16 @@
                                                 <td><?= $red->iconHTML; ?></td>
                                                 <td class="text-center"><a href="<?= ($red->icon) ? $red->icon : '#'; ?>" target="_blank">Ver</a></td>
                                                 <td><a href="<?= $red->url; ?>" target="_blank"><?= $red->nombre; ?></a></td>
-                                                <td class="text-center d-flex justify-content-center gap-1" colspan="">
-                                                    <a href="admin/update/redes/<?= $red->id; ?>"><i class="fa-sharp fa-solid fa-pen-to-square "></i></a>
-                                                    <a href="" onclick="deleteredes(<?= $red->id; ?>)" data-bs-toggle="modal" data-bs-target="#exampleModal"><i class="fa-sharp fa-solid fa-trash"></i></a>
-                                                    <!-- <input class="ch-redes-<?= $red->id; ?>" onchange="changeactivo(<?= $red->id; ?>)" type="checkbox" data-switchery="" <?= ($red->activo) ? 'checked' : ''; ?> data-plugin="switchery" data-color="#64b0f2" data-size="small" /> -->
-                                                    <div class="form-check form-switch">
-                                                        <input class="form-check-input ch-redes-<?= $red->id; ?>" onchange="changeactivoredes(<?= $red->id; ?>)" type="checkbox" role="switch" id="flexSwitchCheckChecked" <?= ($red->activo) ? 'checked' : ''; ?>>
-                                                    </div>
-
-                                                </td>
-                                                
+                                                <?php if (in_array('redes', $user->editar)): ?>
+                                                    <td class="text-center d-flex justify-content-center gap-1" colspan="">
+                                                        <a href="admin/update/redes/<?= $red->id; ?>"><i class="fa-sharp fa-solid fa-pen-to-square "></i></a>
+                                                        <a href="" onclick="deleteredes(<?= $red->id; ?>)" data-bs-toggle="modal" data-bs-target="#exampleModal"><i class="fa-sharp fa-solid fa-trash"></i></a>
+                                                        <!-- <input class="ch-redes-<?= $red->id; ?>" onchange="changeactivo(<?= $red->id; ?>)" type="checkbox" data-switchery="" <?= ($red->activo) ? 'checked' : ''; ?> data-plugin="switchery" data-color="#64b0f2" data-size="small" /> -->
+                                                        <div class="form-check form-switch">
+                                                            <input class="form-check-input ch-redes-<?= $red->id; ?>" onchange="changeactivoredes(<?= $red->id; ?>)" type="checkbox" role="switch" id="flexSwitchCheckChecked" <?= ($red->activo) ? 'checked' : ''; ?>>
+                                                        </div>
+                                                    </td>
+                                                <?php endif; ?>
                                             </tr>
                                         <?php
                                         }
